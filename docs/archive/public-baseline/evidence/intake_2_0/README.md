@@ -89,4 +89,4 @@ Core correction comparison is explicit location-phone listed/requested evidence;
 
 ## Subsequent focused follow-up
 
-The [2026-10-26 employer-readiness evidence](../employer_readiness/README.md) separately qualifies guided synthetic samples and durable XLSX handoff. Historical test counts, screenshots, live observations and measured limits above remain dated baseline evidence.
+The [2026-10-26 operator-readiness evidence](../employer_readiness/README.md) separately qualifies guided synthetic samples and durable XLSX handoff. Historical test counts, screenshots, live observations and measured limits above remain dated baseline evidence.

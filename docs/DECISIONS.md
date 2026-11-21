@@ -194,3 +194,31 @@ Use `importlib.resources` for twelve immutable defaults required by installed co
 ## Strict FHIR bytes and isolated distribution builds (R4)
 
 Share strict decoding and bounded traversal between saved Bundles, search pages and standalone references. Reject ambiguous original keys before identity checks and revisit digest-verified raw bytes at publication; do not rely on a normalized assembly to prove its originals were unambiguous. Keep native resource/profile checks separate from decoding, preserve parser-v2 output semantics and old completed receipts, and retain exact failed responses. Build Python artifacts in an owned source copy with recorded input hashes so checkout build caches cannot silently supply stale files.
+
+## Proposed ADR: scoped research, adaptive interpretation and exchange evidence
+
+Proposed 2026-11-19; not an implemented decision. Reuse the current SQLite ledger, immutable artifacts, reviewed links and shared approval services for the [research/exchange extension](PROVIDER_RESEARCH_EXCHANGE.md). Adaptive interpretation produces versioned declarative mappings for known profiles. Case research has its own finite execution context and proposed findings, with all delegated work consuming one durable parent budget. External recipient acknowledgments remain separate from internal follow-up acknowledgments and observed directory state. Preserve source-native enrollment relationships instead of creating a second provider master or adopting a graph database.
+
+This keeps integration and rollback bounded and makes source/decision lineage inspectable. The trade-off is explicit adapter work for genuinely new source semantics and a narrow connector set. Revisit storage or concurrency architecture only for measured workload or an actual hosted/team requirement. Acceptance and source access precede connector implementation.
+
+## Selected operator-workflow cleanup
+
+Selected 2026-11-19. Apply [the operator contract](OPERATOR_EXPERIENCE.md) before extending the interface: a task-based shell, work-queue entry, delivery decisions ahead of configuration, and readable evidence before raw payloads. Preserve existing routes, action/version guards and service boundaries. Do not expose empty research/exchange/report pages. Keep operational measures in [a separate contract](OPERATIONAL_MEASURES.md) so report populations, clocks and outcomes cannot be inferred from decorative counters. This permits focused component extraction without a service rewrite or generic UI framework.
+
+## 2026-11-21 — Ingestion-first direction and scheduled spec revisions
+
+Selected product direction: adaptable provider-data ingestion, explicit cleaning semantics, reusable reviewed profiles and preserved decisions. Contact review is the first practical application; licensing, expanded identity and provider/network operations follow. This supersedes the immediate PX1-first sequence without discarding its contracts or fixtures. The new ROADMAP maps legacy work and schedules explicit S1–S5 revision gates. S1.0 is a draft; P0 produces the source/workflow/UI/interface review packet. No implementation approval is asserted by this documentation revision.
+
+## 2026-11-21 — Modular application before project extraction
+
+Keep one application/database/artifact store with ingestion/adaptation, provider-domain and application/review boundaries. Shared services enforce HTTP/CLI/MCP decisions. Extract ingestion as a library only for a second real consumer; a future public explorer can consume an approved export or read-only API. Independent service/repository deployment requires a concrete need and compatibility/failure design. This preserves atomic approval and keeps learning focused on explicit contracts rather than additional infrastructure.
+
+## 2026-11-21 — Reviewed adaptation and inspectable output
+
+Learning initially means retrieval/reuse of approved mappings, profile versions and reviewed corrections, not fine-tuning or automatic truth updates. Runtime model/agent proposals are bounded declarative data; new parser code requires ordinary development review and tests before registration. Reuse the existing onboarding, recipe and assistance services. Define proposal provenance, example eligibility, drift and stale-input behavior in S1.2 before implementation.
+
+The proposed first output is a pinned review workbook with Directory, Unresolved issues, and Sources and export details, retaining machine-readable evidence. A later recipient profile follows a named recipient's exact contract. P0 must resolve field-decision-to-dataset propagation and exact workbook semantics. React/TanStack remains the frontend baseline; shadcn/ui is a P0 candidate requiring compatibility/design review, not a completed dependency decision.
+
+## 2026-11-21 — Authorized integrated implementation and private-history preservation
+
+The owner authorized implementation, bounded GPT-6.1 Sol delegation, Git commits and public results, superseding P0's earlier planning-only stop. Current scope is implemented in connected slices under S1.1 with existing approval boundaries. Keep product documentation technical and exclude private preparation. Existing Git history includes personal author metadata; preserve that repository privately and publish a sanitized clean-history release with noreply metadata. Public release status does not imply completion of later roadmap or actual-model/human gates.

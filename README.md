@@ -6,6 +6,12 @@ An analyst receives a clinic workbook and a later CSV that changes one office wh
 
 **Python · FastAPI · React · TypeScript · SQLite**
 
+## Current development direction
+
+The next planned release emphasizes adaptable ingestion: declared source profiles, reusable reviewed mappings, schema-change detection, and a complete Tennessee-focused contact-review workflow. Licensing, expanded identity investigation and provider/network operations follow through explicit spec revisions. These are planned outcomes; the implementation table below remains the current baseline.
+
+**Contributors start with [NEXT](NEXT.md)** for P0 planning, then [S1 draft](docs/ADAPTIVE_INGESTION_SPEC.md), [ROADMAP](ROADMAP.md) and [STATUS](STATUS.md). The ingestion-first plan supersedes the earlier immediate recipient-response priority. The application remains one modular system; separate packages/apps are future evidence-driven extraction decisions.
+
 ## What works
 
 | Area | Implemented behavior |
@@ -24,8 +30,8 @@ The FHIR consumer targets a documented **R4 4.0.1 / Plan-Net 1.2.0 subset**. Uns
 Requires Python 3.10+ and Node 22.12+; the automated environment uses Python 3.13 and Node 22.
 
 ```sh
-git clone https://github.com/mlow-io/provider-directory-workbench.git
-cd provider-directory-workbench
+git clone https://github.com/mlow-io/provider-data-workbench.git
+cd provider-data-workbench
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -e '.[dev,mcp]'
@@ -33,9 +39,9 @@ npm ci --prefix web
 make workbench
 ```
 
-Open the printed local URL. In Intake, load the synthetic clinic workbook, review the mapping and quarantine, then explicitly accept eligible rows. The launcher creates a fresh retained runtime; it prints the root to use when resuming.
+Open the printed local URL. The work queue is the entry point. In Receive data, load the synthetic clinic workbook, review the mapping and quarantine, then explicitly accept eligible rows. The launcher creates a fresh retained runtime; it prints the root to use when resuming.
 
-[Demo and export inspection guide](docs/OPERATIONS_DEMO.md#run-and-inspect) · [Engineering case study](docs/CASE_STUDY.md) · [Synthetic UI screenshot](docs/evidence/canonical/operations-2026-11-14/operations-wide.png)
+[Demo and export inspection guide](docs/OPERATIONS_DEMO.md#run-and-inspect) · [Engineering case study](docs/CASE_STUDY.md) · [Current synthetic UI](docs/evidence/canonical/operator-ui-2026-11-19/work-wide.png)
 
 ## Reproduce the complete workflow
 
@@ -52,13 +58,15 @@ The Python wheel and source distribution also include the headless commands and 
 
 ## Verification and scope
 
-The current implementation passed **869 Python tests**, **134 frontend tests**, **72 desktop/phone browser scenarios**, pipeline validation, a production build, and clean wheel/sdist installed journeys. [The verification record](docs/evidence/canonical/integrated-review-2026-11-15/README.md) includes failures/reruns, exact artifacts and limitations. CI repeats the required checks.
+The 2026-11-15 checkpoint passed **869 Python tests**, **134 frontend tests**, **72 desktop/phone browser scenarios**, pipeline validation, a production build, and clean wheel/sdist installed journeys. [The verification record](docs/evidence/canonical/integrated-review-2026-11-15/README.md) includes failures/reruns, exact artifacts and limitations. CI repeats the required checks.
 
-This is a single-user local demonstration project developed with agent-assisted implementation and human direction/review. Synthetic correctness and bounded live-source observations do not establish production accuracy, full standards conformance or measured customer benefit. Actual-model evaluation and uncoached analyst sessions remain open. Actor names, contact events and submissions are local assertions; the application sends no outreach or payer updates.
+The local UI1 update passed 136 frontend tests and a production build; its [separate record](docs/evidence/canonical/operator-ui-2026-11-19/README.md) preserves the 74-scenario full browser pass, follow-up failures and corrected affected reruns. Adaptive response/enrollment/research extensions remain design contracts.
+
+This is a single-user local application developed with agent-assisted implementation and human direction/review. Synthetic correctness and bounded live-source observations do not establish production accuracy, full standards conformance or measured customer benefit. Actual-model evaluation and uncoached analyst sessions remain open. Actor names, contact events and submissions are local assertions; the application sends no outreach or payer updates.
 
 ## Engineering documentation
 
-[Specification](SPEC.md) · [Architecture](docs/ARCHITECTURE.md) · [Roadmap](ROADMAP.md) · [Current status](STATUS.md) · [Spec-driven delivery](docs/SPEC_DRIVEN_DELIVERY.md)
+[Operator workflow](docs/OPERATOR_EXPERIENCE.md) · [Provider operations contract](docs/PROVIDER_OPERATIONS_CONTRACT.md) · [Specification](SPEC.md) · [Architecture](docs/ARCHITECTURE.md) · [Roadmap](ROADMAP.md) · [Current status](STATUS.md) · [Spec-driven delivery](docs/SPEC_DRIVEN_DELIVERY.md)
 
 [API reference](docs/API_REFERENCE.md) · [Data dictionary](docs/DATA_DICTIONARY.md) · [Design decisions](docs/DECISIONS.md) · [Read-only operational SQL](docs/OPERATIONAL_SQL.md) · [Contributor guide](AGENTS.md)
 

@@ -31,3 +31,11 @@ data/raw/npi_registry_*.csv
 .handoff/
 
 .runtime/
+
+# Private preparation and local research; never product release inputs
+private/
+docs/private/
+docs/career/
+docs/interview-preparation/
+chat-exports/
+publication-private/

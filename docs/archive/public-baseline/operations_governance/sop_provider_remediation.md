@@ -1,6 +1,6 @@
-# Five-minute offline operations demonstration
+# Five-minute offline operator demonstration
 
-Updated 2026-10-26. This is a synthetic operations demonstration, not organizational policy, licensure verification, payer writeback or a compliance certification.
+Updated 2026-10-26. This is a synthetic demonstration demonstration, not operator policy, licensure verification, payer writeback or a compliance certification.
 
 ## Launch and preserve
 

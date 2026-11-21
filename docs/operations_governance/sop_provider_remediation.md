@@ -76,7 +76,7 @@ Legacy QA and Corrections views remain available for the original deterministic 
 
 ## Guided multi-file network demonstration
 
-Start `make workbench` in a fresh root, or resume the printed root with `PYTHONPATH=src python3 scripts/demo.py --root .runtime/employer-demo-REPLACE_ME`. Resuming retains existing inputs/database/artifacts; it does not reset work. Existing clinic/reference samples remain available.
+Start `make workbench` in a fresh root, or resume the printed root with `PYTHONPATH=src python3 scripts/demo.py --root .runtime/operations-demo-REPLACE_ME`. Resuming retains existing inputs/database/artifacts; it does not reset work. Existing clinic/reference samples remain available.
 
 1. Complete the unfamiliar clinic workbook path above: choose header row 2, review suggested columns, save a mapping revision, inspect **2 valid / 1 quarantined**, then accept valid rows explicitly. Clinic location evidence and network participation are distinct; this demo does not infer a cross-source membership or compare the feeds by NPI alone.
 2. Click **Prepare synthetic network catalog** in the offline sample panel. The explicit action creates a versioned synthetic codebook: one payer, CEDAR/PINE, one clinic and NORTH/SOUTH. It imports/accepts/verifies no rows. Repeated setup is idempotent; a binding that an operator subsequently reviewed differently is preserved and setup returns a conflict rather than overwriting it. Use a fresh demo root for an untouched codebook.

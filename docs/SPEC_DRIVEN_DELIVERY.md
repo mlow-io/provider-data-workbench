@@ -1,6 +1,8 @@
 # Spec-driven delivery plan
 
-Updated 2026-11-14. The work packages below define the delivery sequence; linked receipts identify implemented and verified slices. This plan decomposes [ROADMAP](../ROADMAP.md); [STATUS](../STATUS.md) remains the sole summary of verified completion, and [NEXT](../NEXT.md) selects one active slice.
+Updated 2026-11-21. The active work is P0 planning for [S1](ADAPTIVE_INGESTION_SPEC.md); P0–P8 scheduling lives in [ROADMAP](../ROADMAP.md). The D/R work packages below are retained historical delivery contracts, not the current task queue.
+
+Historical baseline updated 2026-11-14. The work packages below define the delivery sequence; linked receipts identify implemented and verified slices. This plan decomposes [ROADMAP](../ROADMAP.md); [STATUS](../STATUS.md) remains the sole summary of verified completion, and [NEXT](../NEXT.md) selects one active slice.
 
 ## Documentation authority
 
@@ -17,6 +19,27 @@ Updated 2026-11-14. The work packages below define the delivery sequence; linked
 | [API_REFERENCE](API_REFERENCE.md), [DATA_DICTIONARY](DATA_DICTIONARY.md) | Implemented HTTP and persistence contracts | Update with code; proposed interfaces belong in a labeled area contract first |
 
 The README is the entrypoint, not another roadmap. Older intake proposals and execution/progress files are historical context, not competing task queues. Do not copy private chats into public design documents.
+
+## Active specification revision protocol
+
+S1.0 records the selected product direction. P0 must turn it into S1.1 with inspected source examples, a code/test gap map, populated user-flow/UI proposal, explicit planned service/storage/export contracts and an owner review. The roadmap assigns S1.2 before assisted adaptation, S1.3 before integrated release, then S2–S5 for licensing, networks, research/exchange and consumer/deployment architecture.
+
+For each revision, record: previous revision; reason and changed behavior; affected requirement IDs; source/record grain; input/output examples; state transitions and error behavior; compatibility/migration/backfill/recovery impact; fixture expectations; chosen UI flow; budget/access limits; unresolved decisions; and selection/approval status. Do not invent an approval date or overwrite earlier decisions. Add a dated decision entry for consequential changes.
+
+Each milestone brief must identify:
+
+1. User-visible outcome and non-goals.
+2. Required spec revision, dependencies and verified baseline.
+3. Existing code to reuse and narrow implementation ownership.
+4. Acceptance IDs mapped to meaningful tests/observations and actual exports.
+5. Invocation-owned storage, source/model request limits and restart behavior.
+6. Stop conditions, evidence to retain and exact continuation instructions.
+
+A long run may complete the explicitly authorized milestones within their frozen contracts. It may choose internal implementation details. It must stop dependent work for unresolved durable semantics, insufficient source rights/access, an unapproved external cost/action or a required owner design decision; continue unrelated authorized work when useful. Record the blocking fact and proposed resolution rather than silently changing the goal. No passage of time grants approval.
+
+Before implementation, maintain this row shape in the active area spec: **requirement ID → existing implementation/test → remaining gap → planned check → observed receipt/limit**. Unrun checks remain planned. A passing parser test does not close the UI/export requirement. Existing D/R/F/N/A/E/PX/UX identifiers remain stable; S1 uses AI-01–10.
+
+After completion, STATUS records evidence, ROADMAP records the closed gate, NEXT selects one continuation, and implemented API/data docs change with code. Do not create another status dashboard or duplicate roadmap. Documentation-only revisions require link/whitespace checks and content consistency review, not full application requalification.
 
 ## Work areas and scope
 

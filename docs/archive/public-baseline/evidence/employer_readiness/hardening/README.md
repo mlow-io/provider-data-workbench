@@ -1,6 +1,6 @@
 # Export scope and launcher hardening
 
-This is dated local regression evidence. This is a separate regression pass after the [original employer-readiness qualification](../README.md); earlier counts/screenshots remain dated evidence.
+This is dated local regression evidence. This is a separate regression pass after the [original operator-readiness qualification](../README.md); earlier counts/screenshots remain dated evidence.
 
 ## Reproduced defects and fixes
 

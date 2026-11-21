@@ -1,4 +1,4 @@
-# Employer-readiness follow-up evidence
+# operator-readiness follow-up evidence
 
 Qualified locally on 2026-10-26 (America/Chicago; browser/runtime timestamps cross into 2026-10-27 UTC). This is dated local evidence for the guided-demo implementation. The [2026-10-23 G0–G5 evidence](../intake_2_0/README.md) remains the separate historical baseline.
 

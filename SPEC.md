@@ -1,7 +1,13 @@
 # Provider Directory Workbench specification
 
+## Selected direction and specification status
+
+Updated 2026-11-21. The selected long-term product is an adaptable provider-data ingestion and reconciliation workbench, growing toward provider/network data operations. Broad but declared import support, cleaning semantics and reusable reviewed mappings are central capabilities. Office contact review is the first complete application of that foundation; licensing and expanded identity/network work are scheduled revisions, not dropped requirements.
+
+[Adaptive ingestion spec S1](docs/ADAPTIVE_INGESTION_SPEC.md) is the active **draft target**, currently revision S1.0. It contains the immediate user flow, proposed breadth, stable acceptance IDs and unresolved decisions. [NEXT](NEXT.md) selects P0 planning; S1.0 does not authorize application implementation. [ROADMAP](ROADMAP.md) binds later milestones to explicit spec revisions. The implementation boundary below describes the existing baseline; it does not claim the S1 target already exists.
+
 ## Purpose and users
-A provider-data operations workbench for an analyst maintaining clinic rosters and comparing them with payer directories and public reference sources. Combine a functional web interface with retained ingestion, repeatable cleaning, quality review, reconciliation, approved datasets and investigation handoffs. The practical job is to turn inconsistent incoming data into a reviewable update and a usable downstream dataset without losing its source evidence.
+An adaptable provider-data operations workbench for an analyst maintaining clinic rosters and comparing them with payer directories and public reference sources. Combine a functional web interface with retained ingestion, repeatable cleaning, quality review, reconciliation, approved datasets and investigation handoffs. The practical job is to turn inconsistent incoming data into a reviewable update and a usable downstream dataset without losing its source evidence.
 
 The primary user is a provider-data or network-operations analyst. A reviewer needs to understand unresolved conflicts and approve changes; an integration engineer needs explicit source contracts, failure states and reproducible outputs. These are workflow roles, not implemented authenticated accounts. The current application remains single-user and local.
 
@@ -80,8 +86,8 @@ Detailed field support, unresolved-reference behavior, profile-specific acceptan
 
 The first release exports the existing approved dataset and evidence formats. A conformant FHIR server, FHIR writeback and profile-conformant FHIR export are separate deferred work.
 
-## Optional AI assistance
-The first task is suggesting column mappings and existing allowlisted normalization operations for clinic CSV/XLSX/flat JSON. Reuse `OnboardingService`, recipe preview and the existing MCP proposal boundary. Deterministic header suggestions and manual mapping must work without a model. Model assistance is not part of the trusted parser or a requirement for ordinary imports.
+## Existing optional AI assistance
+The existing bounded task is suggesting column mappings and existing allowlisted normalization operations for clinic CSV/XLSX/flat JSON. Reuse `OnboardingService`, recipe preview and the existing MCP proposal boundary. Deterministic header suggestions and manual mapping must work without a model. Model assistance is not part of the trusted parser or a requirement for ordinary imports.
 
 Use a small invocation interface with one configured model provider or an MCP-connected agent; do not build a plugin marketplace. A web-initiated task must have visible pending, succeeded, failed and unavailable states and return a proposal into the normal review surface. If an external agent supplies the result, show that attribution; do not present it as an in-app model call.
 
@@ -117,3 +123,19 @@ H1 remains the uncoached investigation walkthrough in [the existing kit](docs/IN
 Single-user local operation; actor names and contacts are assertions. No actual outreach, payer writes, authenticated shared operation, automated identity merge, national ingestion or compliance certification. Provider directory information is not patient eligibility, credentialing or clinical data. Do not ingest patient/claims data as part of this scope. Synthetic tests do not prove customer adoption or real-provider accuracy.
 
 The workflow is intended to be relevant to a healthcare operations team, but team deployment requires a separately scoped authorization, security, audit/retention, operational ownership and concurrency design. Hosting, microservices, a graph database, a distributed queue and a broad plugin system are outside the present scope.
+
+## Proposed extension: scoped research and provider exchange
+
+The proposed [research and exchange contract](docs/PROVIDER_RESEARCH_EXCHANGE.md) extends the current local workflow toward one clinician/office change journey: pinned outbound exchange, retained recipient acknowledgment, explicit response-row correlation, source-native enrollment evidence, bounded selected-case research and a reviewed correction packet. These are planned requirements, not capabilities claimed by the implementation table above.
+
+Reuse current artifact/receipt/attempt retention, reviewed clinician/location links, managed approval versions and append-only investigations. External recipient responses have distinct semantics from internal follow-up acknowledgments. Adaptive intake selects versioned declared profiles and proposes allowlisted mappings; unknown formats remain unsupported rather than executing generated parsers. Research is finite, case-scoped, source-limited and proposal-only, with durable aggregate budgets and inspectable supporting/contradicting evidence. Native enrollment relationships remain source assertions and cannot silently establish exact office identity or commercial participation.
+
+Keep the local Python/FastAPI, React and SQLite design. Add source-specific relational tables and execution/exchange relations only when their slice's contracts and fixtures are frozen. Payment-history analytics, price normalization, autonomous outreach, payer writeback and hosted teams are separate scope decisions. [ROADMAP](ROADMAP.md#proposed-provider-research-and-exchange-extension) retains these contracts for later milestones; ingestion-first scheduling supersedes their former immediate priority.
+
+## Selected operator-workflow upgrade
+
+The [operator experience contract](docs/OPERATOR_EXPERIENCE.md) is part of the selected product work, alongside the [v1 provider operations contract](docs/PROVIDER_OPERATIONS_CONTRACT.md). Make the existing receive, link, reconcile, follow-up and handoff journey coherent before adding further primary destinations. Case research belongs to a pinned discrepancy; source configuration and compatibility tools remain secondary. Do not label planned exchanges or reports as available.
+
+Operational bottlenecks, rejection reasons, response coverage, waiting ages and reconciliation outcomes follow a [separate measure contract](docs/OPERATIONAL_MEASURES.md). Declare populations, source/reason versions, as-of clocks, unknowns and row/case/office units; aggregate before one-to-many joins. File receipt, internal acknowledgment, recipient row acceptance, dataset approval and observed directory correction remain distinct.
+
+Use NPPES identifiers and the existing reviewed clinician/office crosswalk for provider matching. A master patient index and patient identity data are outside this provider-directory scope. New source support requires a named source, native key/grain, permission/access route, retained evidence and qualification case; standards documentation alone is not integration or conformance.
