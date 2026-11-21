@@ -30,16 +30,32 @@ function scopeLabel(scope: unknown) { return typeof scope === "string" ? scope :
 function correctionPhone(value: CorrectionPhone | null) {
   return value ? `${value.phone ?? "Not supplied"} · extension: ${value.phone_extension ?? "Not supplied"}` : "Unavailable";
 }
-function EffectiveCorrectionReview({ comparison }: { comparison: EffectiveCorrections }) {
+function EffectiveCorrectionReview({ comparison, versionId, reportHash }: { comparison: EffectiveCorrections; versionId: string; reportHash: string }) {
+  const [status, setStatus] = useState("all");
+  const [offset, setOffset] = useState(0);
+  const [page, setPage] = useState<{entries: EffectiveCorrections["entries"]; total: number; next_offset: number | null} | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    setPage(null); setError("");
+    const params = new URLSearchParams({expected_report: reportHash, status, offset: String(offset), limit: "20"});
+    fetch(`/api/feed-versions/${encodeURIComponent(versionId)}/correction-comparison?${params}`, {signal: controller.signal})
+      .then(async response => { const data = await response.json(); if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : "Unable to load comparisons"); return data; })
+      .then(data => { if (!controller.signal.aborted) setPage(data); })
+      .catch(err => { if (!controller.signal.aborted) setError(err instanceof Error ? err.message : "Unable to load comparisons"); });
+    return () => controller.abort();
+  }, [versionId, reportHash, status, offset]);
   const labels = [["changed", "Changed"], ["unchanged", "Unchanged"], ["missing", "Missing"], ["blocked_invalid", "Invalid"], ["unresolved", "Unresolved"]] as const;
-  const entries = comparison.entries ?? [];
+  const entries = page?.entries ?? [];
   return <section aria-label="Effective corrected roster comparison">
     <h3>Incoming source against corrected roster</h3>
     <p>Compares the incoming source with the effective phone and extension in approved baseline <code>{comparison.baseline_version}</code>, for previously corrected source keys. The source-to-source comparison follows separately.</p>
     <p>{comparison.notice} Missing or unresolved keys do not establish closure.</p>
     <dl className="mf-summary-counts"><div><dt>Corrected keys assessed</dt><dd>{comparison.total}</dd></div>{labels.map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{comparison.counts[key]}</dd></div>)}</dl>
-    <p>Showing {entries.length} of {comparison.entry_count ?? comparison.total} comparison entries. This is a bounded sample; counts cover all assessed keys.</p>
+    <Field><FieldLabel htmlFor="correction-status-filter">Filter correction comparisons</FieldLabel><NativeSelect id="correction-status-filter" value={status} onChange={event => { setOffset(0); setStatus(event.target.value); }}><NativeSelectOption value="all">All statuses</NativeSelectOption>{labels.map(([key, label]) => <NativeSelectOption key={key} value={key}>{label}</NativeSelectOption>)}</NativeSelect></Field>
+    {error ? <Alert variant="destructive"><AlertDescription>{error} Reload evidence to try again.</AlertDescription></Alert> : !page ? <p role="status">Loading comparison entries…</p> : <p role="status">Showing {entries.length ? offset + 1 : 0}–{offset + entries.length} of {page.total} matching entries. Counts above cover all assessed keys.</p>}
     {entries.length > 0 && <div className="mf-evidence-table" role="region" aria-label="Corrected roster comparison sample" tabIndex={0}><Table aria-label="Corrected roster comparison entries"><TableHeader><TableRow><TableHead scope="col">Source key / status</TableHead><TableHead scope="col">Approved effective phone</TableHead><TableHead scope="col">Incoming source phone</TableHead><TableHead scope="col">Evidence</TableHead></TableRow></TableHeader><TableBody>{entries.map((entry, index) => <TableRow key={index}><TableCell>{scopeLabel(entry.key)}<br /><Badge variant="secondary">{entry.status.replaceAll("_", " ")}</Badge></TableCell><TableCell>{correctionPhone(entry.old)}</TableCell><TableCell>{correctionPhone(entry.new)}</TableCell><TableCell>Decision {entry.decision_id}<br />Prior row {entry.previous_locator ?? "Unavailable"}<br />Incoming row {entry.current_locator ?? "Unavailable"}</TableCell></TableRow>)}</TableBody></Table></div>}
+    {page && <div className="mf-actions"><Button variant="outline" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - 20))}>Previous comparisons</Button><Button variant="outline" disabled={page.next_offset === null} onClick={() => setOffset(page.next_offset!)}>Next comparisons</Button></div>}
   </section>;
 }
 
@@ -268,7 +284,7 @@ export function ManagedFeeds() {
       {version.state === "approved" && <ApprovedExportReview key={version.id} versionId={version.id} />}
       <Tabs key={version.id} defaultValue="evidence"><TabsList aria-label="Delivery evidence views"><TabsTrigger value="evidence">Evidence & holds</TabsTrigger><TabsTrigger value="original">Original & history</TabsTrigger></TabsList><TabsContent value="evidence">
       <h3>Quality and drift findings</h3><p>The comparisons shown here are bounded samples. Download the complete quality report to inspect every finding and comparison entry before deciding. It is review evidence, not an approved dataset export.</p><a className="mf-download" href={`/api/feed-versions/${encodeURIComponent(version.id)}/quality-report`}>Download complete quality report JSON</a>{findings.length === 0 && <p>No quality holds. Explicit dataset approval is still required.</p>}<ul className="mf-findings">{findings.map(finding => <li key={finding.code} className={`mf-finding ${finding.severity}`}><div><strong>{finding.severity === "hard" ? "Approval blocked" : finding.severity === "hold" ? "Review hold" : "Warning"}</strong><p>{finding.message}</p><code>{finding.code}</code>{acknowledged(finding.code) && <p>Risk acknowledged for this report.</p>}</div>{version.state === "candidate" && finding.severity === "hold" && <div className="mf-actions"><Button variant="outline" disabled={pending || !attributed} onClick={() => review(finding.code, "acknowledged")}>Acknowledge {finding.code}</Button><Button variant="outline" disabled={pending || !attributed} onClick={() => review(finding.code, "deferred")}>Defer {finding.code}</Button></div>}{finding.severity === "hard" && <p>Correct the source or contract and reprocess. Acknowledgement cannot bypass this blocker.</p>}</li>)}</ul>
-      {version.report.effective_corrections && <EffectiveCorrectionReview comparison={version.report.effective_corrections} />}
+      {version.report.effective_corrections && <EffectiveCorrectionReview key={`${version.id}:${version.report_hash}`} comparison={version.report.effective_corrections} versionId={version.id} reportHash={version.report_hash} />}
       <p>Source-to-source comparison:</p><DeliveryReviewSummary comparison={version.report.comparison} baselineVersion={version.report.baseline_version} /></TabsContent><TabsContent value="original">      <details><summary>Comparison and original evidence</summary><h4>Pinned comparison</h4><pre>{JSON.stringify(version.report.comparison, null, 2)}</pre><h4>Delivery manifest</h4><pre>{JSON.stringify(version.manifest, null, 2)}</pre><h4>Retained delivery</h4><pre>{JSON.stringify(version.delivery, null, 2)}</pre><h4>Sample rows</h4><p>This preview is bounded. The approved JSON export retains the complete selected dataset and quarantine evidence.</p><pre>{JSON.stringify(version.rows, null, 2)}</pre></details>
       {version.review.length > 0 && <details><summary>Exception review history</summary><ul>{version.review.map((item, index) => <li key={index}>{item.code} · {item.disposition} · {item.actor}: {item.reason}</li>)}</ul></details>}
 

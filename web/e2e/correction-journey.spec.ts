@@ -106,6 +106,12 @@ test('reviewed phone creates a separately approved candidate with complete corre
   await expect(effective).toContainText('6175550199 · extension: 0042');
   await expect(effective).toContainText('6175550101 · extension: Not supplied');
   await expect(effective).toContainText('Changed');
+  await effective.getByLabel('Filter correction comparisons').selectOption('changed');
+  await expect(effective).toContainText('Showing 1–1 of 1 matching entries');
+  await effective.getByLabel('Filter correction comparisons').selectOption('missing');
+  await expect(effective).toContainText('Showing 0–0 of 0 matching entries');
+  await effective.getByLabel('Filter correction comparisons').selectOption('changed');
+  await expect(effective).toContainText('6175550199 · extension: 0042');
   const sourceComparison = page.getByRole('region',{name:'Delivery comparison',exact:true});
   await expect(sourceComparison).toContainText('Unchanged keys');
   await expect(sourceComparison.getByText('Unchanged keys',{exact:true}).locator('..')).toContainText('2');

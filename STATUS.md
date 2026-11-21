@@ -1,6 +1,6 @@
 # Implementation status
 
-Updated 2026-11-21. This is the current summary; dated receipts hold historical details. [NEXT](NEXT.md) selects work, [SPEC](SPEC.md) defines behavior and [ROADMAP](ROADMAP.md) holds future scope. The documentation/code audit is complete. Licensing implementation has not been selected.
+Updated 2026-11-21. This is the current summary; dated receipts hold historical details. [NEXT](NEXT.md) selects work, [SPEC](SPEC.md) defines behavior and [ROADMAP](ROADMAP.md) holds future scope. The documentation/code audit is complete. A report-pinned, filterable correction comparison is implemented; licensing implementation has not been selected.
 
 ## Implemented application
 
@@ -43,3 +43,7 @@ Production-model client quality on its frozen corpus, broader generalization and
 - **Future features:** S2 licensing/expanded identity planning remains proposed. Network expansion, bulk/address corrections, research, recipient templates and hosting are later work in ROADMAP, not current defects or automatic next actions.
 
 [The evidence index](docs/evidence/canonical/README.md) links adaptive release, migration, qualification, correction, mapping and older FHIR/operations/distribution records. Older counts and failed attempts remain in those dated records rather than competing with this summary.
+
+## Correction comparison paging — 2026-11-21
+
+Operators can filter the complete persisted corrected-roster comparison by status and page through it before dataset approval. The page endpoint requires the inspected report hash; mismatches return a conflict. Full counts and the existing complete JSON report remain available. Tests cover a changed 51st office, filtered/empty results, invalid limits/status and stale hash, plus actual desktop/mobile review. Python 920, frontend 155, production build and full browser 76 passed. The service currently reads the complete persisted report before slicing; no constant-time or capacity claim is made.

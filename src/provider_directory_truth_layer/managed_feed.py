@@ -567,6 +567,25 @@ class ManagedFeed:
                     'report': json.loads(row['report']),
                     'notice': 'Review evidence only; not an approved dataset export'}
 
+    def correction_comparison_page(self, version_id, expected_report, status='all', offset=0, limit=20):
+        """Page persisted correction evidence without making a candidate consumable."""
+        from .reconciliation_store import page_parameters
+        page_parameters(offset, limit)
+        if status not in {'all', 'changed', 'unchanged', 'missing', 'blocked_invalid', 'unresolved'}:
+            raise ValueError('Choose a valid comparison status')
+        if not expected_report:
+            raise ValueError('Provide the inspected report hash')
+        result = self.quality_report(version_id)
+        if result['report_hash'] != expected_report:
+            raise Conflict('Report changed; reload before inspecting comparisons')
+        comparison = result['report'].get('effective_corrections')
+        entries = comparison['entries'] if comparison else []
+        selected = [entry for entry in entries if status == 'all' or entry['status'] == status]
+        return {'version_id': version_id, 'report_hash': result['report_hash'], 'status': status,
+                'total': len(selected), 'offset': offset, 'limit': limit,
+                'next_offset': offset + limit if offset + limit < len(selected) else None,
+                'entries': selected[offset:offset + limit]}
+
     def review(self, version_id, payload):
         actor, reason = required(payload, 'actor'), required(payload, 'reason')
         with self.store.db() as conn:

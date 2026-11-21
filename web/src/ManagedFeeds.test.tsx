@@ -24,6 +24,12 @@ function api(options: { hard?: boolean; stale?: boolean; corrections?: boolean; 
     if (url.endsWith("/exceptions")) acknowledged = body.disposition === "acknowledged";
     if (url.endsWith("/decide")) approved = true;
     const version = { id: "candidate-2", kind: options.derived ? "derived_field_candidate" : "source_delivery", report_notice: options.derived ? "Inherited report" : undefined, state: approved ? "approved" : "candidate", report_hash: reportHash, current_version: "approved-1", report: { counts: { raw: 3, valid: 2, quarantined: 1, unique: 3 }, effective_corrections: options.corrections ? { baseline_version: "corrected-base", fields: ["phone", "phone_extension"], notice: "Incoming data may differ from reviewed corrections.", total: 73, counts: {changed: 2, unchanged: 70, missing: 1, blocked_invalid: 0, unresolved: 0}, entry_count: 73, entries: [{key: ["001", "NORTH"], status: "changed", old: {phone: "6175550199", phone_extension: "0042"}, new: {phone: "6175550101", phone_extension: null}, previous_locator: "row:2", current_locator: "row:3", decision_id: "decision-1"}] } : null, comparison: { baseline_version: "approved-1", missing: 1 }, findings: options.hard ? [{ code: "headers", severity: "hard", message: "Required phone header is missing" }] : [{ code: "quarantine", severity: "hold", message: "One source row is quarantined" }] }, review: acknowledged ? [{ code: "quarantine", disposition: "acknowledged", actor: "Reviewer", reason: "Reviewed invalid row" }] : [], rows: [{ original: { zip: "02108" } }], delivery: { id: "delivery-2" }, manifest: { receipt_id: "receipt-1", attempt_id: "attempt-1", source_delivery: { period: "2026-11-02" }, designation: "synthetic", notice: "Synthetic source assertions, not independently verified provider truth." } };
+    if (url.includes('/correction-comparison?')) {
+      const params = new URL(url, 'http://localhost').searchParams;
+      const entry = version.report.effective_corrections!.entries[0];
+      const selected = params.get('status');
+      return new Response(JSON.stringify({entries: selected === 'missing' ? [] : [entry], total: selected === 'missing' ? 0 : 73, next_offset: selected === 'all' ? 20 : null}));
+    }
     const value = url === "/api/feeds" ? (body ? feed : { items: [feed] })
       : url === "/api/feeds/recipes" ? { items: [recipe] }
       : url === "/api/feeds/feed-1/current" ? { version_id: approved ? "candidate-2" : "approved-1", stale: true, notice: "A newer delivery is awaiting review" }
@@ -192,12 +198,14 @@ test("incoming source separately compares the corrected roster with complete cou
   await openCandidate();
   const panel = screen.getByRole("region", { name: "Effective corrected roster comparison" });
   expect(panel).toHaveTextContent("corrected-base");
-  expect(panel).toHaveTextContent("Showing 1 of 73 comparison entries");
+  await waitFor(() => expect(panel).toHaveTextContent("Showing 1–1 of 73 matching entries"));
   expect(panel).toHaveTextContent("Corrected keys assessed73");
   expect(panel).toHaveTextContent("Changed2");
   expect(panel).toHaveTextContent("6175550199 · extension: 0042");
   expect(panel).toHaveTextContent("6175550101 · extension: Not supplied");
   expect(panel).toHaveTextContent("Missing or unresolved keys do not establish closure");
+  fireEvent.change(within(panel).getByLabelText("Filter correction comparisons"), {target: {value: "missing"}});
+  await waitFor(() => expect(panel).toHaveTextContent("Showing 0–0 of 0 matching entries"));
   expect(screen.getByText("Source-to-source comparison:")).toBeInTheDocument();
 });
 

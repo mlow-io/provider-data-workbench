@@ -51,6 +51,10 @@ def mount(app, store):
     def quality_report(version_id: str):
         return JSONResponse(feeds.quality_report(version_id), headers={'Content-Disposition': f'attachment; filename=quality-review-{version_id}.json'})
 
+    @app.get('/api/feed-versions/{version_id}/correction-comparison')
+    def correction_comparison(version_id: str, expected_report: str, status: str = 'all', offset: int = 0, limit: int = 20):
+        return feeds.correction_comparison_page(version_id, expected_report, status, offset, limit)
+
     @app.get('/api/feed-versions/{version_id}/field-materialization')
     def field_materialization_choices(version_id: str, offset: int = 0, limit: int = 20):
         from .field_materialization import FieldMaterialization

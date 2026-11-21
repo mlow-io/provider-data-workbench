@@ -88,6 +88,16 @@ def test_complete_candidate_report_exposes_drift_beyond_bounded_sample_without_w
     assert entries[50]['old']['phone'] == '6175550101'
     assert entries[50]['new']['phone'] == '6175550199'
     assert client.get(f'/api/feed-versions/{candidate}/export').status_code == 422
+    page_url = f'/api/feed-versions/{candidate}/correction-comparison'
+    page = client.get(page_url, params={'expected_report': detail['report_hash'], 'status': 'changed', 'limit': 1})
+    assert page.status_code == 200
+    assert page.json()['total'] == 1 and page.json()['entries'][0]['new']['phone'] == '6175550199'
+    assert page.json()['next_offset'] is None
+    all_page = client.get(page_url, params={'expected_report': detail['report_hash'], 'offset': 50, 'limit': 1}).json()
+    assert all_page['total'] == 51 and all_page['entries'][0]['status'] == 'changed'
+    assert client.get(page_url, params={'expected_report': 'stale'}).status_code == 409
+    assert client.get(page_url, params={'expected_report': detail['report_hash'], 'status': 'invalid'}).status_code == 422
+    assert client.get(page_url, params={'expected_report': detail['report_hash'], 'limit': 101}).status_code == 422
     assert client.get('/api/feed-versions/missing/quality-report').status_code == 404
     assert client.get(f'/api/feed-versions/{corrected}/quality-report').json()['state'] == 'approved'
     assert database_dump(store) == before
