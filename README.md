@@ -90,3 +90,6 @@ The [UI qualification protocol](docs/UI_QUALIFICATION.md) includes a reproducibl
 ## Reviewed correction workflow
 
 Review exact clinician/office identity links and select a phone assertion in Reconciliation. Open the current approved delivery, inspect reviewed phone decisions, compare the number and extension, and create a complete roster candidate. Approve that candidate separately before preparing its pinned JSON/XLSX handoff. Original source bytes and earlier approved versions remain available; corrected rows include decision/source lineage. See [S1.3](docs/FIELD_MATERIALIZATION_SPEC.md), [the operator flow](docs/OPERATOR_EXPERIENCE.md#reviewed-correction-to-handoff) and [review export format 2](docs/REVIEW_WORKBOOK_CONTRACT.md).
+
+
+[The independent mapping challenge](docs/AI_MAPPING_EVALUATION.md) records a blinded Terra Medium proposal pass against a frozen synthetic key and deterministic aliases. Its replay uses actual proposal/review services and runs in CI without model access. The result is narrow evidence for unfamiliar header mapping; production-model quality and human time savings remain unverified.

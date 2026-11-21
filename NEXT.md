@@ -1,13 +1,15 @@
-# Next task: independently evaluate assisted mapping
+# Proposed next task: Tennessee licensing-source specification S2
 
-The owner authorized implementation and sanitized public source delivery. The reviewed-phone candidate/export slice is implemented under [S1.3](docs/FIELD_MATERIALIZATION_SPEC.md); [STATUS](STATUS.md) and its dated receipt own verification. Preserve original private drafts and the public repository's clean ancestry. No hosted deployment follows from source publication.
+The reviewed correction/export engineering slice and independent external-agent mapping challenge are complete. Read [STATUS](STATUS.md), [S1.3](docs/FIELD_MATERIALIZATION_SPEC.md), [its receipt](docs/evidence/canonical/correction-export-2026-11-21/README.md) and [the mapping evaluation](docs/AI_MAPPING_EVALUATION.md) before changing behavior. The actual-model client and uncoached-human evidence remain open; saved proposal replay is not a fresh inference trial. Preserve private drafts and the public repository's clean ancestry.
 
-## Selected bounded evaluation
+## Proposed planning scope, awaiting owner selection
 
-Use Terra Medium to propose mappings for independently authored, slightly altered synthetic provider schemas through the existing declarative proposal/review services. Freeze expected mappings/abstentions before the proposal agent sees cases; withhold the answers. Include renamed/reordered/extra columns, ambiguous phone roles, duplicate headers and an instruction-like source cell. Record precisely what the agent saw. Do not claim prompt-injection resistance when the adversarial cell was not actually exposed.
+Freeze S2 before implementing licensing/expanded identity features. Produce a small source/contract/design packet:
 
-Compare against deterministic aliases on the same cases. Score exact field choices and safe abstentions separately from schema validity and product usefulness. Record rejected unsafe operations, unapproved apply blocks, approved apply/accept results and preserved original bytes/values. Model proposals must never approve themselves or execute code. No production API/model call, new dependency, live source acquisition or participant trial is implied.
+1. Name a Tennessee licensing source and inspect its actual supported access method, terms, scope, freshness and stable identifiers. Distinguish a licensing-board assertion from an NPPES registry entry. Record absent access or absent samples as a prerequisite, never synthetic success.
+2. Define credential grain: clinician versus organization, issuing jurisdiction/board, license number, status, relevant dates and retained source locator. License status is distinct from office contact accuracy and network participation. NPI alone cannot choose an office or establish a credential match.
+3. Define conservative matching candidates, separate review decisions, stale/conflict/unknown handling and an explainable two-provider synthetic flow. Preserve originals and earlier decisions; no automatic identity merges, provider removal or contact overwrites.
+4. Reuse existing intake/profile, comparison, reviewed-link and decision/export services. Identify the smallest additions and their exact API/schema/migration effects. Avoid another canonical store, arbitrary scraping runtime or generic connector platform.
+5. Add acceptance IDs, independent expected fixtures, UI flow and required checks, plus a privacy-safe source-evidence policy. Return a reviewable S2 spec and next implementation brief; planning alone does not authorize new production adapters, migrations, scraping/model calls or hosting.
 
-Replace coached draft self-scores with independently authored cases and transparent limitations; do not relabel a controlled transport as model inference. Use at most two disjoint bounded workers under AGENTS, with no recursive delegation. Publish synthetic technical receipts only. Owner visual review/uncoached-human outcomes remain open.
-
-After this evaluation, revise the next licensing/identity S2 planning brief with a named Tennessee source, exact grain, legal/source limitations and acceptance checks before implementation. Networks remain S3; bulk/address correction and recipient templates remain later revisions.
+S3 provider/payer/product/network relationships remain a later named revision. Bulk/address corrections, recipient templates and case research remain in ROADMAP. Owner visual feedback and participant walkthroughs retain separate gates; an engineering receipt does not close them. Use bounded Terra workers under AGENTS only when an explicitly selected task benefits from disjoint work.

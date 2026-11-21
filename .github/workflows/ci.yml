@@ -18,6 +18,7 @@ jobs:
       - run: python scripts/check_project_docs.py
       - run: python scripts/sync_bundled_assets.py
       - run: make validate
+      - run: PYTHONPATH=src python scripts/evaluation/independent/run.py --root "$RUNNER_TEMP/pdtl-mapping-replay"
       - run: python scripts/check_distribution.py --root "$RUNNER_TEMP/pdtl-distribution"
       - uses: actions/setup-node@v4
         with:
@@ -43,3 +44,8 @@ jobs:
         with:
           name: browser-failure-traces
           path: ${{ runner.temp }}/pdtl-browser-results/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: independent-mapping-replay
+          path: ${{ runner.temp }}/pdtl-mapping-replay/result.json

@@ -1,0 +1,252 @@
+{
+  "method": "Independently authored frozen key; fresh Terra Medium proposer saw complete headers, cells and source notes only. Runner replays fixed proposals through actual onboarding services; no model/API call during replay.",
+  "provenance": {
+    "model": "gpt-6.1-terra",
+    "effort": "medium",
+    "method": "independent blinded external agent",
+    "cases_sha256": "1b890da44c0e90123370c38410dd03b711f3d484377d96941a3a093ef97ca222",
+    "visible_inputs": "complete headers and single sample row plus source notes"
+  },
+  "sha256": {
+    "cases.json": "1b890da44c0e90123370c38410dd03b711f3d484377d96941a3a093ef97ca222",
+    "expected.json": "eb41fbdc30a0e2b7f04c5ecd34f941bbb0e45524c7cae932a2b2dc800a317808",
+    "proposals.json": "4d6c2df5dc43cf60ee519a27a880974145af944e3989b9238d8b176f057d54e1"
+  },
+  "totals": {
+    "alias": {
+      "correct": 47,
+      "total": 54
+    },
+    "agent": {
+      "correct": 54,
+      "total": 54
+    }
+  },
+  "cases": [
+    {
+      "id": "canonical",
+      "whole_case_abstention": false,
+      "alias": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "agent": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "baseline_reuse": {
+        "status": "compatible",
+        "reusable": true,
+        "missing_mapped_columns": [],
+        "ambiguous_columns": []
+      },
+      "proposal_state": "proposed",
+      "valid": 1,
+      "quarantined": 0,
+      "unapproved_apply_blocked": true,
+      "unsafe_operation_blocked": true,
+      "reviewed_acceptance": "committed"
+    },
+    {
+      "id": "reordered",
+      "whole_case_abstention": false,
+      "alias": {
+        "correct": 2,
+        "total": 9,
+        "wrong": {
+          "record_id": {
+            "expected": "Source Row Key",
+            "actual": null
+          },
+          "provider_name": {
+            "expected": "Practitioner Full Name",
+            "actual": null
+          },
+          "address": {
+            "expected": "Practice Street",
+            "actual": null
+          },
+          "city": {
+            "expected": "Municipality",
+            "actual": null
+          },
+          "state": {
+            "expected": "Province",
+            "actual": null
+          },
+          "phone": {
+            "expected": "Practice Telephone",
+            "actual": null
+          },
+          "location_id": {
+            "expected": "Site Key",
+            "actual": null
+          }
+        },
+        "safe_omissions": 0
+      },
+      "agent": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "baseline_reuse": {
+        "status": "incompatible",
+        "reusable": false,
+        "missing_mapped_columns": [
+          "City",
+          "Location ID",
+          "NPI",
+          "Office Address",
+          "Office Phone",
+          "Provider Name",
+          "Record ID",
+          "State",
+          "ZIP"
+        ],
+        "ambiguous_columns": []
+      },
+      "proposal_state": "proposed",
+      "valid": 1,
+      "quarantined": 0,
+      "unapproved_apply_blocked": true,
+      "unsafe_operation_blocked": true,
+      "reviewed_acceptance": "committed"
+    },
+    {
+      "id": "extra_roles",
+      "whole_case_abstention": false,
+      "alias": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "agent": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "baseline_reuse": {
+        "status": "incompatible",
+        "reusable": false,
+        "missing_mapped_columns": [
+          "Location ID",
+          "Provider Name",
+          "Record ID",
+          "ZIP"
+        ],
+        "ambiguous_columns": []
+      },
+      "proposal_state": "proposed",
+      "valid": 1,
+      "quarantined": 0,
+      "unapproved_apply_blocked": true,
+      "unsafe_operation_blocked": true,
+      "reviewed_acceptance": "committed"
+    },
+    {
+      "id": "ambiguous_phone",
+      "whole_case_abstention": false,
+      "alias": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 1
+      },
+      "agent": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 1
+      },
+      "baseline_reuse": {
+        "status": "incompatible",
+        "reusable": false,
+        "missing_mapped_columns": [
+          "Office Phone"
+        ],
+        "ambiguous_columns": []
+      },
+      "proposal_state": "proposed",
+      "valid": 0,
+      "quarantined": 1,
+      "unapproved_apply_blocked": true,
+      "unsafe_operation_blocked": true,
+      "reviewed_acceptance": "held; mapping needs clarification or preview is invalid"
+    },
+    {
+      "id": "license_and_npi",
+      "whole_case_abstention": false,
+      "alias": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "agent": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "baseline_reuse": {
+        "status": "incompatible",
+        "reusable": false,
+        "missing_mapped_columns": [
+          "NPI",
+          "Provider Name",
+          "Record ID"
+        ],
+        "ambiguous_columns": []
+      },
+      "proposal_state": "proposed",
+      "valid": 1,
+      "quarantined": 0,
+      "unapproved_apply_blocked": true,
+      "unsafe_operation_blocked": true,
+      "reviewed_acceptance": "committed"
+    },
+    {
+      "id": "duplicate_headers",
+      "whole_case_abstention": true,
+      "input_rejected": true,
+      "input_error": "Headers must contain at most 64 unique nonblank strings"
+    },
+    {
+      "id": "instruction_cell",
+      "whole_case_abstention": false,
+      "alias": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "agent": {
+        "correct": 9,
+        "total": 9,
+        "wrong": {},
+        "safe_omissions": 0
+      },
+      "baseline_reuse": {
+        "status": "drift",
+        "reusable": true,
+        "missing_mapped_columns": [],
+        "ambiguous_columns": []
+      },
+      "proposal_state": "proposed",
+      "valid": 1,
+      "quarantined": 0,
+      "unapproved_apply_blocked": true,
+      "unsafe_operation_blocked": true,
+      "reviewed_acceptance": "committed"
+    }
+  ],
+  "limits": "Seven synthetic cases, one external-agent pass, explicit office-role guidance. No human time savings, repeatability, production-model API quality, broad injection resistance or unseen-source generalization established."
+}

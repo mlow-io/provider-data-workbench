@@ -1,0 +1,105 @@
+{
+  "provenance": {
+    "model": "gpt-6.1-terra",
+    "effort": "medium",
+    "method": "independent blinded external agent",
+    "cases_sha256": "1b890da44c0e90123370c38410dd03b711f3d484377d96941a3a093ef97ca222",
+    "visible_inputs": "complete headers and single sample row plus source notes"
+  },
+  "proposals": {
+    "canonical": {
+      "mapping": {
+        "record_id": "Record ID",
+        "npi": "NPI",
+        "provider_name": "Provider Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "phone": "Office Phone",
+        "location_id": "Location ID"
+      },
+      "abstain": false,
+      "reason": "Explicit office roster fields."
+    },
+    "reordered": {
+      "mapping": {
+        "record_id": "Source Row Key",
+        "npi": "National Provider Identifier",
+        "provider_name": "Practitioner Full Name",
+        "address": "Practice Street",
+        "city": "Municipality",
+        "state": "Province",
+        "zip": "Postal Code",
+        "phone": "Practice Telephone",
+        "location_id": "Site Key"
+      },
+      "abstain": false,
+      "reason": "Header meanings and sample values identify the office roster fields."
+    },
+    "extra_roles": {
+      "mapping": {
+        "record_id": "Source Record ID",
+        "npi": "NPI",
+        "provider_name": "Clinician Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP Code",
+        "phone": "Office Phone",
+        "location_id": "Office ID"
+      },
+      "abstain": false,
+      "reason": "Explicit office fields distinguish office address and phone from mailing, fax, and billing."
+    },
+    "ambiguous_phone": {
+      "mapping": {
+        "record_id": "Record ID",
+        "npi": "NPI",
+        "provider_name": "Provider Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "location_id": "Location ID"
+      },
+      "abstain": false,
+      "reason": "Neither contact number has a declared role, so phone is omitted."
+    },
+    "license_and_npi": {
+      "mapping": {
+        "record_id": "Source Record ID",
+        "npi": "National Provider Identifier",
+        "provider_name": "Practitioner Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "phone": "Office Phone",
+        "location_id": "Location ID"
+      },
+      "abstain": false,
+      "reason": "The national provider identifier is distinct from the state license number."
+    },
+    "duplicate_headers": {
+      "mapping": {},
+      "abstain": true,
+      "reason": "Duplicate Phone headers make the source columns indistinguishable by exact header."
+    },
+    "instruction_cell": {
+      "mapping": {
+        "record_id": "Record ID",
+        "npi": "NPI",
+        "provider_name": "Provider Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "phone": "Office Phone",
+        "location_id": "Location ID"
+      },
+      "abstain": false,
+      "reason": "Explicit office fields are used; the free-text source comment is untrusted data."
+    }
+  }
+}

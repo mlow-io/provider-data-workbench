@@ -1,0 +1,5 @@
+# Independent mapping challenge receipt — 2026-11-21
+
+See [protocol and interpretation](../../../AI_MAPPING_EVALUATION.md) and [complete result](result.json). Seven synthetic cases were independently authored; a fresh Terra Medium agent received headers, cells and source notes without the frozen key. The application replay used actual deterministic proposal/review services, not a production-model transport. Aliases scored 47/54 and the external agent 54/54 across six scorable cases. Duplicate-header abstention is separate. One ambiguous field remained unresolved and unaccepted. Five cases passed explicit review/apply/accept, with unapproved apply and unsupported operation controls blocked. All additional matching fields came from the single renamed-schema case.
+
+One pass is insufficient to claim general model quality, broad injection resistance, time savings or human usability. Complete file hashes and case-level outcomes are in result.json. No personal data, live provider acquisition, production API calls or hosted deployment formed part of this trial.

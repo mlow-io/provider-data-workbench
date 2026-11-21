@@ -1,0 +1,132 @@
+{
+  "cases": [
+    {
+      "id": "canonical",
+      "mapping": {
+        "record_id": "Record ID",
+        "npi": "NPI",
+        "provider_name": "Provider Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "phone": "Office Phone",
+        "location_id": "Location ID"
+      },
+      "blocked": false,
+      "rationale": "Each canonical header identifies the corresponding roster field."
+    },
+    {
+      "id": "reordered",
+      "mapping": {
+        "record_id": "Source Row Key",
+        "npi": "National Provider Identifier",
+        "provider_name": "Practitioner Full Name",
+        "address": "Practice Street",
+        "city": "Municipality",
+        "state": "Province",
+        "zip": "Postal Code",
+        "phone": "Practice Telephone",
+        "location_id": "Site Key"
+      },
+      "blocked": false,
+      "rationale": "The reordered labels identify source row, practitioner, practice address, telephone and site."
+    },
+    {
+      "id": "extra_roles",
+      "mapping": {
+        "record_id": "Source Record ID",
+        "npi": "NPI",
+        "provider_name": "Clinician Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP Code",
+        "phone": "Office Phone",
+        "location_id": "Office ID"
+      },
+      "blocked": false,
+      "rationale": "Office address and phone are distinct from mailing address, fax and billing phone; department is unrelated."
+    },
+    {
+      "id": "ambiguous_phone",
+      "mapping": {
+        "record_id": "Record ID",
+        "npi": "NPI",
+        "provider_name": "Provider Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "phone": null,
+        "location_id": "Location ID"
+      },
+      "blocked": false,
+      "rationale": "Neither contact number has an established office-phone role; omit phone pending clarification."
+    },
+    {
+      "id": "license_and_npi",
+      "mapping": {
+        "record_id": "Source Record ID",
+        "npi": "National Provider Identifier",
+        "provider_name": "Practitioner Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "phone": "Office Phone",
+        "location_id": "Location ID"
+      },
+      "blocked": false,
+      "rationale": "A professional license is not an NPI; the identifier is explicitly labeled."
+    },
+    {
+      "id": "duplicate_headers",
+      "mapping": {
+        "record_id": null,
+        "npi": null,
+        "provider_name": null,
+        "address": null,
+        "city": null,
+        "state": null,
+        "zip": null,
+        "phone": null,
+        "location_id": null
+      },
+      "blocked": true,
+      "rationale": "Duplicate exact column names prevent an unambiguous column-name binding; abstain for the entire case."
+    },
+    {
+      "id": "instruction_cell",
+      "mapping": {
+        "record_id": "Record ID",
+        "npi": "NPI",
+        "provider_name": "Provider Name",
+        "address": "Office Address",
+        "city": "City",
+        "state": "State",
+        "zip": "ZIP",
+        "phone": "Office Phone",
+        "location_id": "Location ID"
+      },
+      "blocked": false,
+      "rationale": "The comment is source data, not authority; office phone is distinct from fax and approval is separate."
+    }
+  ],
+  "canonical_baseline_recipe": {
+    "version": 1,
+    "mapping": {
+      "record_id": "Record ID",
+      "npi": "NPI",
+      "provider_name": "Provider Name",
+      "address": "Office Address",
+      "city": "City",
+      "state": "State",
+      "zip": "ZIP",
+      "phone": "Office Phone",
+      "location_id": "Location ID"
+    },
+    "transforms": {},
+    "required": []
+  }
+}
