@@ -1,0 +1,22 @@
+{
+  "designation": "synthetic",
+  "requests": 2,
+  "failed_status": "failed",
+  "http_status": 200,
+  "raw_sha256": "49acd7286777a357fae4827a3382b67f647563e12ad5602b3d746daf0764a4a6",
+  "raw_verified": true,
+  "no_receipt": true,
+  "restart_preserved": true,
+  "approved_sha256": "2e3bc84a73079d1fa77a89057c167788c9c075736f43ac41c730914430352554",
+  "approved_bytes_preserved": true,
+  "approved_version_preserved": true,
+  "operational_table_counts_preserved": {
+    "receipt": 5,
+    "observation": 18,
+    "feed_version": 2,
+    "feed_decision": 1,
+    "work_case": 2,
+    "recipe_revision": 2
+  },
+  "south_preserved_by_operations_rehearsal": true
+}

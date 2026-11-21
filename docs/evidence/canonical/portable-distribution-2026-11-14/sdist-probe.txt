@@ -1,0 +1,10 @@
+Operations rehearsal failed: Choose a new operations root; existing storage is preserved
+Provider Directory Truth Layer run complete
+records: 12.0
+records_with_issues: 9.0
+total_issues: 11.0
+outputs: <distribution-root>/sdist-journey/qa
+Retained synthetic operations rehearsal: <distribution-root>/sdist-journey/operations/operations-rehearsal.json
+Approved contacts: 2; NORTH: reopened; held delivery, restart and restore preserved the approved consumer.
+Retained 8 synthetic cases; model calls attempted: 0; completed model cases: 0
+Evaluation report: <distribution-root>/sdist-journey/mapping/evaluation.json

@@ -1,0 +1,1140 @@
+{
+  "fixture_id": "r0-three-source-challenge-v1",
+  "schema_version": 1,
+  "designation": "Hand-authored synthetic evaluation labels; fictional people, identifiers, addresses and networks. No production matching results.",
+  "label_authoring": {
+    "method": "Independent manual source assertions and truth labels, authored before matching implementation.",
+    "purpose": "Freeze small challenge truth; all links remain operator-review candidates in a future application.",
+    "is_matching_output": false,
+    "runtime_identity_ids": false,
+    "record_id_semantics": "key and record_id are stable evaluation labels; source_native_id is the separately retained source identity and may be absent."
+  },
+  "networks": [
+    {
+      "network_id": "NET-CEDAR",
+      "name": "CEDAR (Synthetic)"
+    },
+    {
+      "network_id": "NET-PINE",
+      "name": "PINE (Synthetic)"
+    }
+  ],
+  "sources": {
+    "clinic": [
+      {
+        "key": "C1",
+        "record_id": "clinic:C1",
+        "entity_type": "clinician",
+        "name": "Alex Example",
+        "npi": "0000000001",
+        "office": "NORTH",
+        "phone": "2125550101",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "C1"
+      },
+      {
+        "key": "C2",
+        "record_id": "clinic:C2",
+        "entity_type": "clinician",
+        "name": "Alex Example",
+        "npi": "0000000001",
+        "office": "SOUTH",
+        "phone": "2125550102",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "20 Sample Ave",
+            "suite": "200",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "C2"
+      },
+      {
+        "key": "C3",
+        "record_id": "clinic:C3",
+        "entity_type": "clinician",
+        "name": "Robin Fixture",
+        "npi": "0000000002",
+        "office": "NORTH",
+        "phone": "2125550103",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "C3"
+      },
+      {
+        "key": "C4",
+        "record_id": "clinic:C4",
+        "entity_type": "clinician",
+        "name": "Casey Ambiguous",
+        "npi": null,
+        "office": "NORTH",
+        "phone": "2125550104",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": null
+      },
+      {
+        "key": "C5",
+        "record_id": "clinic:C5",
+        "entity_type": "clinician",
+        "name": "Casey Ambiguous",
+        "npi": null,
+        "office": "NORTH",
+        "phone": "2125550105",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": null
+      },
+      {
+        "key": "C6",
+        "record_id": "clinic:C6",
+        "entity_type": "organization",
+        "name": "Example Care Group",
+        "npi": "0000000901",
+        "office": "NORTH",
+        "phone": "2125550106",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "C6"
+      },
+      {
+        "key": "C7",
+        "record_id": "clinic:C7",
+        "entity_type": "clinician",
+        "name": "Morgan Suite",
+        "npi": "0000000007",
+        "office": "NORTH-SUITE-200",
+        "phone": "2125550107",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "200",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "C7"
+      }
+    ],
+    "payer": [
+      {
+        "key": "P1",
+        "record_id": "payer:P1",
+        "entity_type": "clinician",
+        "name": "Alex Example",
+        "npi": "0000000001",
+        "office": "NORTH",
+        "phone": "2125550199",
+        "network_id": "NET-CEDAR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "P1"
+      },
+      {
+        "key": "P2",
+        "record_id": "payer:P2",
+        "entity_type": "clinician",
+        "name": "Alex Example",
+        "npi": "0000000001",
+        "office": "SOUTH",
+        "phone": "2125550102",
+        "network_id": "NET-CEDAR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "20 Sample Ave",
+            "suite": "200",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "P2"
+      },
+      {
+        "key": "P3",
+        "record_id": "payer:P3",
+        "entity_type": "clinician",
+        "name": "Robin Fixture",
+        "npi": "0000000001",
+        "office": "NORTH",
+        "phone": "2125550103",
+        "network_id": "NET-CEDAR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "P3"
+      },
+      {
+        "key": "P4",
+        "record_id": "payer:P4",
+        "entity_type": "clinician",
+        "name": "Alex Example",
+        "npi": "0000000001",
+        "office": "NORTH",
+        "phone": "2125550198",
+        "network_id": "NET-PINE",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "P4"
+      },
+      {
+        "key": "P5",
+        "record_id": "payer:P5",
+        "entity_type": "clinician",
+        "name": "Casey Ambiguous",
+        "npi": null,
+        "office": "NORTH",
+        "phone": "2125550185",
+        "network_id": "NET-CEDAR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": null
+      },
+      {
+        "key": "P6",
+        "record_id": "payer:P6",
+        "entity_type": "organization",
+        "name": "Example Care Group",
+        "npi": "0000000001",
+        "office": "NORTH",
+        "phone": "2125550106",
+        "network_id": "NET-PINE",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "P6"
+      },
+      {
+        "key": "P7",
+        "record_id": "payer:P7",
+        "entity_type": "clinician",
+        "name": "Morgan Suite",
+        "npi": "0000000007",
+        "office": "NORTH-SUITE-200",
+        "phone": "2125550107",
+        "network_id": "NET-CEDAR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "200",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "P7"
+      },
+      {
+        "key": "P8",
+        "record_id": "payer:P8",
+        "entity_type": "clinician",
+        "name": "Avery Contradiction",
+        "npi": "0000000001",
+        "office": "NORTH",
+        "phone": "2125550188",
+        "network_id": "NET-PINE",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "P8"
+      },
+      {
+        "key": "P9",
+        "record_id": "payer:P9",
+        "entity_type": "clinician",
+        "name": "Alex Example",
+        "npi": null,
+        "office": null,
+        "phone": "2125550189",
+        "network_id": "NET-CEDAR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": null,
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": null
+      }
+    ],
+    "public_reference": [
+      {
+        "key": "R1",
+        "record_id": "public_reference:R1",
+        "entity_type": "clinician",
+        "name": "Alex Example",
+        "npi": "0000000001",
+        "office": null,
+        "phone": "2125550101",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "mailing",
+            "line1": "90 Postal Rd",
+            "suite": null,
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          },
+          {
+            "path": "addresses[1]",
+            "index": 1,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          },
+          {
+            "path": "addresses[2]",
+            "index": 2,
+            "kind": "practice",
+            "line1": "20 Sample Ave",
+            "suite": "200",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[1]",
+          "index": 1
+        },
+        "source_native_id": "R1"
+      },
+      {
+        "key": "R2",
+        "record_id": "public_reference:R2",
+        "entity_type": "clinician",
+        "name": "Robin Fixture",
+        "npi": "0000000002",
+        "office": null,
+        "phone": null,
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "mailing",
+            "line1": "90 Postal Rd",
+            "suite": null,
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": null,
+        "source_native_id": "R2"
+      },
+      {
+        "key": "R3",
+        "record_id": "public_reference:R3",
+        "entity_type": "organization",
+        "name": "Example Care Group",
+        "npi": "0000000901",
+        "office": null,
+        "phone": null,
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "R3"
+      },
+      {
+        "key": "R4",
+        "record_id": "public_reference:R4",
+        "entity_type": "clinician",
+        "name": "Avery Contradiction",
+        "npi": "0000000001",
+        "office": null,
+        "phone": null,
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "R4"
+      },
+      {
+        "key": "R5",
+        "record_id": "public_reference:R5",
+        "entity_type": "clinician",
+        "name": "Morgan Suite",
+        "npi": "0000000007",
+        "office": null,
+        "phone": null,
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "200",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "R5"
+      },
+      {
+        "key": "R6",
+        "record_id": "public_reference:R6",
+        "entity_type": "clinician",
+        "name": "Casey Ambiguous",
+        "npi": null,
+        "office": null,
+        "phone": null,
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "suite": "100",
+            "city": "Exampleton",
+            "state": "MA",
+            "zip": "02108"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": null
+      }
+    ]
+  },
+  "expected_clinician_links": [
+    {
+      "clinician_id": "CLIN-ALEX",
+      "records": [
+        "clinic:C1",
+        "clinic:C2",
+        "payer:P1",
+        "payer:P2",
+        "payer:P4",
+        "public_reference:R1"
+      ],
+      "reason": "Hand-labeled same clinician across two offices and two payer networks; office links are separate.",
+      "review_required": true
+    },
+    {
+      "clinician_id": "CLIN-ROBIN",
+      "records": [
+        "clinic:C3",
+        "public_reference:R2"
+      ],
+      "reason": "Hand-labeled clinician identity; reference mailing address does not establish an operating office.",
+      "review_required": true
+    },
+    {
+      "clinician_id": "CLIN-MORGAN",
+      "records": [
+        "clinic:C7",
+        "payer:P7",
+        "public_reference:R5"
+      ],
+      "reason": "Hand-labeled clinician in Suite 200; distinct from other clinicians sharing this street.",
+      "review_required": true
+    }
+  ],
+  "expected_organization_links": [
+    {
+      "organization_id": "ORG-EXAMPLE",
+      "records": [
+        "clinic:C6",
+        "public_reference:R3"
+      ],
+      "reason": "Organization identity remains separate from clinicians and from unresolved payer organization assertions."
+    }
+  ],
+  "expected_location_links": [
+    {
+      "location_id": "LOC-NORTH-S100",
+      "label": "NORTH \u00b7 Suite 100",
+      "members": [
+        {
+          "record": "clinic:C1",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "clinic:C3",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "clinic:C4",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "clinic:C5",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "clinic:C6",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P1",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P3",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P4",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P5",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P6",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P8",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:R3",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:R4",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:R6",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:R1",
+          "address_path": "addresses[1]",
+          "address_index": 1
+        }
+      ],
+      "reason": "Explicit practice-address assertions agree at street and suite; shared office does not identify a clinician."
+    },
+    {
+      "location_id": "LOC-SOUTH-S200",
+      "label": "SOUTH \u00b7 Suite 200",
+      "members": [
+        {
+          "record": "clinic:C2",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P2",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:R1",
+          "address_path": "addresses[2]",
+          "address_index": 2
+        }
+      ],
+      "reason": "Second operating office is separately selected from the same native reference record."
+    },
+    {
+      "location_id": "LOC-NORTH-S200",
+      "label": "NORTH \u00b7 Suite 200",
+      "members": [
+        {
+          "record": "clinic:C7",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:P7",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:R5",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        }
+      ],
+      "reason": "Same street as NORTH Suite 100, but distinct suite means a separate location."
+    }
+  ],
+  "expected_unresolved": [
+    {
+      "records": [
+        "clinic:C1",
+        "public_reference:R4"
+      ],
+      "scope": "clinician",
+      "case": "same_npi_conflicting_identity",
+      "reason": "Identical NPI contradicts person names; no alias or reviewed identity bridge is supplied."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "payer:P8"
+      ],
+      "scope": "clinician",
+      "case": "same_npi_conflicting_identity",
+      "reason": "Contradictory person name despite same NPI; retain unresolved identity."
+    },
+    {
+      "records": [
+        "clinic:C3",
+        "payer:P3"
+      ],
+      "scope": "clinician",
+      "case": "contradictory_identifiers",
+      "reason": "Name, office and phone agree but NPI contradicts; neither assertion is selected as truth."
+    },
+    {
+      "records": [
+        "clinic:C4",
+        "clinic:C5"
+      ],
+      "scope": "clinician",
+      "case": "ambiguous_name_missing_identifiers",
+      "reason": "Two unkeyed clinicians have identical names and shared office but different phones; do not collapse them."
+    },
+    {
+      "records": [
+        "clinic:C4",
+        "payer:P5",
+        "public_reference:R6"
+      ],
+      "scope": "clinician",
+      "case": "ambiguous_name_missing_identifiers",
+      "reason": "No NPI or reviewed native crosswalk chooses between the two Casey clinicians."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "payer:P9"
+      ],
+      "scope": "clinician_and_location",
+      "case": "missing_identifier_and_suite",
+      "reason": "A matching name and street without NPI, office key or suite cannot establish a reviewed person/location link."
+    },
+    {
+      "records": [
+        "clinic:C6",
+        "payer:P6"
+      ],
+      "scope": "organization",
+      "case": "contradictory_identifiers",
+      "reason": "Same organization name but conflicting NPI; organization resolution is not inferred."
+    }
+  ],
+  "expected_clinician_nonlinks": [
+    {
+      "records": [
+        "clinic:C1",
+        "clinic:C3"
+      ],
+      "scope": "clinician",
+      "case": "shared_office_distinct_clinicians",
+      "reason": "Shared practice suite is not person identity."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "payer:P6"
+      ],
+      "scope": "clinician",
+      "case": "organization_vs_clinician",
+      "reason": "An organization assertion cannot bind to a clinician even when NPI is equal."
+    },
+    {
+      "records": [
+        "clinic:C6",
+        "public_reference:R1"
+      ],
+      "scope": "clinician",
+      "case": "organization_vs_clinician",
+      "reason": "Organization and clinician are distinct identity types."
+    }
+  ],
+  "expected_location_nonlinks": [
+    {
+      "records": [
+        "clinic:C1",
+        "clinic:C2"
+      ],
+      "scope": "location",
+      "case": "two_offices_per_clinician",
+      "reason": "One clinician has two distinct operating offices."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "clinic:C7"
+      ],
+      "scope": "location",
+      "case": "distinct_suites",
+      "reason": "Same street with Suite 100 versus Suite 200 remains distinct."
+    },
+    {
+      "records": [
+        "clinic:C3",
+        "public_reference:R2"
+      ],
+      "scope": "operating_location",
+      "case": "mailing_not_practice",
+      "reason": "Mailing-only native evidence cannot establish the clinician's operating office."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "public_reference:R1"
+      ],
+      "scope": "operating_location",
+      "case": "mailing_not_practice",
+      "address_selection": {
+        "record": "public_reference:R1",
+        "address_path": "addresses[0]",
+        "address_index": 0
+      },
+      "reason": "The reference mailing address is excluded; only explicitly selected practice paths can link."
+    }
+  ],
+  "expected_conflicts": [
+    {
+      "records": [
+        "clinic:C1",
+        "payer:P1"
+      ],
+      "field": "phone",
+      "reason": "Same labeled clinician/location, contradictory phone assertions."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "payer:P4"
+      ],
+      "field": "phone",
+      "reason": "Second network independently publishes a different phone."
+    },
+    {
+      "records": [
+        "clinic:C3",
+        "payer:P3"
+      ],
+      "field": "npi",
+      "reason": "Person evidence and NPI conflict; identity remains unresolved."
+    }
+  ],
+  "impact_case": {
+    "proposal_id": "PROPOSAL-NORTH-PHONE",
+    "clinician_id": "CLIN-ALEX",
+    "location_id": "LOC-NORTH-S100",
+    "field": "phone",
+    "anchor_record": "clinic:C1",
+    "old_value": "2125550101",
+    "proposed_value": "2125550111",
+    "source_scope": [
+      "payer"
+    ],
+    "network_scope": [
+      "NET-CEDAR",
+      "NET-PINE"
+    ],
+    "assessed_records": [
+      "payer:P1",
+      "payer:P2",
+      "payer:P3",
+      "payer:P4",
+      "payer:P5",
+      "payer:P6",
+      "payer:P7",
+      "payer:P8",
+      "payer:P9"
+    ],
+    "expected_targets": [
+      {
+        "record": "payer:P1",
+        "network_id": "NET-CEDAR",
+        "reason": "Reviewed same clinician and NORTH Suite 100 in CEDAR."
+      },
+      {
+        "record": "payer:P4",
+        "network_id": "NET-PINE",
+        "reason": "Reviewed same clinician and NORTH Suite 100 in PINE."
+      }
+    ],
+    "expected_unaffected": [
+      {
+        "record": "payer:P2",
+        "reason": "Same clinician, SOUTH office; NORTH phone proposal does not target it."
+      },
+      {
+        "record": "payer:P7",
+        "reason": "Different clinician at distinct Suite 200; same street does not extend impact."
+      }
+    ],
+    "expected_not_assessed": [
+      {
+        "record": "payer:P3",
+        "reason": "Unresolved contradictory clinician identity."
+      },
+      {
+        "record": "payer:P5",
+        "reason": "Ambiguous name and missing identifiers; no reviewed clinician link."
+      },
+      {
+        "record": "payer:P6",
+        "reason": "Unresolved organization assertion; no clinician binding."
+      },
+      {
+        "record": "payer:P8",
+        "reason": "Conflicting identity despite equal NPI; no reviewed clinician link."
+      },
+      {
+        "record": "payer:P9",
+        "reason": "Missing clinician and exact location linkage."
+      }
+    ],
+    "expected_counts": {
+      "affected": 2,
+      "unaffected_within_assessed_scope": 2,
+      "not_assessed": 5
+    },
+    "notice": "Hand-labeled dependency scope only. No source change, automatic follow-up, external submission or verification is authorized.",
+    "dependency_assumption": "Expected targets assume the labeled clinician and location relationships have been explicitly approved in a future evaluation. This fixture itself approves nothing."
+  },
+  "compatibility_note": "expected_links aliases labeled location groups for the initial fixture sanity test; new evaluations must use the explicit clinician/location label collections.",
+  "expected_links": [
+    {
+      "records": [
+        "clinic:C1",
+        "clinic:C3",
+        "clinic:C4",
+        "clinic:C5",
+        "clinic:C6",
+        "payer:P1",
+        "payer:P3",
+        "payer:P4",
+        "payer:P5",
+        "payer:P6",
+        "payer:P8",
+        "public_reference:R3",
+        "public_reference:R4",
+        "public_reference:R6",
+        "public_reference:R1"
+      ],
+      "scope": "location",
+      "review_required": true
+    },
+    {
+      "records": [
+        "clinic:C2",
+        "payer:P2",
+        "public_reference:R1"
+      ],
+      "scope": "location",
+      "review_required": true
+    },
+    {
+      "records": [
+        "clinic:C7",
+        "payer:P7",
+        "public_reference:R5"
+      ],
+      "scope": "location",
+      "review_required": true
+    }
+  ],
+  "expected_nonlinks": [
+    {
+      "records": [
+        "clinic:C1",
+        "clinic:C2"
+      ],
+      "scope": "location",
+      "case": "two_offices_per_clinician",
+      "reason": "One clinician has two distinct operating offices."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "clinic:C7"
+      ],
+      "scope": "location",
+      "case": "distinct_suites",
+      "reason": "Same street with Suite 100 versus Suite 200 remains distinct."
+    },
+    {
+      "records": [
+        "clinic:C3",
+        "public_reference:R2"
+      ],
+      "scope": "operating_location",
+      "case": "mailing_not_practice",
+      "reason": "Mailing-only native evidence cannot establish the clinician's operating office."
+    },
+    {
+      "records": [
+        "clinic:C1",
+        "public_reference:R1"
+      ],
+      "scope": "operating_location",
+      "case": "mailing_not_practice",
+      "address_selection": {
+        "record": "public_reference:R1",
+        "address_path": "addresses[0]",
+        "address_index": 0
+      },
+      "reason": "The reference mailing address is excluded; only explicitly selected practice paths can link."
+    }
+  ]
+}

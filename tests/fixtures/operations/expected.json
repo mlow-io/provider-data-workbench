@@ -1,0 +1,19 @@
+{
+  "designation": "independently authored synthetic operations expectations; no real clinicians",
+  "npi": "1000000001",
+  "contacts": {
+    "NORTH": {"phone": "6175550100", "phone_extension": "007", "zip": "02108"},
+    "SOUTH": {"phone": "6175550200", "phone_extension": "008", "zip": "02108"}
+  },
+  "workbook": {"valid": 1, "quarantined": 2},
+  "approved_rows": 2,
+  "held_missing_keys": 1,
+  "fhir_office_assertions": 2,
+  "north_selected_phone": "6175550199",
+  "north_selected_extension": null,
+  "north_work_status": "reopened",
+  "north_outreach_events": 2,
+  "north_resource_locators": ["$.entry[0].resource", "$.entry[1].resource", "$.entry[2].resource", "$.entry[3].resource", "$.entry[5].resource"],
+  "excluded_south_resource_locator": "$.entry[4].resource",
+  "automatic_local_networks": 0
+}

@@ -1,0 +1,6 @@
+{
+  "enabled": false,
+  "configured_key_present": false,
+  "available": false,
+  "reason": "Optional model client is disabled or OPENAI_API_KEY is unavailable"
+}

@@ -1,0 +1,123 @@
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, expect, test, vi } from "vitest";
+import { ManagedFeeds } from "./ManagedFeeds";
+
+afterEach(() => vi.unstubAllGlobals());
+const recipe = { id: "recipe-1", name: "Reviewed synthetic clinic", source: "synthetic-clinic", scope: "weekly-clinic", definition: { mapping: { npi: "npi", phone: "phone", location_id: "location_id" } } };
+const contract = { id: "contract-1", state: "approved", definition: { recipe_revision_id: "recipe-1", required_headers: ["npi", "phone", "location_id"], row_change_fraction: 0.2 } };
+const feed = { id: "feed-1", name: "Synthetic clinic weekly", source: recipe.source, scope: recipe.scope, revision: 2, config: { inbox: "/synthetic/inbox", owner: "Clinic coordinator", enabled: true, contract_id: "contract-1" }, contracts: [contract], jobs: [{ id: "job-1", state: "succeeded", execution_count: 1 }], versions: [{ id: "candidate-2", state: "candidate", period: "2026-11-02", delivery_id: "delivery-2", created_at: "2026-11-02T09:00:00Z" }], windows: [] };
+function api(options: { hard?: boolean; stale?: boolean } = {}) {
+  const calls: { url: string; body?: Record<string, unknown> }[] = [];
+  let acknowledged = false;
+  let approved = false;
+  let reportHash = "report-2";
+  let conflict = options.stale ?? false;
+  vi.stubGlobal("fetch", vi.fn(async (input: string, init?: RequestInit) => {
+    const url = String(input);
+    const body = init?.body ? JSON.parse(String(init.body)) : undefined;
+    calls.push({ url, body });
+    if (url.endsWith("/decide") && conflict) {
+      conflict = false; reportHash = "report-3";
+      return new Response(JSON.stringify({ detail: "Approved baseline changed; reload before approval" }), { status: 409 });
+    }
+    if (url.endsWith("/exceptions")) acknowledged = body.disposition === "acknowledged";
+    if (url.endsWith("/decide")) approved = true;
+    const version = { id: "candidate-2", state: approved ? "approved" : "candidate", report_hash: reportHash, current_version: "approved-1", report: { counts: { raw: 3, valid: 2, quarantined: 1, unique: 3 }, comparison: { baseline_version: "approved-1", missing: 1 }, findings: options.hard ? [{ code: "headers", severity: "hard", message: "Required phone header is missing" }] : [{ code: "quarantine", severity: "hold", message: "One source row is quarantined" }] }, review: acknowledged ? [{ code: "quarantine", disposition: "acknowledged", actor: "Reviewer", reason: "Reviewed invalid row" }] : [], rows: [{ original: { zip: "02108" } }], delivery: { id: "delivery-2" }, manifest: { period: "2026-11-02" } };
+    const value = url === "/api/feeds" ? (body ? feed : { items: [feed] })
+      : url === "/api/feeds/recipes" ? { items: [recipe] }
+      : url === "/api/feeds/feed-1/current" ? { version_id: approved ? "candidate-2" : "approved-1", stale: true, notice: "A newer delivery is awaiting review" }
+      : url === "/api/feeds/feed-1" ? feed
+      : url === "/api/feed-versions/candidate-2" ? version
+      : { id: "saved" };
+    return new Response(JSON.stringify(value));
+  }));
+  return calls;
+}
+async function openCandidate() {
+  fireEvent.click(await screen.findByRole("button", { name: /Synthetic clinic weekly/ }));
+  fireEvent.change(screen.getByLabelText("Reviewer"), { target: { value: "Reviewer" } });
+  fireEvent.change(screen.getByLabelText("Decision reason"), { target: { value: "Reviewed invalid row" } });
+  fireEvent.click(await screen.findByRole("button", { name: /candidate · 2026-11-02/ }));
+  await screen.findByRole("heading", { name: "Dataset review · candidate" });
+}
+
+test("registry failure is not reported as an empty registry and can be retried", async () => {
+  let unavailable = true;
+  vi.stubGlobal("fetch", vi.fn(async (input: string) => {
+    if (String(input) === '/api/feeds' && unavailable) {
+      return new Response(JSON.stringify({detail:'Source registry unavailable'}), {status:503});
+    }
+    return new Response(JSON.stringify({items:[]}));
+  }));
+  render(<ManagedFeeds />);
+  expect(await screen.findByRole('alert')).toHaveTextContent('Source registry unavailable');
+  expect(screen.queryByText(/No managed feeds yet/)).not.toBeInTheDocument();
+  unavailable = false;
+  fireEvent.click(screen.getByRole('button', {name:'Reload evidence'}));
+  await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+  expect(await screen.findByText(/No managed feeds yet/)).toBeVisible();
+});
+
+test("held candidate leaves prior approved version available and requires separate risk acknowledgement and dataset approval", async () => {
+  const calls = api();
+  render(<ManagedFeeds />);
+  await openCandidate();
+  expect(screen.getByRole("link", { name: "Download current approved JSON" })).toHaveAttribute("href", "/api/feed-versions/approved-1/export");
+  expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeDisabled();
+  expect(calls.filter(call => call.body)).toHaveLength(0);
+  fireEvent.click(screen.getByRole("button", { name: "Acknowledge quarantine" }));
+  await waitFor(() => expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeEnabled());
+  expect(calls.some(call => call.url.endsWith("/decide"))).toBe(false);
+  fireEvent.click(screen.getByRole("button", { name: "Approve dataset version" }));
+  await screen.findByRole("heading", { name: "Dataset review · approved" });
+  const decision = calls.find(call => call.url.endsWith("/decide"))!;
+  expect(decision.body).toMatchObject({ decision: "approved", expected_report: "report-2", expected_current: "approved-1", actor: "Reviewer", reason: "Reviewed invalid row" });
+  expect(decision.body?.idempotency_key).toEqual(expect.any(String));
+  expect(screen.getByRole("link", { name: "Download this approved version JSON" })).toHaveAttribute("href", "/api/feed-versions/candidate-2/export");
+});
+
+test("hard contract failure cannot be acknowledged or approved", async () => {
+  api({ hard: true });
+  render(<ManagedFeeds />);
+  await openCandidate();
+  expect(screen.getByText("Required phone header is missing")).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /Acknowledge/ })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Reject candidate" })).toBeEnabled();
+});
+
+test("stale approval reports a conflict and reload refreshes the pinned report before a new decision", async () => {
+  const calls = api({ stale: true });
+  render(<ManagedFeeds />);
+  await openCandidate();
+  fireEvent.click(screen.getByRole("button", { name: "Acknowledge quarantine" }));
+  await waitFor(() => expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeEnabled());
+  fireEvent.click(screen.getByRole("button", { name: "Approve dataset version" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Approved baseline changed; reload before approval");
+  expect(screen.getByRole("heading", { name: "Dataset review · candidate" })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Reload evidence" }));
+  await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
+  await waitFor(() => expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeEnabled());
+  fireEvent.click(screen.getByRole("button", { name: "Approve dataset version" }));
+  await screen.findByRole("heading", { name: "Dataset review · approved" });
+  expect(calls.filter(call => call.url.endsWith("/decide")).map(call => call.body?.expected_report)).toEqual(["report-2", "report-3"]);
+});
+
+test("registration is disabled without reviewer and reason and preserves the chosen recipe's source scope", async () => {
+  const calls = api();
+  render(<ManagedFeeds />);
+  await screen.findByRole("button", { name: /Synthetic clinic weekly/ });
+  fireEvent.click(screen.getByText("Register a clinic CSV feed"));
+  const form = screen.getByRole("button", { name: "Register disabled feed" }).closest("form")!;
+  expect(within(form).getByRole("button", { name: "Register disabled feed" })).toBeDisabled();
+  fireEvent.change(screen.getByLabelText("Feed name"), { target: { value: "New clinic" } });
+  fireEvent.change(screen.getByLabelText("Approved source recipe"), { target: { value: "recipe-1" } });
+  fireEvent.change(screen.getByLabelText("Local inbox directory"), { target: { value: "/synthetic/new-inbox" } });
+  fireEvent.change(screen.getByLabelText("Feed owner"), { target: { value: "Coordinator" } });
+  fireEvent.change(screen.getByLabelText("Reviewer"), { target: { value: "Reviewer" } });
+  fireEvent.change(screen.getByLabelText("Decision reason"), { target: { value: "Register reviewed scope" } });
+  fireEvent.submit(form);
+  await waitFor(() => expect(calls.find(call => call.url === "/api/feeds" && call.body)?.body).toMatchObject({ name: "New clinic", source: "synthetic-clinic", scope: "weekly-clinic", inbox: "/synthetic/new-inbox", owner: "Coordinator", actor: "Reviewer", reason: "Register reviewed scope" }));
+  await screen.findByText("Feed registered and disabled. Propose and approve its contract before enabling deliveries.");
+  expect(calls.some(call => call.url.endsWith("/approve") || call.url.endsWith("/configure") || call.url.endsWith("/decide"))).toBe(false);
+});

@@ -1,0 +1,88 @@
+python3 -m pytest
+============================= test session starts ==============================
+platform darwin -- Python 3.13.2, pytest-9.2.0, pluggy-1.7.0
+rootdir: <checkout>
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0
+collected 849 items
+
+tests/test_approved_consumer.py .........................                [  2%]
+tests/test_change_impact.py ...............                              [  4%]
+tests/test_change_impact_evaluation.py .....                             [  5%]
+tests/test_comparison.py ............................................... [ 10%]
+.................................................                        [ 16%]
+tests/test_demo_launcher.py .........                                    [ 17%]
+tests/test_employer_readiness.py ................                        [ 19%]
+tests/test_export.py ......                                              [ 20%]
+tests/test_fhir_acquisition.py ......................................... [ 25%]
+...................                                                      [ 27%]
+tests/test_fhir_filtered_response.py ................................... [ 31%]
+                                                                         [ 31%]
+tests/test_fhir_intake.py .............................................. [ 36%]
+................................                                         [ 40%]
+tests/test_fhir_store.py ....................                            [ 42%]
+tests/test_field_reconciliation.py ..............                        [ 44%]
+tests/test_follow_up.py .............                                    [ 46%]
+tests/test_follow_up_export.py .........                                 [ 47%]
+tests/test_identity_review.py ..............                             [ 48%]
+tests/test_ingestion_recovery.py ..                                      [ 49%]
+tests/test_intake_adapters.py ....................................       [ 53%]
+tests/test_intake_api.py ....                                            [ 53%]
+tests/test_intake_store.py ..........................                    [ 56%]
+tests/test_managed_feed.py ......................                        [ 59%]
+tests/test_managed_feed_boundaries.py .................                  [ 61%]
+tests/test_mapping_assistant.py ...........................              [ 64%]
+tests/test_mapping_evaluation.py .....                                   [ 65%]
+tests/test_mapping_model_transport.py ........                           [ 66%]
+tests/test_mcp_onboarding.py ...                                         [ 66%]
+tests/test_network_demo_api.py .                                         [ 66%]
+tests/test_network_demo_samples.py ...                                   [ 67%]
+tests/test_network_intake.py ...........                                 [ 68%]
+tests/test_network_review.py ........                                    [ 69%]
+tests/test_normalization_recipes.py .................................... [ 73%]
+........................................                                 [ 78%]
+tests/test_normalize.py ....                                             [ 78%]
+tests/test_npi_api.py .....                                              [ 79%]
+tests/test_onboarding_service.py ..........                              [ 80%]
+tests/test_operations_rehearsal.py ....                                  [ 80%]
+tests/test_operations_sql.py ............                                [ 82%]
+tests/test_outreach.py ............                                      [ 83%]
+tests/test_pinned_receipt.py .....                                       [ 84%]
+tests/test_pipeline.py ....                                              [ 84%]
+tests/test_project_docs.py .....                                         [ 85%]
+tests/test_reconciliation_contract_fixtures.py ..........                [ 86%]
+tests/test_reconciliation_corpus.py ............                         [ 87%]
+tests/test_reconciliation_demo.py .                                      [ 88%]
+tests/test_reconciliation_evaluation.py .......                          [ 88%]
+tests/test_reconciliation_queue.py ...........                           [ 90%]
+tests/test_reconciliation_store.py .....................                 [ 92%]
+tests/test_reconciliation_triage.py ...............                      [ 94%]
+tests/test_recurring_api.py .                                            [ 94%]
+tests/test_recurring_intake.py ..........                                [ 95%]
+tests/test_remediation.py .......                                        [ 96%]
+tests/test_remediation_api.py .......                                    [ 97%]
+tests/test_review_api.py ...                                             [ 97%]
+tests/test_storage.py ...                                                [ 98%]
+tests/test_storage_backup.py ...............                             [ 99%]
+tests/test_work_export_scope.py .                                        [100%]
+
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  <checkout>/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 849 passed, 1 warning in 161.36s (0:02:41) ==================
+python3 scripts/run_validation.py
+Provider Directory Truth Layer run complete
+records: 12.0
+records_with_issues: 9.0
+total_issues: 11.0
+payer_listings: 8
+field_discrepancies: 6
+outputs: <checkout>/.runtime/validation-uke0onf1/exports
+[OK] Provider Directory Truth Layer validation passed
+[OK] Outputs present and exception report populated
+[OK] SQLite review database contains expected tables
+Retained validation root: <checkout>/.runtime/validation-uke0onf1

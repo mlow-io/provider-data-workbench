@@ -1,0 +1,4 @@
+record_id,npi,provider_name,address,city,state,zip,phone,location_id
+SYNTHETIC-001,1234567890,Synthetic Avery Clinic,10 Fiction Street,Example,MA,02108,invalid-phone,NORTH
+SYNTHETIC-001,1234567890,Synthetic Avery Clinic,20 Fiction Street,Example,MA,02109,6175550102,SOUTH
+SYNTHETIC-002,1234567891,Synthetic Jordan Clinic,30 Fiction Street,Example,MA,02110,6175550103,EAST

@@ -1,0 +1,31 @@
+{
+  "resourceType": "Location",
+  "id": "north",
+  "status": "active",
+  "name": "Synthetic NORTH",
+  "address": {
+    "line": [
+      "10 Example St"
+    ],
+    "city": "Example",
+    "state": "ZZ",
+    "postalCode": "02108",
+    "country": "US"
+  },
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "617-555-0100",
+      "use": "work"
+    }
+  ],
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Location"
+    ]
+  },
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Synthetic NORTH office at 10 Example St, Example MA 02108. Phone 617-555-0100.</div>"
+  }
+}

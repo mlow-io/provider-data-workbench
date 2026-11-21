@@ -1,0 +1,105 @@
+F.F..FF                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_positive_graph_keeps_independent_values_network_scope_and_all_reference_paths _
+
+    def test_positive_graph_keeps_independent_values_network_scope_and_all_reference_paths():
+        result = parse_bundle(PAYLOAD)
+>       assert len(result['assertions']) == 2, result['findings']
+E       AssertionError: [{'code': 'unresolved_network_scope', 'locator': '$.entry[6].resource', 'message': 'Network reference must resolve to ...ry[7].resource', 'message': 'Network reference must resolve to an explicit Network profile', 'severity': 'error', ...}]
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/test_fhir_graph.py:25: AssertionError
+_ test_network_classification_requires_the_declared_supported_profile[http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network|1.2.0-True] _
+
+canonical = 'http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network|1.2.0'
+supported = True
+
+    @pytest.mark.parametrize('canonical, supported', [(NETWORK_PROFILE, True), (NETWORK_PROFILE + '|1.2.0', True),
+        (NETWORK_PROFILE + '|999.0.0', False), (NETWORK_PROFILE + '|1.2.0#other', False)])
+    def test_network_classification_requires_the_declared_supported_profile(canonical, supported):
+        value = json.loads(PAYLOAD); value['entry'][3]['resource']['meta']['profile'] = [canonical]
+        result = parse_bundle(packed(value).encode())
+>       assert len(result['assertions']) == (2 if supported else 0)
+E       assert 0 == 2
+E        +  where 0 = len([])
+
+tests/test_fhir_graph.py:51: AssertionError
+____ test_v1_attempt_and_observations_survive_explicit_v2_reinterpretation _____
+
+tmp_path = PosixPath('/private<temporary-path>')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109dd23f0>
+
+    def test_v1_attempt_and_observations_survive_explicit_v2_reinterpretation(tmp_path, monkeypatch):
+        from provider_directory_truth_layer import fhir_intake, fhir_store
+        value = json.loads(PAYLOAD); value['entry'][3]['resource']['meta']['profile'] = [NETWORK_PROFILE]
+        raw = packed(value).encode()
+        store = IntakeStore(tmp_path/'graph.sqlite3', tmp_path)
+        # The bare Network representation had identical interpretation semantics in
+        # v1. Model that known preceding version without rewriting stored attempts.
+        with monkeypatch.context() as legacy:
+            legacy.setattr(fhir_intake, 'VERSION', 'fhir-plannet-r4-v1')
+            legacy.setattr(fhir_store, 'VERSION', 'fhir-plannet-r4-v1')
+            receipt = store.receive(raw, 'old-graph.json', source='synthetic-old-graph', profile='fhir-plannet-r4')
+            accepted = store.commit(receipt['id'], request(receipt))
+        old_attempt = receipt['attempt_id']; old_observations = copy.deepcopy(accepted['observations'])
+        reopened = IntakeStore.open_existing(store.path, store.root)
+        old = reopened.detail(receipt['id'])
+        assert old['attempt_id'] == old_attempt and old['preview']['native']['parser_version'] == 'fhir-plannet-r4-v1'
+        assert old['observations'] == old_observations
+        newer = reopened.mapping(receipt['id'], {'expected_attempt': old_attempt})
+        assert newer['attempt_id'] != old_attempt
+>       assert newer['preview']['native']['parser_version'] == EXPECTED['parser_version']
+E       AssertionError: assert 'fhir-plannet-r4-v1' == 'fhir-plannet-r4-v2'
+E         
+E         - fhir-plannet-r4-v2
+E         ?                  ^
+E         + fhir-plannet-r4-v1
+E         ?                  ^
+
+tests/test_fhir_graph.py:76: AssertionError
+___ test_profile_graph_reaches_reviewed_north_export_without_changing_south ____
+
+tmp_path = PosixPath('/private<temporary-path>')
+
+    def test_profile_graph_reaches_reviewed_north_export_without_changing_south(tmp_path):
+        from provider_directory_truth_layer.identity_review import IdentityReview
+        from provider_directory_truth_layer.field_reconciliation import FieldReconciliation, workbook
+        from provider_directory_truth_layer.operations_rehearsal import link, xlsx_payload
+        store = IntakeStore(tmp_path/'graph.sqlite3', tmp_path)
+        native = store.receive(PAYLOAD, 'profile-graph.json', source='synthetic-profile-graph', profile='fhir-plannet-r4')
+        accepted = store.commit(native['id'], request(native))
+        assert len(accepted['observations']) == 8 and accepted['linked_cases'] == []
+        clinic_rows = [{'record_id': role['id'], 'npi': EXPECTED['npi'], 'provider_name': EXPECTED['provider_name'],
+            'entity_type': 'clinician', 'location_id': role['id'].removeprefix('role-').upper(),
+            'address': role['address_line'], 'city': 'Example', 'state': 'MA', 'zip': role['zip'],
+            'phone': '6175550199' if role['id'] == 'role-north' else '6175550200'} for role in EXPECTED['roles']]
+        clinic = store.receive(packed(clinic_rows).encode(), 'clinic.json', source='synthetic-clinic')
+        comparison = ReconciliationStore(store)
+        run = comparison.create_run({'inputs': [{'receipt_id': r['id'], 'attempt_id': r['attempt_id']} for r in (native, clinic)],
+            'actor': 'Synthetic reviewer', 'reason': 'Review exact source and office relationships'})
+        reviewer = IdentityReview(store)
+>       person = link(reviewer, comparison, run['id'], native, clinic, 'clinician', 'Synthetic Example')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_fhir_graph.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/provider_directory_truth_layer/operations_rehearsal.py:152: in link
+    require(bool(choices), 'Expected exact typed source candidate is missing: ' + label)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+condition = False
+message = 'Expected exact typed source candidate is missing: Synthetic Example'
+
+    def require(condition, message):
+        if not condition:
+>           raise RuntimeError(message)
+E           RuntimeError: Expected exact typed source candidate is missing: Synthetic Example
+
+src/provider_directory_truth_layer/operations_rehearsal.py:53: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_fhir_graph.py::test_positive_graph_keeps_independent_values_network_scope_and_all_reference_paths
+FAILED tests/test_fhir_graph.py::test_network_classification_requires_the_declared_supported_profile[http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network|1.2.0-True]
+FAILED tests/test_fhir_graph.py::test_v1_attempt_and_observations_survive_explicit_v2_reinterpretation
+FAILED tests/test_fhir_graph.py::test_profile_graph_reaches_reviewed_north_export_without_changing_south
+4 failed, 3 passed in 0.50s

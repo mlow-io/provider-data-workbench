@@ -1,0 +1,253 @@
+.rc-shell {
+  max-width: 1480px;
+}
+.rc-shell button,
+.rc-shell select,
+.rc-shell input {
+  font: inherit;
+}
+.rc-shell button {
+  cursor: pointer;
+  padding: 9px 12px;
+  border: 1px solid #b5cbc8;
+  border-radius: 5px;
+  background: #f4f8f6;
+  color: #224b46;
+}
+.rc-shell button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.rc-shell label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.rc-shell input:not([type="checkbox"]),
+.rc-shell select {
+  padding: 10px;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid #b7cbc8;
+  border-radius: 5px;
+  background: white;
+  color: #203c43;
+}
+.rc-shell :focus-visible {
+  outline: 3px solid #357d75;
+  outline-offset: 3px;
+}
+.rc-shell code,
+.rc-shell pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.rc-source-list {
+  border-top: 1px solid #dce6e3;
+}
+.rc-source {
+  padding: 16px 0;
+  border-bottom: 1px solid #dce6e3;
+}
+.rc-source .rc-check {
+  flex-direction: row;
+  align-items: start;
+  gap: 12px;
+}
+.rc-check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: #2a6c60;
+}
+.rc-check small {
+  display: block;
+  font-weight: 400;
+  color: #657b7e;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.rc-source-actions,
+.rc-create,
+.rc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: end;
+  margin-top: 16px;
+}
+.rc-source-actions label {
+  max-width: 360px;
+}
+.rc-create label {
+  flex: 1 1 220px;
+}
+.rc-pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  font-size: 13px;
+}
+.rc-warning,
+.rc-error {
+  padding: 14px;
+  border-left: 4px solid #ab6f28;
+  background: #fff5e6;
+  overflow-wrap: anywhere;
+}
+.rc-error {
+  background: #fff0ed;
+  border-color: #b04d41;
+}
+.rc-quality-counts,
+.rc-run-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0;
+}
+.rc-quality-counts span,
+.rc-run-summary span {
+  background: #f0f6f3;
+  padding: 8px 11px;
+  border: 1px solid #d7e5de;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.rc-shell details {
+  border-top: 1px solid #d7e3df;
+  padding: 12px 0;
+  min-width: 0;
+}
+.rc-shell summary {
+  cursor: pointer;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.rc-shell h4 {
+  margin: 12px 0;
+  font-size: 14px;
+}
+.rc-reference {
+  font-size: 12px;
+  color: #60777a;
+  overflow-wrap: anywhere;
+}
+.rc-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+.rc-evidence {
+  min-width: 0;
+}
+.rc-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dce5e2;
+}
+.rc-scroll table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+.rc-scroll td,
+.rc-scroll th {
+  padding: 9px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e0e8e5;
+  vertical-align: top;
+  min-width: 100px;
+}
+.rc-scroll th {
+  background: #f4f7f5;
+}
+.rc-reasons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.rc-reasons section {
+  padding: 8px 14px;
+  border-top: 3px solid #78968d;
+  background: #f3f7f5;
+}
+.rc-reasons .rc-contradictions {
+  border-color: #ac6e46;
+  background: #fcf4ed;
+}
+.rc-reasons .rc-missing {
+  border-color: #89939b;
+  background: #f2f4f7;
+}
+.rc-reasons ul {
+  margin: 0;
+  padding: 0 0 0 16px;
+}
+.rc-reasons li,
+.rc-reasons p {
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.rc-candidate-meta {
+  display: block;
+  margin-left: 18px;
+  font-size: 12px;
+  color: #58736c;
+}
+.rc-candidate-context {
+  display: block;
+  margin-left: 18px;
+  color: #425f5c;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 720px) {
+  .rc-pair,
+  .rc-reasons {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rc-source-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .rc-source-actions label {
+    max-width: none;
+  }
+  .rc-shell {
+    padding: 26px 16px 60px;
+  }
+  .rc-shell .iw-card {
+    padding: 18px;
+  }
+}
+
+/* Target-search groups are flex items too: allow long labels/IDs to shrink
+   inside the decision fieldset rather than widening the mobile document. */
+.rc-create > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.rc-create input,
+.rc-create select,
+.rc-create textarea {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+@media (max-width: 720px) {
+  .rc-create {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+}

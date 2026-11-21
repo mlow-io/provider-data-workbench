@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "frozen_before_actual_trials": true,
+  "corpus_file": "mapping-assistant-v1.json",
+  "sha256": "2ea25f58152ccbd5875ddfa19108c5296a257f4846155b66c071f51e6568589c",
+  "case_count": 8,
+  "selection": "Fixed named challenges, no tuning on actual model results.",
+  "comparison": "Existing alias-only suggestions; no invented transforms. Gold bindings and selected cleaned values are authored expectations.",
+  "engineering_gates": [
+    "zero invalid operations reaching acceptance",
+    "zero incorrect automatic state changes"
+  ],
+  "benefit_gate": "No post-hoc threshold. Keep experimental/disabled until actual benefit evidence exists."
+}

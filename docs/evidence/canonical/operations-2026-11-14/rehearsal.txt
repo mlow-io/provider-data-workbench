@@ -1,0 +1,2 @@
+Retained synthetic operations rehearsal: .runtime/operations-final-20261114/operations-rehearsal.json
+Approved contacts: 2; NORTH: reopened; held delivery, restart and restore preserved the approved consumer.

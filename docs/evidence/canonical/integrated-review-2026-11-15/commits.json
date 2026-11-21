@@ -1,0 +1,21 @@
+{
+  "baseline": "760acde40001a4c66614b21979381767795e8e97",
+  "local_commits": [
+    {
+      "sha": "d09b66403bc9ae6e68e78133da5fc761e66a519e",
+      "parent": "760acde40001a4c66614b21979381767795e8e97",
+      "author": "mlow-io",
+      "email": "225331421+mlow-io@users.noreply.github.com",
+      "subject": "Connect retained FHIR evidence and optional mapping to provider operations"
+    },
+    {
+      "sha": "cd8d79f2c655f13cec435d954c7bef4487e4c066",
+      "parent": "d09b66403bc9ae6e68e78133da5fc761e66a519e",
+      "author": "mlow-io",
+      "email": "225331421+mlow-io@users.noreply.github.com",
+      "subject": "Define bounded provider-data operations scope and spec-driven delivery"
+    }
+  ],
+  "evidence_commit": "The local commit containing this file; its own hash is not embedded to avoid a circular digest",
+  "published": false
+}

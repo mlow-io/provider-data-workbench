@@ -1,0 +1,547 @@
+{
+  "fixture_id": "r0-heldout-lantern-v1",
+  "schema_version": 1,
+  "designation": "Independently hand-authored synthetic heldout labels; fictional people/identifiers. Reserved evaluation, not matcher tuning.",
+  "label_authoring": {
+    "method": "Separate manual scenario with different names, addresses, suites and network labels; no challenge fixture labels or algorithm outputs used as answers.",
+    "purpose": "Reserved heldout identity/location/impact challenge.",
+    "is_matching_output": false,
+    "runtime_identity_ids": false,
+    "record_id_semantics": "key and record_id are stable evaluation labels; source_native_id is the separately retained source identity and may be absent."
+  },
+  "networks": [
+    {
+      "network_id": "NET-HARBOR",
+      "name": "HARBOR (Synthetic)"
+    },
+    {
+      "network_id": "NET-MEADOW",
+      "name": "MEADOW (Synthetic)"
+    }
+  ],
+  "sources": {
+    "clinic": [
+      {
+        "key": "H-C1",
+        "record_id": "clinic:H-C1",
+        "entity_type": "clinician",
+        "name": "Lena Lantern",
+        "npi": "0000000081",
+        "office": "LAKE",
+        "phone": "2075550101",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "04",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-C1"
+      },
+      {
+        "key": "H-C2",
+        "record_id": "clinic:H-C2",
+        "entity_type": "clinician",
+        "name": "Lena Lantern",
+        "npi": "0000000081",
+        "office": "HILL",
+        "phone": "2075550102",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "8 Ridge Walk",
+            "suite": "B",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-C2"
+      },
+      {
+        "key": "H-C3",
+        "record_id": "clinic:H-C3",
+        "entity_type": "clinician",
+        "name": "Jun Unkeyed",
+        "npi": null,
+        "office": "LAKE-SUITE-40",
+        "phone": "2075550103",
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "40",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": null
+      }
+    ],
+    "payer": [
+      {
+        "key": "H-P1",
+        "record_id": "payer:H-P1",
+        "entity_type": "clinician",
+        "name": "Lena Lantern",
+        "npi": "0000000081",
+        "office": "LAKE",
+        "phone": "2075550191",
+        "network_id": "NET-HARBOR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "04",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-P1"
+      },
+      {
+        "key": "H-P2",
+        "record_id": "payer:H-P2",
+        "entity_type": "clinician",
+        "name": "Lena Lantern",
+        "npi": "0000000081",
+        "office": "LAKE",
+        "phone": "2075550192",
+        "network_id": "NET-MEADOW",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "04",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-P2"
+      },
+      {
+        "key": "H-P3",
+        "record_id": "payer:H-P3",
+        "entity_type": "clinician",
+        "name": "Lena Lantern",
+        "npi": "0000000081",
+        "office": "HILL",
+        "phone": "2075550102",
+        "network_id": "NET-HARBOR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "8 Ridge Walk",
+            "suite": "B",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-P3"
+      },
+      {
+        "key": "H-P4",
+        "record_id": "payer:H-P4",
+        "entity_type": "organization",
+        "name": "Lantern Care LLC",
+        "npi": "0000000081",
+        "office": "LAKE",
+        "phone": "2075550104",
+        "network_id": "NET-MEADOW",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "04",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-P4"
+      },
+      {
+        "key": "H-P5",
+        "record_id": "payer:H-P5",
+        "entity_type": "clinician",
+        "name": "Jun Unkeyed",
+        "npi": null,
+        "office": null,
+        "phone": "2075550195",
+        "network_id": "NET-HARBOR",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "40",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": null
+      }
+    ],
+    "public_reference": [
+      {
+        "key": "H-R1",
+        "record_id": "public_reference:H-R1",
+        "entity_type": "clinician",
+        "name": "Lena Lantern",
+        "npi": "0000000081",
+        "office": null,
+        "phone": null,
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "04",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          },
+          {
+            "path": "addresses[1]",
+            "index": 1,
+            "kind": "mailing",
+            "line1": "61 Envelope Ln",
+            "suite": null,
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          },
+          {
+            "path": "addresses[2]",
+            "index": 2,
+            "kind": "practice",
+            "line1": "8 Ridge Walk",
+            "suite": "B",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-R1"
+      },
+      {
+        "key": "H-R2",
+        "record_id": "public_reference:H-R2",
+        "entity_type": "clinician",
+        "name": "Lena Different",
+        "npi": "0000000081",
+        "office": null,
+        "phone": null,
+        "network_id": null,
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "44 Lantern Way",
+            "suite": "04",
+            "city": "Fable Harbor",
+            "state": "MA",
+            "zip": "04001"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        },
+        "source_native_id": "H-R2"
+      }
+    ]
+  },
+  "expected_clinician_links": [
+    {
+      "clinician_id": "CLIN-LENA",
+      "records": [
+        "clinic:H-C1",
+        "clinic:H-C2",
+        "payer:H-P1",
+        "payer:H-P2",
+        "payer:H-P3",
+        "public_reference:H-R1"
+      ],
+      "reason": "Independently labeled clinician across LAKE and HILL; location truth is separate.",
+      "review_required": true
+    }
+  ],
+  "expected_organization_links": [],
+  "expected_location_links": [
+    {
+      "location_id": "LOC-LAKE-04",
+      "label": "LAKE \u00b7 Suite 04",
+      "members": [
+        {
+          "record": "clinic:H-C1",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:H-P1",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:H-P2",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:H-P4",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:H-R1",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:H-R2",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        }
+      ],
+      "reason": "Explicit Suite 04 practice-address evidence only."
+    },
+    {
+      "location_id": "LOC-HILL-B",
+      "label": "HILL \u00b7 Suite B",
+      "members": [
+        {
+          "record": "clinic:H-C2",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:H-P3",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "public_reference:H-R1",
+          "address_path": "addresses[2]",
+          "address_index": 2
+        }
+      ],
+      "reason": "Separate second practice path."
+    },
+    {
+      "location_id": "LOC-LAKE-40",
+      "label": "LAKE \u00b7 Suite 40",
+      "members": [
+        {
+          "record": "clinic:H-C3",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        },
+        {
+          "record": "payer:H-P5",
+          "address_path": "addresses[0]",
+          "address_index": 0
+        }
+      ],
+      "reason": "Suite 40 is not Suite 04; clinician identity remains unresolved."
+    }
+  ],
+  "expected_unresolved": [
+    {
+      "records": [
+        "clinic:H-C1",
+        "public_reference:H-R2"
+      ],
+      "scope": "clinician",
+      "case": "same_npi_conflicting_identity",
+      "reason": "Different person-name assertion conflicts with equal NPI; unresolved."
+    },
+    {
+      "records": [
+        "clinic:H-C3",
+        "payer:H-P5"
+      ],
+      "scope": "clinician",
+      "case": "missing_identifiers",
+      "reason": "Equal name/address without identifiers or reviewed crosswalk stays unresolved."
+    }
+  ],
+  "expected_clinician_nonlinks": [
+    {
+      "records": [
+        "clinic:H-C1",
+        "payer:H-P4"
+      ],
+      "scope": "clinician",
+      "case": "organization_vs_clinician",
+      "reason": "Organization with same NPI is not a clinician identity."
+    }
+  ],
+  "expected_location_nonlinks": [
+    {
+      "records": [
+        "clinic:H-C1",
+        "clinic:H-C2"
+      ],
+      "scope": "location",
+      "case": "two_offices_per_clinician",
+      "reason": "One clinician, two offices."
+    },
+    {
+      "records": [
+        "clinic:H-C1",
+        "clinic:H-C3"
+      ],
+      "scope": "location",
+      "case": "distinct_suites",
+      "reason": "Suite 04 and Suite 40 are distinct."
+    },
+    {
+      "records": [
+        "clinic:H-C1",
+        "public_reference:H-R1"
+      ],
+      "scope": "operating_location",
+      "case": "mailing_not_practice",
+      "address_selection": {
+        "record": "public_reference:H-R1",
+        "address_path": "addresses[1]",
+        "address_index": 1
+      },
+      "reason": "Native mailing address cannot substitute for selected practice address."
+    }
+  ],
+  "expected_conflicts": [
+    {
+      "records": [
+        "clinic:H-C1",
+        "payer:H-P1"
+      ],
+      "field": "phone",
+      "reason": "Independently labeled same clinician/location phone discrepancy."
+    }
+  ],
+  "impact_case": {
+    "proposal_id": "PROPOSAL-LAKE-PHONE",
+    "clinician_id": "CLIN-LENA",
+    "location_id": "LOC-LAKE-04",
+    "field": "phone",
+    "anchor_record": "clinic:H-C1",
+    "old_value": "2075550101",
+    "proposed_value": "2075550111",
+    "source_scope": [
+      "payer"
+    ],
+    "network_scope": [
+      "NET-HARBOR",
+      "NET-MEADOW"
+    ],
+    "assessed_records": [
+      "payer:H-P1",
+      "payer:H-P2",
+      "payer:H-P3",
+      "payer:H-P4",
+      "payer:H-P5"
+    ],
+    "expected_targets": [
+      {
+        "record": "payer:H-P1",
+        "network_id": "NET-HARBOR",
+        "reason": "Labeled LAKE clinician/location link."
+      },
+      {
+        "record": "payer:H-P2",
+        "network_id": "NET-MEADOW",
+        "reason": "Same reviewed scope in second network."
+      }
+    ],
+    "expected_unaffected": [
+      {
+        "record": "payer:H-P3",
+        "reason": "HILL office excluded."
+      }
+    ],
+    "expected_not_assessed": [
+      {
+        "record": "payer:H-P4",
+        "reason": "Organization has no clinician link."
+      },
+      {
+        "record": "payer:H-P5",
+        "reason": "Unresolved person without identifiers."
+      }
+    ],
+    "expected_counts": {
+      "affected": 2,
+      "unaffected_within_assessed_scope": 1,
+      "not_assessed": 2
+    },
+    "notice": "Reserved labels only; no external action or automatic verification.",
+    "dependency_assumption": "Expected targets assume the labeled clinician and location relationships have been explicitly approved in a future evaluation. This fixture itself approves nothing."
+  }
+}

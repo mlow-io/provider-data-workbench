@@ -1,0 +1,46 @@
+{
+  "synthetic": false,
+  "scope": "Bounded read-only public metadata/source-readiness probes; no provider payloads committed",
+  "checks": [
+    {
+      "check": "hap-metadata",
+      "status_line": "HTTP/1.0 302 Moved Temporarily",
+      "location": "/metadata/",
+      "body_bytes": 0,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "hap-canonical-metadata",
+      "status_line": "HTTP/1.1 200 ",
+      "location": null,
+      "body_bytes": 1409295,
+      "body_sha256": "0385e4707dc49f496afcc44c2b62c416f60e87fda5aeb90af1b367f3722f4985"
+    },
+    {
+      "check": "hap-location",
+      "status_line": "HTTP/1.1 429 Too Many Requests",
+      "location": null,
+      "body_bytes": 166,
+      "body_sha256": "5bb1c8a8390c284e9a4634c04eee34dfd08759d66d2b613b0631ab10e2f1f3d9"
+    },
+    {
+      "check": "network-health-metadata",
+      "status_line": "HTTP/1.1 500 Input parameter validation failed: Bulk Publish ID is not valid: PlanNet",
+      "location": null,
+      "body_bytes": 0,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "request_limits": {
+    "timeout_seconds": 20,
+    "max_bytes": 10485760,
+    "automatic_redirects": 0
+  },
+  "metadata_result": {
+    "resourceType": "CapabilityStatement",
+    "fhirVersion": "4.0.1",
+    "plan_net_version": "not declared in received metadata"
+  },
+  "provider_data_smoke": "open: bounded Location query returned 429",
+  "raw_bytes": "Retained only in ignored invocation-owned runtime directory"
+}

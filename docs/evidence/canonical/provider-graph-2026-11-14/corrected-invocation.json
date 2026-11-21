@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "<JAVA_HOME>/bin/java",
+    "-Xmx2g",
+    "-Duser.home=<checkout>/.runtime/r2-graph-validation-20261114/home",
+    "-jar",
+    "<checkout>/.runtime/fhir-validation/validator_cli-7.0.5.jar",
+    "tests/fixtures/intake/fhir-plannet/profile-graph.json",
+    "-version",
+    "4.0.1",
+    "-ig",
+    "hl7.fhir.us.davinci-pdex-plan-net#1.2.0",
+    "-tx",
+    "https://tx.fhir.org/r4",
+    "-txCache",
+    "<checkout>/.runtime/r2-graph-validation-20261114/tx-cache-corrected",
+    "-txLog",
+    "<checkout>/.runtime/r2-graph-validation-20261114/corrected-transactions.log",
+    "-validation-timeout",
+    "30000",
+    "-output",
+    "<checkout>/.runtime/r2-graph-validation-20261114/corrected-graph-validation.json"
+  ],
+  "outer_timeout_seconds": 120,
+  "input_sha256": "93763f70b048d59d4f0fcaef0e6f76676752a2762287672cc28456a0e2708c61",
+  "jar_sha256": "9dfe9f305b0f9389eceade2a4a1c9a2740d7b0e614066fdf07a78b571c76d92f"
+}

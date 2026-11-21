@@ -1,0 +1,39 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_default_qa_ignores_current_directory_fixture_names ____________
+
+tmp_path = PosixPath('<temporary-path>')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ae416e0>
+
+    def test_default_qa_ignores_current_directory_fixture_names(tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        # Local lookalikes must not silently replace the versioned synthetic defaults.
+        (tmp_path / 'data/raw').mkdir(parents=True)
+        (tmp_path / 'data/raw/sample_provider_directory.csv').write_text('broken local file')
+        (tmp_path / 'config').mkdir()
+        (tmp_path / 'config/qa_rules.yml').write_text('broken local rules')
+        monkeypatch.setattr(sys, 'argv', ['provider-truth-layer', 'run', '--output-dir', str(tmp_path/'qa'),
+            '--sqlite', str(tmp_path/'qa.sqlite3'), '--as-of', '2026-06-01'])
+>       main()
+
+<checkout>/tests/test_portable_defaults.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<checkout>/src/provider_directory_truth_layer/cli.py:161: in main
+    result = run_pipeline(
+<checkout>/src/provider_directory_truth_layer/pipeline.py:27: in run_pipeline
+    config = load_rule_config(config_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('config/qa_rules.yml')
+
+    def load_rule_config(path: Path) -> RuleConfig:
+        data: dict[str, Any] = yaml.safe_load(path.read_text()) or {}
+>       remediation_data: dict[str, Any] = data.get("remediation", {}) or {}
+                                           ^^^^^^^^
+E       AttributeError: 'str' object has no attribute 'get'
+
+<checkout>/src/provider_directory_truth_layer/config.py:78: AttributeError
+=========================== short test summary info ============================
+FAILED tests/test_portable_defaults.py::test_default_qa_ignores_current_directory_fixture_names
+1 failed, 1 passed in 0.61s

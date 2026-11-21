@@ -1,0 +1,19 @@
+{
+  "version": "synthetic-reconciliation-corpus-v1",
+  "synthetic": true,
+  "seed": 42,
+  "entities": 300,
+  "record_count": 1005,
+  "source_record_counts": {
+    "clinic": 330,
+    "payer": 330,
+    "reference": 345
+  },
+  "expected_clinician_pair_count": 980,
+  "expected_location_pair_count": 1890,
+  "canonical_json_sha256": "c0cd94357f24c7ffb622ce07c2406b71706107c5fe73194b970d8e2b5e7aaa53",
+  "hash_encoding": "UTF-8 JSON with sort_keys=True and separators=(comma,colon); no trailing newline",
+  "truth_authoring": "Latent entities and physical offices assigned before source rendering. No matcher imports, output, or inferred source-value labels used.",
+  "positive_label_scope": "Exhaustive cross-source clinician and practice-office truth within generated inputs.",
+  "limitations": "Fictional, deliberately invalid synthetic identifiers; synthetic evaluation does not establish production accuracy."
+}

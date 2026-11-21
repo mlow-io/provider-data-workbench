@@ -1,0 +1,35 @@
+{
+  "source": "hap",
+  "source_documentation": "https://api.hap.org/providerdirectoryapi",
+  "source_advertised_plan_net": "1.0.0; not verified conformance",
+  "parser_target": "Plan-Net 1.2.0 subset",
+  "initial_capture": {
+    "state": "failed",
+    "status": 200,
+    "requests": 1,
+    "pages": 1,
+    "partial": true,
+    "reason": "Original cross-host pagination rejected before follow-up routing fix",
+    "raw_sha256": "ef46817120e4505f68568084d7100546d37c020450124870654fac73e174a296"
+  },
+  "filtered_capture": {
+    "state": "complete",
+    "status": 200,
+    "requests": 1,
+    "pages": 1,
+    "partial": false,
+    "source_resource_id_sha256": "4366b5b129b090eceaa9e6a3790f7151eb0ba3340e0b1adb47e8a34dd6f23906",
+    "raw_page_sha256": "5cb079cd1b507036b0de3d517737e5af8ee2f5613bf5cf41f98ffb9180c84162",
+    "derived_sha256": "4653b02fd624e5309cd4192a2f274076cfff290e6c765999377618b79a7c2825",
+    "supported": 1,
+    "invalid": 0,
+    "unresolved": 0,
+    "unsupported": 0,
+    "explicitly_accepted_reference_observations": 1,
+    "new_cases": 0,
+    "managed_feed_decisions": 0,
+    "restart_preserved": true,
+    "saved_parser_replay_equivalent": true
+  },
+  "limits": "One source-specific Location only. No live pagination or PractitionerRole/network interoperability qualification, target-profile validation, complete directory, identity review, actual provider verification, human task or publication. Actual source bytes and native IDs remain in ignored owned runtime storage."
+}

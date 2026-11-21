@@ -1,0 +1,55 @@
+{
+  "fixture_version": 1,
+  "designation": "synthetic",
+  "source": "synthetic-managed-clinic",
+  "dataset_scope": {"clinic": "synthetic-managed-clinic", "dataset": "weekly-full-roster"},
+  "profile": "flat",
+  "identity_fields": ["record_id", "location_id"],
+  "baseline": "baseline.csv",
+  "counts_authorship": "Hand-authored from fixture rows before managed-feed implementation; not copied from processing output.",
+  "cases": {
+    "baseline.csv": {
+      "raw": 3, "valid": 3, "quarantined": 0, "unique_keys": 3,
+      "new": 3, "changed": 0, "unchanged": 0, "blocked_invalid": 0, "unresolved": 0, "missing": 0,
+      "baseline": null, "holds": [], "requires_explicit_first_approval": true
+    },
+    "clean_update.csv": {
+      "raw": 3, "valid": 3, "quarantined": 0, "unique_keys": 3,
+      "new": 0, "changed": 1, "unchanged": 2, "blocked_invalid": 0, "unresolved": 0, "missing": 0,
+      "changed_keys": [["SYNTHETIC-001", "NORTH"]], "holds": []
+    },
+    "row_drop.csv": {
+      "raw": 1, "valid": 1, "quarantined": 0, "unique_keys": 1,
+      "new": 0, "changed": 0, "unchanged": 1, "blocked_invalid": 0, "unresolved": 0, "missing": 2,
+      "missing_keys": [["SYNTHETIC-001", "SOUTH"], ["SYNTHETIC-002", "EAST"]],
+      "holds": ["row_count_drift", "missing_prior_keys"]
+    },
+    "invalid_phone.csv": {
+      "raw": 3, "valid": 2, "quarantined": 1, "unique_keys": 3,
+      "new": 0, "changed": 0, "unchanged": 2, "blocked_invalid": 1, "unresolved": 0, "missing": 0,
+      "quarantined_keys": [["SYNTHETIC-001", "NORTH"]], "holds": ["quarantined_rows"]
+    },
+    "duplicate_key.csv": {
+      "raw": 4, "valid": 2, "quarantined": 2, "unique_keys": 3,
+      "new": 0, "changed": 0, "unchanged": 2, "blocked_invalid": 2, "unresolved": 0, "missing": 0,
+      "duplicate_keys": [["SYNTHETIC-001", "NORTH"]],
+      "holds": ["row_count_drift", "quarantined_rows"]
+    },
+    "header_drift.csv": {
+      "raw": 3, "valid": null, "quarantined": null, "unique_keys": null,
+      "new": null, "changed": null, "unchanged": null, "blocked_invalid": null, "unresolved": null, "missing": null,
+      "missing_required_headers": ["phone"], "hard_blockers": ["missing_required_headers"],
+      "count_notice": "Row interpretation/comparison not assessed after required-header contract failure; null is not zero."
+    },
+    "empty.csv": {
+      "raw": 0, "valid": 0, "quarantined": 0, "unique_keys": 0,
+      "new": 0, "changed": 0, "unchanged": 0, "blocked_invalid": 0, "unresolved": 0, "missing": 3,
+      "hard_blockers": ["empty_full_snapshot"], "holds": ["row_count_drift", "missing_prior_keys"]
+    },
+    "reordered_repeat.csv": {
+      "raw": 3, "valid": 3, "quarantined": 0, "unique_keys": 3,
+      "new": 0, "changed": 0, "unchanged": 3, "blocked_invalid": 0, "unresolved": 0, "missing": 0,
+      "holds": [], "same_bytes_as_baseline": false, "same_normalized_records_as_baseline": true
+    }
+  }
+}

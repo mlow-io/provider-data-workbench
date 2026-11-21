@@ -1,0 +1,3272 @@
+{
+  "scope": {
+    "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+    "location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb"
+  },
+  "clinician": {
+    "id": "3a0a1d774f654956918c85c9ec2fc2d5",
+    "label": "Synthetic Clinician",
+    "identifiers": "[]",
+    "actor": "Synthetic operations reviewer",
+    "reason": "Explicit review of synthetic source evidence",
+    "created_at": "2026-11-15T01:00:16.834570+00:00"
+  },
+  "location": {
+    "id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+    "label": "NORTH",
+    "organization_id": null,
+    "actor": "Synthetic operations reviewer",
+    "reason": "Explicit review of synthetic source evidence",
+    "created_at": "2026-11-15T01:00:16.843748+00:00"
+  },
+  "snapshot": "d4e14b71060d8d36daea25f24b6d277a5ba156f37cc821322abe9b9a0546643d",
+  "evidence_snapshot": "9f45599241cb557141434f1d6d533b8ab21428c7edfa987b0b2191a2b4f6f98e",
+  "inputs_fresh": true,
+  "fields": [
+    {
+      "field": "phone",
+      "options": [
+        {
+          "ref": "0b42c2129158a957038248e50b62fa84228773cb8a9f8124df35b36bac920ffe",
+          "source": "synthetic-operations-saved-payer",
+          "value": {
+            "number": "6175550199",
+            "extension": null
+          },
+          "comparison_value": {
+            "number": "6175550199",
+            "extension": null
+          },
+          "selectable": true,
+          "findings": {
+            "phone_extension": [
+              "null"
+            ]
+          },
+          "link_ids": [
+            "5bdc93a562ea43ffbfc5eabe947f4dc5",
+            "a3bcde17262e46b0ac28a41e40a9d3cf"
+          ],
+          "receipt_id": "77c8c1298a4746368f50f8f4da08df29",
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "locator": "$.entry[5].resource",
+          "address_path": "location[0]",
+          "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+          "network_id": null,
+          "source_field_values": {},
+          "provenance": {},
+          "supporting_refs": [
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "provider_name",
+              "locator": "$.entry[0].resource",
+              "path": "name[0]"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "address",
+              "locator": "$.entry[3].resource",
+              "path": "address"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "location_context",
+              "locator": "$.entry[5].resource",
+              "path": "location[0].reference"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "npi",
+              "locator": "$.entry[0].resource",
+              "path": "identifier"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "phone",
+              "locator": "$.entry[3].resource",
+              "path": "telecom[0].value"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "organization_context",
+              "locator": "$.entry[1].resource",
+              "path": "id"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "network_context",
+              "locator": "$.entry[2].resource",
+              "path": "id"
+            }
+          ],
+          "source_network_reference": "Organization/synthetic-network",
+          "native_validation": {
+            "profile": "not_run",
+            "terminology": "not_run"
+          }
+        },
+        {
+          "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+          "source": "synthetic-operations-clinic",
+          "value": {
+            "number": "6175550100",
+            "extension": "007"
+          },
+          "comparison_value": {
+            "number": "6175550100",
+            "extension": "007"
+          },
+          "selectable": true,
+          "findings": {},
+          "link_ids": [
+            "56ac2258569d4ed4bbbc170b7b025d52",
+            "187a28a2c6c947deb197ce1aea119779"
+          ],
+          "receipt_id": "d781eab37628460a907aac7fffdccc99",
+          "attempt_id": "31e60188dba147a680b4e83db8772102",
+          "locator": "row:2",
+          "address_path": "",
+          "artifact_sha": "0993bf382e6e2d11f6a982ef821ef5f5e51f27b864d4a37cc37aa1ff192a3f4d",
+          "network_id": null,
+          "source_field_values": {
+            "address": "10 Example St",
+            "city": "Example",
+            "npi": "1000000001",
+            "phone": "+1 (617) 555-0100 ext 007",
+            "provider_name": "  Synthetic   Clinician ",
+            "state": " ma ",
+            "zip": "02108"
+          },
+          "provenance": {}
+        },
+        {
+          "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+          "source": "synthetic-operations-payer",
+          "value": {
+            "number": "6175550199",
+            "extension": null
+          },
+          "comparison_value": {
+            "number": "6175550199",
+            "extension": null
+          },
+          "selectable": true,
+          "findings": {
+            "phone_extension": [
+              "null"
+            ]
+          },
+          "link_ids": [
+            "4744b42d7384427fbf3ce4ecb74701e8",
+            "7d7aff2d48ca45af9b0d8936e424aece"
+          ],
+          "receipt_id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "locator": "$.entry[5].resource",
+          "address_path": "location[0]",
+          "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+          "network_id": null,
+          "source_field_values": {},
+          "provenance": {},
+          "supporting_refs": [
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "provider_name",
+              "locator": "$.entry[0].resource",
+              "path": "name[0]",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "address",
+              "locator": "$.entry[3].resource",
+              "path": "address",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "location_context",
+              "locator": "$.entry[5].resource",
+              "path": "location[0].reference",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[2].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "npi",
+              "locator": "$.entry[0].resource",
+              "path": "identifier",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "phone",
+              "locator": "$.entry[3].resource",
+              "path": "telecom[0].value",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "organization_context",
+              "locator": "$.entry[1].resource",
+              "path": "id",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[1].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "network_context",
+              "locator": "$.entry[2].resource",
+              "path": "id",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[2].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            }
+          ],
+          "source_network_reference": "Organization/synthetic-network",
+          "native_validation": {
+            "profile": "not_run",
+            "terminology": "not_run"
+          }
+        }
+      ],
+      "option_count": 3,
+      "decision": {
+        "seq": 1,
+        "id": "43bb572a2f9445b5ac226e3159cbde6b",
+        "request_id": "operations-north-phone",
+        "request_hash": "77231da6ca46dccc46664cf5278cad2cbf9ca93dcb2f230fa9e0ca1ec29bb96b",
+        "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+        "location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+        "field": "phone",
+        "decision": "select",
+        "selected_ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+        "value": {
+          "extension": null,
+          "number": "6175550199"
+        },
+        "snapshot": "9f45599241cb557141434f1d6d533b8ab21428c7edfa987b0b2191a2b4f6f98e",
+        "review_snapshot": "adfcaa8ea8caf604708cb2f6b1bc69098dbc4072cb70ba1443756c1917be9889",
+        "evidence": {
+          "address_path": "location[0]",
+          "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "comparison_value": {
+            "extension": null,
+            "number": "6175550199"
+          },
+          "findings": {
+            "phone_extension": [
+              "null"
+            ]
+          },
+          "link_ids": [
+            "4744b42d7384427fbf3ce4ecb74701e8",
+            "7d7aff2d48ca45af9b0d8936e424aece"
+          ],
+          "locator": "$.entry[5].resource",
+          "native_validation": {
+            "profile": "not_run",
+            "terminology": "not_run"
+          },
+          "network_id": null,
+          "provenance": {},
+          "receipt_id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+          "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+          "selectable": true,
+          "source": "synthetic-operations-payer",
+          "source_field_values": {},
+          "source_network_reference": "Organization/synthetic-network",
+          "supporting_refs": [
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "provider_name",
+              "locator": "$.entry[0].resource",
+              "path": "name[0]",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "address",
+              "locator": "$.entry[3].resource",
+              "path": "address",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "location_context",
+              "locator": "$.entry[5].resource",
+              "path": "location[0].reference",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[2].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "npi",
+              "locator": "$.entry[0].resource",
+              "path": "identifier",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "phone",
+              "locator": "$.entry[3].resource",
+              "path": "telecom[0].value",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "organization_context",
+              "locator": "$.entry[1].resource",
+              "path": "id",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[1].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "network_context",
+              "locator": "$.entry[2].resource",
+              "path": "id",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[2].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            }
+          ],
+          "value": {
+            "extension": null,
+            "number": "6175550199"
+          }
+        },
+        "previous_id": null,
+        "actor": "Synthetic operations reviewer",
+        "reason": "Explicit review of synthetic source evidence",
+        "created_at": "2026-11-15T01:00:16.876207+00:00",
+        "stale": false
+      },
+      "history": [
+        {
+          "seq": 1,
+          "id": "43bb572a2f9445b5ac226e3159cbde6b",
+          "request_id": "operations-north-phone",
+          "request_hash": "77231da6ca46dccc46664cf5278cad2cbf9ca93dcb2f230fa9e0ca1ec29bb96b",
+          "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+          "location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+          "field": "phone",
+          "decision": "select",
+          "selected_ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+          "value": {
+            "extension": null,
+            "number": "6175550199"
+          },
+          "snapshot": "9f45599241cb557141434f1d6d533b8ab21428c7edfa987b0b2191a2b4f6f98e",
+          "review_snapshot": "adfcaa8ea8caf604708cb2f6b1bc69098dbc4072cb70ba1443756c1917be9889",
+          "evidence": {
+            "address_path": "location[0]",
+            "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "comparison_value": {
+              "extension": null,
+              "number": "6175550199"
+            },
+            "findings": {
+              "phone_extension": [
+                "null"
+              ]
+            },
+            "link_ids": [
+              "4744b42d7384427fbf3ce4ecb74701e8",
+              "7d7aff2d48ca45af9b0d8936e424aece"
+            ],
+            "locator": "$.entry[5].resource",
+            "native_validation": {
+              "profile": "not_run",
+              "terminology": "not_run"
+            },
+            "network_id": null,
+            "provenance": {},
+            "receipt_id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+            "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+            "selectable": true,
+            "source": "synthetic-operations-payer",
+            "source_field_values": {},
+            "source_network_reference": "Organization/synthetic-network",
+            "supporting_refs": [
+              {
+                "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+                "field": "provider_name",
+                "locator": "$.entry[0].resource",
+                "path": "name[0]",
+                "source_pages": [
+                  {
+                    "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                    "locator": "$.entry[0].resource",
+                    "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                    "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                  }
+                ]
+              },
+              {
+                "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+                "field": "address",
+                "locator": "$.entry[3].resource",
+                "path": "address",
+                "source_pages": [
+                  {
+                    "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                    "locator": "$.entry[0].resource",
+                    "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                    "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                  }
+                ]
+              },
+              {
+                "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+                "field": "location_context",
+                "locator": "$.entry[5].resource",
+                "path": "location[0].reference",
+                "source_pages": [
+                  {
+                    "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                    "locator": "$.entry[2].resource",
+                    "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                    "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                  }
+                ]
+              },
+              {
+                "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+                "field": "npi",
+                "locator": "$.entry[0].resource",
+                "path": "identifier",
+                "source_pages": [
+                  {
+                    "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                    "locator": "$.entry[0].resource",
+                    "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                    "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                  }
+                ]
+              },
+              {
+                "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+                "field": "phone",
+                "locator": "$.entry[3].resource",
+                "path": "telecom[0].value",
+                "source_pages": [
+                  {
+                    "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                    "locator": "$.entry[0].resource",
+                    "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                    "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                  }
+                ]
+              },
+              {
+                "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+                "field": "organization_context",
+                "locator": "$.entry[1].resource",
+                "path": "id",
+                "source_pages": [
+                  {
+                    "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                    "locator": "$.entry[1].resource",
+                    "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                    "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                  }
+                ]
+              },
+              {
+                "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+                "field": "network_context",
+                "locator": "$.entry[2].resource",
+                "path": "id",
+                "source_pages": [
+                  {
+                    "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                    "locator": "$.entry[2].resource",
+                    "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                    "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                  }
+                ]
+              }
+            ],
+            "value": {
+              "extension": null,
+              "number": "6175550199"
+            }
+          },
+          "previous_id": null,
+          "actor": "Synthetic operations reviewer",
+          "reason": "Explicit review of synthetic source evidence",
+          "created_at": "2026-11-15T01:00:16.876207+00:00",
+          "stale": false
+        }
+      ],
+      "status": "selected",
+      "preferred_value": {
+        "extension": null,
+        "number": "6175550199"
+      }
+    },
+    {
+      "field": "address",
+      "options": [
+        {
+          "ref": "0b42c2129158a957038248e50b62fa84228773cb8a9f8124df35b36bac920ffe",
+          "source": "synthetic-operations-saved-payer",
+          "value": {
+            "line1": "10 Example St",
+            "line2": null,
+            "suite": null,
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108"
+          },
+          "comparison_value": {
+            "line1": "10 example st",
+            "line2": null,
+            "suite": null,
+            "city": "example",
+            "state": "ma",
+            "zip": "02108"
+          },
+          "selectable": true,
+          "findings": {
+            "address.suite": [
+              "null"
+            ]
+          },
+          "link_ids": [
+            "5bdc93a562ea43ffbfc5eabe947f4dc5",
+            "a3bcde17262e46b0ac28a41e40a9d3cf"
+          ],
+          "receipt_id": "77c8c1298a4746368f50f8f4da08df29",
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "locator": "$.entry[5].resource",
+          "address_path": "location[0]",
+          "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+          "network_id": null,
+          "source_field_values": {},
+          "provenance": {},
+          "supporting_refs": [
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "provider_name",
+              "locator": "$.entry[0].resource",
+              "path": "name[0]"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "address",
+              "locator": "$.entry[3].resource",
+              "path": "address"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "location_context",
+              "locator": "$.entry[5].resource",
+              "path": "location[0].reference"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "npi",
+              "locator": "$.entry[0].resource",
+              "path": "identifier"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "phone",
+              "locator": "$.entry[3].resource",
+              "path": "telecom[0].value"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "organization_context",
+              "locator": "$.entry[1].resource",
+              "path": "id"
+            },
+            {
+              "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+              "field": "network_context",
+              "locator": "$.entry[2].resource",
+              "path": "id"
+            }
+          ],
+          "source_network_reference": "Organization/synthetic-network",
+          "native_validation": {
+            "profile": "not_run",
+            "terminology": "not_run"
+          }
+        },
+        {
+          "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+          "source": "synthetic-operations-clinic",
+          "value": {
+            "line1": "10 Example St",
+            "line2": null,
+            "suite": null,
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108"
+          },
+          "comparison_value": {
+            "line1": "10 example st",
+            "line2": null,
+            "suite": null,
+            "city": "example",
+            "state": "ma",
+            "zip": "02108"
+          },
+          "selectable": true,
+          "findings": {
+            "address.suite": [
+              "null"
+            ]
+          },
+          "link_ids": [
+            "56ac2258569d4ed4bbbc170b7b025d52",
+            "187a28a2c6c947deb197ce1aea119779"
+          ],
+          "receipt_id": "d781eab37628460a907aac7fffdccc99",
+          "attempt_id": "31e60188dba147a680b4e83db8772102",
+          "locator": "row:2",
+          "address_path": "",
+          "artifact_sha": "0993bf382e6e2d11f6a982ef821ef5f5e51f27b864d4a37cc37aa1ff192a3f4d",
+          "network_id": null,
+          "source_field_values": {
+            "address": "10 Example St",
+            "city": "Example",
+            "npi": "1000000001",
+            "phone": "+1 (617) 555-0100 ext 007",
+            "provider_name": "  Synthetic   Clinician ",
+            "state": " ma ",
+            "zip": "02108"
+          },
+          "provenance": {}
+        },
+        {
+          "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+          "source": "synthetic-operations-payer",
+          "value": {
+            "line1": "10 Example St",
+            "line2": null,
+            "suite": null,
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108"
+          },
+          "comparison_value": {
+            "line1": "10 example st",
+            "line2": null,
+            "suite": null,
+            "city": "example",
+            "state": "ma",
+            "zip": "02108"
+          },
+          "selectable": true,
+          "findings": {
+            "address.suite": [
+              "null"
+            ]
+          },
+          "link_ids": [
+            "4744b42d7384427fbf3ce4ecb74701e8",
+            "7d7aff2d48ca45af9b0d8936e424aece"
+          ],
+          "receipt_id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "locator": "$.entry[5].resource",
+          "address_path": "location[0]",
+          "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+          "network_id": null,
+          "source_field_values": {},
+          "provenance": {},
+          "supporting_refs": [
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "provider_name",
+              "locator": "$.entry[0].resource",
+              "path": "name[0]",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "address",
+              "locator": "$.entry[3].resource",
+              "path": "address",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "location_context",
+              "locator": "$.entry[5].resource",
+              "path": "location[0].reference",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[2].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "npi",
+              "locator": "$.entry[0].resource",
+              "path": "identifier",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "phone",
+              "locator": "$.entry[3].resource",
+              "path": "telecom[0].value",
+              "source_pages": [
+                {
+                  "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                  "locator": "$.entry[0].resource",
+                  "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "organization_context",
+              "locator": "$.entry[1].resource",
+              "path": "id",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[1].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            },
+            {
+              "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+              "field": "network_context",
+              "locator": "$.entry[2].resource",
+              "path": "id",
+              "source_pages": [
+                {
+                  "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                  "locator": "$.entry[2].resource",
+                  "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                  "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+                }
+              ]
+            }
+          ],
+          "source_network_reference": "Organization/synthetic-network",
+          "native_validation": {
+            "profile": "not_run",
+            "terminology": "not_run"
+          }
+        }
+      ],
+      "option_count": 3,
+      "decision": null,
+      "history": [],
+      "status": "unreviewed",
+      "preferred_value": null
+    }
+  ],
+  "records": [
+    {
+      "address": {
+        "city": "Example",
+        "kind": "practice",
+        "line1": "10 Example St",
+        "line2": null,
+        "path": "location[0]",
+        "state": "MA",
+        "suite": null,
+        "zip": "02108"
+      },
+      "address_path": "location[0]",
+      "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+      "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+      "clinician_ref": "323a8a1aebe9f0511f0d17f9501d83cb56181341495892d52e861f5ca849ff71",
+      "comparison": {
+        "address": {
+          "city": "example",
+          "kind": "practice",
+          "line1": "10 example st",
+          "line2": null,
+          "path": "location[0]",
+          "source_path": null,
+          "state": "ma",
+          "suite": null,
+          "zip": "02108",
+          "zip_base": "02108"
+        },
+        "entity_kind": "clinician",
+        "native_id": "practitionerrole/role-north",
+        "npi": "1000000001",
+        "phone": "6175550199",
+        "phone_extension": null,
+        "provider_name": "synthetic example"
+      },
+      "comparison_provenance": {},
+      "entity_kind": "clinician",
+      "entity_kind_conflict": false,
+      "entity_kind_declaration": "clinician",
+      "entity_kind_evidence": {
+        "resourceType": "Practitioner"
+      },
+      "field_findings": {
+        "address.suite": [
+          "null"
+        ],
+        "phone_extension": [
+          "null"
+        ]
+      },
+      "locator": "$.entry[5].resource",
+      "native_id": "PractitionerRole/role-north",
+      "native_validation": {
+        "profile": "not_run",
+        "terminology": "not_run"
+      },
+      "network_id": null,
+      "npi": "1000000001",
+      "organization_id": null,
+      "original_fields": {
+        "address": {
+          "city": "Example",
+          "kind": "practice",
+          "line1": "10 Example St",
+          "line2": null,
+          "path": "location[0]",
+          "state": "MA",
+          "suite": null,
+          "zip": "02108"
+        },
+        "address_path": "location[0]",
+        "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+        "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+        "clinician_ref": "323a8a1aebe9f0511f0d17f9501d83cb56181341495892d52e861f5ca849ff71",
+        "entity_kind": "clinician",
+        "entity_kind_conflict": false,
+        "entity_kind_declaration": "clinician",
+        "entity_kind_evidence": {
+          "resourceType": "Practitioner"
+        },
+        "locator": "$.entry[5].resource",
+        "native_id": "PractitionerRole/role-north",
+        "native_validation": {
+          "profile": "not_run",
+          "terminology": "not_run"
+        },
+        "network_id": null,
+        "npi": "1000000001",
+        "organization_id": null,
+        "phone": "6175550199",
+        "phone_extension": null,
+        "provider_name": "Synthetic Example",
+        "receipt_id": "77c8c1298a4746368f50f8f4da08df29",
+        "ref": "0b42c2129158a957038248e50b62fa84228773cb8a9f8124df35b36bac920ffe",
+        "source": "synthetic-operations-saved-payer",
+        "source_field_values": {},
+        "source_location_id": null,
+        "source_network_reference": "Organization/synthetic-network",
+        "source_problems": [],
+        "supporting_refs": [
+          {
+            "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+            "field": "provider_name",
+            "locator": "$.entry[0].resource",
+            "path": "name[0]"
+          },
+          {
+            "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+            "field": "address",
+            "locator": "$.entry[3].resource",
+            "path": "address"
+          },
+          {
+            "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+            "field": "location_context",
+            "locator": "$.entry[5].resource",
+            "path": "location[0].reference"
+          },
+          {
+            "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+            "field": "npi",
+            "locator": "$.entry[0].resource",
+            "path": "identifier"
+          },
+          {
+            "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+            "field": "phone",
+            "locator": "$.entry[3].resource",
+            "path": "telecom[0].value"
+          },
+          {
+            "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+            "field": "organization_context",
+            "locator": "$.entry[1].resource",
+            "path": "id"
+          },
+          {
+            "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+            "field": "network_context",
+            "locator": "$.entry[2].resource",
+            "path": "id"
+          }
+        ]
+      },
+      "phone": "6175550199",
+      "phone_extension": null,
+      "provider_name": "Synthetic Example",
+      "receipt_id": "77c8c1298a4746368f50f8f4da08df29",
+      "ref": "0b42c2129158a957038248e50b62fa84228773cb8a9f8124df35b36bac920ffe",
+      "rule_version": "provider-comparison-v4",
+      "source": "synthetic-operations-saved-payer",
+      "source_field_values": {},
+      "source_location_id": null,
+      "source_network_reference": "Organization/synthetic-network",
+      "source_problems": [],
+      "supporting_refs": [
+        {
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "field": "provider_name",
+          "locator": "$.entry[0].resource",
+          "path": "name[0]"
+        },
+        {
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "field": "address",
+          "locator": "$.entry[3].resource",
+          "path": "address"
+        },
+        {
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "field": "location_context",
+          "locator": "$.entry[5].resource",
+          "path": "location[0].reference"
+        },
+        {
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "field": "npi",
+          "locator": "$.entry[0].resource",
+          "path": "identifier"
+        },
+        {
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "field": "phone",
+          "locator": "$.entry[3].resource",
+          "path": "telecom[0].value"
+        },
+        {
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "field": "organization_context",
+          "locator": "$.entry[1].resource",
+          "path": "id"
+        },
+        {
+          "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+          "field": "network_context",
+          "locator": "$.entry[2].resource",
+          "path": "id"
+        }
+      ],
+      "clinician_type_support": {
+        "link_id": "5bdc93a562ea43ffbfc5eabe947f4dc5",
+        "run_id": "f30ae9edba804181bd28a5cf94946f70",
+        "entity_kind": "clinician"
+      }
+    },
+    {
+      "address": {
+        "city": "Example",
+        "kind": "practice",
+        "line1": "10 Example St",
+        "line2": null,
+        "path": "",
+        "state": "MA",
+        "suite": null,
+        "use_record_phone": true,
+        "zip": "02108"
+      },
+      "address_path": "",
+      "artifact_sha": "0993bf382e6e2d11f6a982ef821ef5f5e51f27b864d4a37cc37aa1ff192a3f4d",
+      "attempt_id": "31e60188dba147a680b4e83db8772102",
+      "clinician_ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "comparison": {
+        "address": {
+          "city": "example",
+          "kind": "practice",
+          "line1": "10 example st",
+          "line2": null,
+          "path": "",
+          "source_path": null,
+          "state": "ma",
+          "suite": null,
+          "zip": "02108",
+          "zip_base": "02108"
+        },
+        "entity_kind": "clinician",
+        "native_id": "syn-001",
+        "npi": "1000000001",
+        "phone": "6175550100",
+        "phone_extension": "007",
+        "provider_name": "synthetic clinician"
+      },
+      "comparison_provenance": {},
+      "entity_kind": "clinician",
+      "entity_kind_conflict": false,
+      "entity_kind_declaration": "unknown",
+      "entity_kind_evidence": {
+        "entity_type": "clinician"
+      },
+      "evaluation_ref": null,
+      "field_findings": {
+        "address.suite": [
+          "null"
+        ]
+      },
+      "locator": "row:2",
+      "native_id": "SYN-001",
+      "network_id": null,
+      "npi": "1000000001",
+      "organization_id": null,
+      "original_fields": {
+        "address": {
+          "city": "Example",
+          "kind": "practice",
+          "line1": "10 Example St",
+          "line2": null,
+          "path": "",
+          "state": "MA",
+          "suite": null,
+          "use_record_phone": true,
+          "zip": "02108"
+        },
+        "address_path": "",
+        "artifact_sha": "0993bf382e6e2d11f6a982ef821ef5f5e51f27b864d4a37cc37aa1ff192a3f4d",
+        "attempt_id": "31e60188dba147a680b4e83db8772102",
+        "clinician_ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+        "entity_kind": "clinician",
+        "entity_kind_conflict": false,
+        "entity_kind_declaration": "unknown",
+        "entity_kind_evidence": {
+          "entity_type": "clinician"
+        },
+        "evaluation_ref": null,
+        "locator": "row:2",
+        "native_id": "SYN-001",
+        "network_id": null,
+        "npi": "1000000001",
+        "organization_id": null,
+        "phone": "6175550100",
+        "phone_extension": "007",
+        "provider_name": "Synthetic Clinician",
+        "receipt_id": "d781eab37628460a907aac7fffdccc99",
+        "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+        "source": "synthetic-operations-clinic",
+        "source_field_values": {
+          "address": "10 Example St",
+          "city": "Example",
+          "npi": "1000000001",
+          "phone": "+1 (617) 555-0100 ext 007",
+          "provider_name": "  Synthetic   Clinician ",
+          "state": " ma ",
+          "zip": "02108"
+        },
+        "source_location_id": "NORTH",
+        "source_problems": []
+      },
+      "phone": "6175550100",
+      "phone_extension": "007",
+      "provider_name": "Synthetic Clinician",
+      "receipt_id": "d781eab37628460a907aac7fffdccc99",
+      "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "rule_version": "provider-comparison-v4",
+      "source": "synthetic-operations-clinic",
+      "source_field_values": {
+        "address": "10 Example St",
+        "city": "Example",
+        "npi": "1000000001",
+        "phone": "+1 (617) 555-0100 ext 007",
+        "provider_name": "  Synthetic   Clinician ",
+        "state": " ma ",
+        "zip": "02108"
+      },
+      "source_location_id": "NORTH",
+      "source_problems": [],
+      "clinician_type_support": {
+        "link_id": "56ac2258569d4ed4bbbc170b7b025d52",
+        "run_id": "f30ae9edba804181bd28a5cf94946f70",
+        "entity_kind": "clinician"
+      }
+    },
+    {
+      "address": {
+        "city": "Example",
+        "kind": "practice",
+        "line1": "10 Example St",
+        "line2": null,
+        "path": "location[0]",
+        "state": "MA",
+        "suite": null,
+        "zip": "02108"
+      },
+      "address_path": "location[0]",
+      "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+      "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+      "clinician_ref": "b9e900702f58d6ea1324a8411f19a0c3c9e1867a472c0ec1cb72148353c4f6d1",
+      "comparison": {
+        "address": {
+          "city": "example",
+          "kind": "practice",
+          "line1": "10 example st",
+          "line2": null,
+          "path": "location[0]",
+          "source_path": null,
+          "state": "ma",
+          "suite": null,
+          "zip": "02108",
+          "zip_base": "02108"
+        },
+        "entity_kind": "clinician",
+        "native_id": "practitionerrole/role-north",
+        "npi": "1000000001",
+        "phone": "6175550199",
+        "phone_extension": null,
+        "provider_name": "synthetic example"
+      },
+      "comparison_provenance": {},
+      "entity_kind": "clinician",
+      "entity_kind_conflict": false,
+      "entity_kind_declaration": "clinician",
+      "entity_kind_evidence": {
+        "resourceType": "Practitioner"
+      },
+      "field_findings": {
+        "address.suite": [
+          "null"
+        ],
+        "phone_extension": [
+          "null"
+        ]
+      },
+      "locator": "$.entry[5].resource",
+      "native_id": "PractitionerRole/role-north",
+      "native_validation": {
+        "profile": "not_run",
+        "terminology": "not_run"
+      },
+      "network_id": null,
+      "npi": "1000000001",
+      "organization_id": null,
+      "original_fields": {
+        "address": {
+          "city": "Example",
+          "kind": "practice",
+          "line1": "10 Example St",
+          "line2": null,
+          "path": "location[0]",
+          "state": "MA",
+          "suite": null,
+          "zip": "02108"
+        },
+        "address_path": "location[0]",
+        "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+        "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+        "clinician_ref": "b9e900702f58d6ea1324a8411f19a0c3c9e1867a472c0ec1cb72148353c4f6d1",
+        "entity_kind": "clinician",
+        "entity_kind_conflict": false,
+        "entity_kind_declaration": "clinician",
+        "entity_kind_evidence": {
+          "resourceType": "Practitioner"
+        },
+        "locator": "$.entry[5].resource",
+        "native_id": "PractitionerRole/role-north",
+        "native_validation": {
+          "profile": "not_run",
+          "terminology": "not_run"
+        },
+        "network_id": null,
+        "npi": "1000000001",
+        "organization_id": null,
+        "phone": "6175550199",
+        "phone_extension": null,
+        "provider_name": "Synthetic Example",
+        "receipt_id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+        "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+        "source": "synthetic-operations-payer",
+        "source_field_values": {},
+        "source_location_id": null,
+        "source_network_reference": "Organization/synthetic-network",
+        "source_problems": [],
+        "supporting_refs": [
+          {
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "field": "provider_name",
+            "locator": "$.entry[0].resource",
+            "path": "name[0]",
+            "source_pages": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          {
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "field": "address",
+            "locator": "$.entry[3].resource",
+            "path": "address",
+            "source_pages": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          {
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "field": "location_context",
+            "locator": "$.entry[5].resource",
+            "path": "location[0].reference",
+            "source_pages": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          {
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "field": "npi",
+            "locator": "$.entry[0].resource",
+            "path": "identifier",
+            "source_pages": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          {
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "field": "phone",
+            "locator": "$.entry[3].resource",
+            "path": "telecom[0].value",
+            "source_pages": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          {
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "field": "organization_context",
+            "locator": "$.entry[1].resource",
+            "path": "id",
+            "source_pages": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          {
+            "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+            "field": "network_context",
+            "locator": "$.entry[2].resource",
+            "path": "id",
+            "source_pages": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "phone": "6175550199",
+      "phone_extension": null,
+      "provider_name": "Synthetic Example",
+      "receipt_id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+      "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+      "rule_version": "provider-comparison-v4",
+      "source": "synthetic-operations-payer",
+      "source_field_values": {},
+      "source_location_id": null,
+      "source_network_reference": "Organization/synthetic-network",
+      "source_problems": [],
+      "supporting_refs": [
+        {
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "field": "provider_name",
+          "locator": "$.entry[0].resource",
+          "path": "name[0]",
+          "source_pages": [
+            {
+              "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+              "locator": "$.entry[0].resource",
+              "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+              "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+            }
+          ]
+        },
+        {
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "field": "address",
+          "locator": "$.entry[3].resource",
+          "path": "address",
+          "source_pages": [
+            {
+              "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+              "locator": "$.entry[0].resource",
+              "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+              "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+            }
+          ]
+        },
+        {
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "field": "location_context",
+          "locator": "$.entry[5].resource",
+          "path": "location[0].reference",
+          "source_pages": [
+            {
+              "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+              "locator": "$.entry[2].resource",
+              "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+              "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+            }
+          ]
+        },
+        {
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "field": "npi",
+          "locator": "$.entry[0].resource",
+          "path": "identifier",
+          "source_pages": [
+            {
+              "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+              "locator": "$.entry[0].resource",
+              "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+              "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+            }
+          ]
+        },
+        {
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "field": "phone",
+          "locator": "$.entry[3].resource",
+          "path": "telecom[0].value",
+          "source_pages": [
+            {
+              "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+              "locator": "$.entry[0].resource",
+              "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+              "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+            }
+          ]
+        },
+        {
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "field": "organization_context",
+          "locator": "$.entry[1].resource",
+          "path": "id",
+          "source_pages": [
+            {
+              "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+              "locator": "$.entry[1].resource",
+              "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+              "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+            }
+          ]
+        },
+        {
+          "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+          "field": "network_context",
+          "locator": "$.entry[2].resource",
+          "path": "id",
+          "source_pages": [
+            {
+              "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+              "locator": "$.entry[2].resource",
+              "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+              "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+            }
+          ]
+        }
+      ],
+      "clinician_type_support": {
+        "link_id": "4744b42d7384427fbf3ce4ecb74701e8",
+        "run_id": "f30ae9edba804181bd28a5cf94946f70",
+        "entity_kind": "clinician"
+      }
+    }
+  ],
+  "source_count": 3,
+  "links": [
+    {
+      "seq": 1,
+      "id": "5bdc93a562ea43ffbfc5eabe947f4dc5",
+      "kind": "clinician",
+      "ref": "323a8a1aebe9f0511f0d17f9501d83cb56181341495892d52e861f5ca849ff71",
+      "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "practice_location_id": null,
+      "previous_id": null,
+      "decision_id": "7e641299158b4b4a90d7fe0ce6a817ca",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.834627+00:00"
+    },
+    {
+      "seq": 5,
+      "id": "a3bcde17262e46b0ac28a41e40a9d3cf",
+      "kind": "location",
+      "ref": "0b42c2129158a957038248e50b62fa84228773cb8a9f8124df35b36bac920ffe",
+      "clinician_id": null,
+      "practice_location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": null,
+      "decision_id": "4d2deaf50e34413eb30be3374f210f7e",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.843789+00:00"
+    },
+    {
+      "seq": 3,
+      "id": "56ac2258569d4ed4bbbc170b7b025d52",
+      "kind": "clinician",
+      "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "practice_location_id": null,
+      "previous_id": "6913b562dab04f7e99c40b8536072c64",
+      "decision_id": "1bb769d97a0043a9b9f2b92ef5ba283a",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.839437+00:00"
+    },
+    {
+      "seq": 7,
+      "id": "187a28a2c6c947deb197ce1aea119779",
+      "kind": "location",
+      "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "clinician_id": null,
+      "practice_location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": "0b8645cef8fa4925a5768f76e67c9011",
+      "decision_id": "b128a2f55a084ef6b14cca2d55c655e1",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.852441+00:00"
+    },
+    {
+      "seq": 4,
+      "id": "4744b42d7384427fbf3ce4ecb74701e8",
+      "kind": "clinician",
+      "ref": "b9e900702f58d6ea1324a8411f19a0c3c9e1867a472c0ec1cb72148353c4f6d1",
+      "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "practice_location_id": null,
+      "previous_id": null,
+      "decision_id": "1bb769d97a0043a9b9f2b92ef5ba283a",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.839460+00:00"
+    },
+    {
+      "seq": 8,
+      "id": "7d7aff2d48ca45af9b0d8936e424aece",
+      "kind": "location",
+      "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+      "clinician_id": null,
+      "practice_location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": null,
+      "decision_id": "b128a2f55a084ef6b14cca2d55c655e1",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.852469+00:00"
+    }
+  ],
+  "run_snapshots": {
+    "f30ae9edba804181bd28a5cf94946f70": [
+      {
+        "receipt_id": "d781eab37628460a907aac7fffdccc99",
+        "latest_attempt": "31e60188dba147a680b4e83db8772102",
+        "latest_attempt_state": "committed",
+        "accepted_baseline": "31e60188dba147a680b4e83db8772102"
+      },
+      {
+        "receipt_id": "77c8c1298a4746368f50f8f4da08df29",
+        "latest_attempt": "0c480ce9572e4a29ad5641a1e633d3f4",
+        "latest_attempt_state": "committed",
+        "accepted_baseline": "0c480ce9572e4a29ad5641a1e633d3f4"
+      },
+      {
+        "receipt_id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+        "latest_attempt": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+        "latest_attempt_state": "committed",
+        "accepted_baseline": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a"
+      },
+      {
+        "receipt_id": "cad2db1ec8d54906aece5b80a3d4481c",
+        "latest_attempt": "09837ba5b20a4543a989116ae289608a",
+        "latest_attempt_state": "committed",
+        "accepted_baseline": "31e60188dba147a680b4e83db8772102"
+      }
+    ]
+  },
+  "scope_problems": [],
+  "notice": "Local reviewed preferences, not verified provider facts. Source assertions are unchanged; address components and phone extensions remain coherent.",
+  "source_context": [
+    {
+      "receipt": {
+        "id": "77c8c1298a4746368f50f8f4da08df29",
+        "label": "directory.json",
+        "source": "synthetic-operations-saved-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.137762+00:00",
+        "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {}
+      },
+      "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[0].resource",
+        "native_id": "Practitioner/synthetic-clinician",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [],
+          "resource_type": "Practitioner",
+          "source_id": "synthetic-clinician"
+        },
+        "original": {
+          "active": true,
+          "id": "synthetic-clinician",
+          "identifier": [
+            {
+              "system": "https://example.invalid/clinician-id",
+              "value": "SYNTHETIC-001"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/us-npi",
+              "value": "1000000001"
+            }
+          ],
+          "name": [
+            {
+              "family": "Example",
+              "given": [
+                "Synthetic"
+              ],
+              "use": "official"
+            }
+          ],
+          "resourceType": "Practitioner"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "77c8c1298a4746368f50f8f4da08df29",
+        "label": "directory.json",
+        "source": "synthetic-operations-saved-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.137762+00:00",
+        "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {}
+      },
+      "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[1].resource",
+        "native_id": "Organization/synthetic-clinic",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [],
+          "resource_type": "Organization",
+          "source_id": "synthetic-clinic"
+        },
+        "original": {
+          "active": true,
+          "id": "synthetic-clinic",
+          "name": "Synthetic Example Clinic",
+          "resourceType": "Organization"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "77c8c1298a4746368f50f8f4da08df29",
+        "label": "directory.json",
+        "source": "synthetic-operations-saved-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.137762+00:00",
+        "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {}
+      },
+      "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[2].resource",
+        "native_id": "Organization/synthetic-network",
+        "normalized": {
+          "meta": {
+            "profile": [
+              "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network"
+            ]
+          },
+          "native_assertions": [],
+          "resource_type": "Organization",
+          "source_id": "synthetic-network"
+        },
+        "original": {
+          "active": true,
+          "id": "synthetic-network",
+          "meta": {
+            "profile": [
+              "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network"
+            ]
+          },
+          "name": "Synthetic Example Network",
+          "resourceType": "Organization"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "77c8c1298a4746368f50f8f4da08df29",
+        "label": "directory.json",
+        "source": "synthetic-operations-saved-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.137762+00:00",
+        "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {}
+      },
+      "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[3].resource",
+        "native_id": "Location/north",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [],
+          "resource_type": "Location",
+          "source_id": "north"
+        },
+        "original": {
+          "address": {
+            "city": "Example",
+            "country": "US",
+            "line": [
+              "10 Example St"
+            ],
+            "postalCode": "02108",
+            "state": "MA"
+          },
+          "id": "north",
+          "managingOrganization": {
+            "reference": "Organization/synthetic-clinic"
+          },
+          "name": "Synthetic NORTH",
+          "resourceType": "Location",
+          "status": "active",
+          "telecom": [
+            {
+              "system": "phone",
+              "use": "work",
+              "value": "6175550199"
+            }
+          ]
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "77c8c1298a4746368f50f8f4da08df29",
+        "label": "directory.json",
+        "source": "synthetic-operations-saved-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.137762+00:00",
+        "artifact_sha": "4232c0de2cc37e6c769668c46921e8468b537c9480f8098027f2f16054d8b0a1",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {}
+      },
+      "attempt_id": "0c480ce9572e4a29ad5641a1e633d3f4",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[5].resource",
+        "native_id": "PractitionerRole/role-north",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [
+            {
+              "address": {
+                "city": "Example",
+                "country": "US",
+                "line": [
+                  "10 Example St"
+                ],
+                "postalCode": "02108",
+                "state": "MA"
+              },
+              "address_path": "location[0]",
+              "clinician_locator": "$.entry[0].resource",
+              "location_locator": "$.entry[3].resource",
+              "location_status": "active",
+              "locator": "$.entry[5].resource",
+              "network_id": null,
+              "npi": "1000000001",
+              "phone": "6175550199",
+              "practitioner_active": true,
+              "provider_name": "Synthetic Example",
+              "role_active": true,
+              "role_period": null,
+              "rule_version": "fhir-plannet-r4-v1",
+              "source_network_reference": "Organization/synthetic-network",
+              "supporting_refs": [
+                {
+                  "field": "provider_name",
+                  "locator": "$.entry[0].resource",
+                  "path": "name[0]"
+                },
+                {
+                  "field": "address",
+                  "locator": "$.entry[3].resource",
+                  "path": "address"
+                },
+                {
+                  "field": "location_context",
+                  "locator": "$.entry[5].resource",
+                  "path": "location[0].reference"
+                },
+                {
+                  "field": "npi",
+                  "locator": "$.entry[0].resource",
+                  "path": "identifier"
+                },
+                {
+                  "field": "phone",
+                  "locator": "$.entry[3].resource",
+                  "path": "telecom[0].value"
+                },
+                {
+                  "field": "organization_context",
+                  "locator": "$.entry[1].resource",
+                  "path": "id"
+                },
+                {
+                  "field": "network_context",
+                  "locator": "$.entry[2].resource",
+                  "path": "id"
+                }
+              ]
+            }
+          ],
+          "resource_type": "PractitionerRole",
+          "source_id": "role-north"
+        },
+        "original": {
+          "active": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
+              "valueReference": {
+                "reference": "Organization/synthetic-network"
+              }
+            }
+          ],
+          "id": "role-north",
+          "location": [
+            {
+              "reference": "Location/north"
+            }
+          ],
+          "organization": {
+            "reference": "Organization/synthetic-clinic"
+          },
+          "practitioner": {
+            "reference": "Practitioner/synthetic-clinician"
+          },
+          "resourceType": "PractitionerRole"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "d781eab37628460a907aac7fffdccc99",
+        "label": "baseline.csv",
+        "source": "synthetic-operations-clinic",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:15.747608+00:00",
+        "artifact_sha": "0993bf382e6e2d11f6a982ef821ef5f5e51f27b864d4a37cc37aa1ff192a3f4d",
+        "profile": "flat",
+        "duplicate_of": null,
+        "metadata": {
+          "as_of": "2026-11-02",
+          "completeness": "full",
+          "delivery_id": "56cc1255704d41ad8acfbdcaaa938082",
+          "managed_feed_id": "bfe6b20708e54480a2dc39a576b1caad",
+          "scope": "weekly-full-roster"
+        }
+      },
+      "attempt_id": "31e60188dba147a680b4e83db8772102",
+      "spec": {
+        "adapter_version": "1",
+        "baseline_attempt_id": null,
+        "comparison_rule_version": "provider-comparison-v4",
+        "delimiter": ",",
+        "encoding": "utf-8-sig",
+        "managed_feed_id": "bfe6b20708e54480a2dc39a576b1caad",
+        "mapping": {
+          "address": "Office Address",
+          "city": "City",
+          "location_id": "Office Key",
+          "npi": "NPI",
+          "phone": "Office Tel",
+          "provider_name": "Clinician Name",
+          "record_id": "Record Key",
+          "reference_phone": "Directory Phone",
+          "state": "State",
+          "zip": "Postal"
+        },
+        "profile": "flat",
+        "recipe_revision_id": "d924f1f38102498d89cd9023b41c1a00"
+      },
+      "row": {
+        "comparison": "new",
+        "comparison_values": [
+          {
+            "address": {
+              "city": "Example",
+              "kind": "practice",
+              "line1": "10 Example St",
+              "line2": null,
+              "path": "",
+              "state": "MA",
+              "suite": null,
+              "use_record_phone": true,
+              "zip": "02108"
+            },
+            "address_path": "",
+            "artifact_sha": "0993bf382e6e2d11f6a982ef821ef5f5e51f27b864d4a37cc37aa1ff192a3f4d",
+            "attempt_id": "31e60188dba147a680b4e83db8772102",
+            "clinician_ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+            "comparison": {
+              "address": {
+                "city": "example",
+                "kind": "practice",
+                "line1": "10 example st",
+                "line2": null,
+                "path": "",
+                "source_path": null,
+                "state": "ma",
+                "suite": null,
+                "zip": "02108",
+                "zip_base": "02108"
+              },
+              "entity_kind": "clinician",
+              "native_id": "syn-001",
+              "npi": "1000000001",
+              "phone": "6175550100",
+              "phone_extension": "007",
+              "provider_name": "synthetic clinician"
+            },
+            "comparison_provenance": {},
+            "entity_kind": "clinician",
+            "entity_kind_conflict": false,
+            "entity_kind_declaration": "unknown",
+            "entity_kind_evidence": {
+              "entity_type": "clinician"
+            },
+            "evaluation_ref": null,
+            "field_findings": {
+              "address.suite": [
+                "null"
+              ]
+            },
+            "locator": "row:2",
+            "native_id": "SYN-001",
+            "network_id": null,
+            "npi": "1000000001",
+            "organization_id": null,
+            "original_fields": {
+              "address": {
+                "city": "Example",
+                "kind": "practice",
+                "line1": "10 Example St",
+                "line2": null,
+                "path": "",
+                "state": "MA",
+                "suite": null,
+                "use_record_phone": true,
+                "zip": "02108"
+              },
+              "address_path": "",
+              "artifact_sha": "0993bf382e6e2d11f6a982ef821ef5f5e51f27b864d4a37cc37aa1ff192a3f4d",
+              "attempt_id": "31e60188dba147a680b4e83db8772102",
+              "clinician_ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+              "entity_kind": "clinician",
+              "entity_kind_conflict": false,
+              "entity_kind_declaration": "unknown",
+              "entity_kind_evidence": {
+                "entity_type": "clinician"
+              },
+              "evaluation_ref": null,
+              "locator": "row:2",
+              "native_id": "SYN-001",
+              "network_id": null,
+              "npi": "1000000001",
+              "organization_id": null,
+              "phone": "6175550100",
+              "phone_extension": "007",
+              "provider_name": "Synthetic Clinician",
+              "receipt_id": "d781eab37628460a907aac7fffdccc99",
+              "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+              "source": "synthetic-operations-clinic",
+              "source_field_values": {
+                "address": "10 Example St",
+                "city": "Example",
+                "npi": "1000000001",
+                "phone": "+1 (617) 555-0100 ext 007",
+                "provider_name": "  Synthetic   Clinician ",
+                "state": " ma ",
+                "zip": "02108"
+              },
+              "source_location_id": "NORTH",
+              "source_problems": []
+            },
+            "phone": "6175550100",
+            "phone_extension": "007",
+            "provider_name": "Synthetic Clinician",
+            "receipt_id": "d781eab37628460a907aac7fffdccc99",
+            "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+            "rule_version": "provider-comparison-v4",
+            "source": "synthetic-operations-clinic",
+            "source_field_values": {
+              "address": "10 Example St",
+              "city": "Example",
+              "npi": "1000000001",
+              "phone": "+1 (617) 555-0100 ext 007",
+              "provider_name": "  Synthetic   Clinician ",
+              "state": " ma ",
+              "zip": "02108"
+            },
+            "source_location_id": "NORTH",
+            "source_problems": []
+          }
+        ],
+        "locator": "row:2",
+        "native_id": "SYN-001",
+        "normalization": {
+          "address": {
+            "findings": [],
+            "original": "10 Example St",
+            "source_column": "Office Address",
+            "steps": [],
+            "value": "10 Example St"
+          },
+          "city": {
+            "findings": [],
+            "original": "Example",
+            "source_column": "City",
+            "steps": [],
+            "value": "Example"
+          },
+          "location_id": {
+            "findings": [],
+            "original": "NORTH",
+            "source_column": "Office Key",
+            "steps": [],
+            "value": "NORTH"
+          },
+          "npi": {
+            "findings": [],
+            "original": "1000000001",
+            "source_column": "NPI",
+            "steps": [],
+            "value": "1000000001"
+          },
+          "phone": {
+            "findings": [],
+            "original": "+1 (617) 555-0100 ext 007",
+            "source_column": "Office Tel",
+            "steps": [
+              {
+                "after": "6175550100",
+                "before": "+1 (617) 555-0100 ext 007",
+                "findings": [],
+                "op": {
+                  "op": "phone_us"
+                }
+              }
+            ],
+            "value": "6175550100"
+          },
+          "phone_extension": {
+            "derived_from": "phone",
+            "findings": [],
+            "original": "+1 (617) 555-0100 ext 007",
+            "source_column": "Office Tel",
+            "steps": [
+              {
+                "after": "007",
+                "before": "+1 (617) 555-0100 ext 007",
+                "findings": [],
+                "op": {
+                  "op": "phone_us"
+                },
+                "source_column": "Office Tel"
+              }
+            ],
+            "value": "007"
+          },
+          "provider_name": {
+            "findings": [],
+            "original": "  Synthetic   Clinician ",
+            "source_column": "Clinician Name",
+            "steps": [
+              {
+                "after": "Synthetic   Clinician",
+                "before": "  Synthetic   Clinician ",
+                "findings": [],
+                "op": {
+                  "op": "trim"
+                }
+              },
+              {
+                "after": "Synthetic Clinician",
+                "before": "Synthetic   Clinician",
+                "findings": [],
+                "op": {
+                  "op": "collapse_spaces"
+                }
+              }
+            ],
+            "value": "Synthetic Clinician"
+          },
+          "record_id": {
+            "findings": [],
+            "original": "SYN-001",
+            "source_column": "Record Key",
+            "steps": [],
+            "value": "SYN-001"
+          },
+          "reference_phone": {
+            "findings": [],
+            "original": "6175550199",
+            "source_column": "Directory Phone",
+            "steps": [
+              {
+                "after": "6175550199",
+                "before": "6175550199",
+                "findings": [],
+                "op": {
+                  "op": "phone_us"
+                }
+              }
+            ],
+            "value": "6175550199"
+          },
+          "state": {
+            "findings": [],
+            "original": " ma ",
+            "source_column": "State",
+            "steps": [
+              {
+                "after": "MA",
+                "before": " ma ",
+                "findings": [],
+                "op": {
+                  "op": "state_us"
+                }
+              }
+            ],
+            "value": "MA"
+          },
+          "zip": {
+            "findings": [],
+            "original": "02108",
+            "source_column": "Postal",
+            "steps": [
+              {
+                "after": "02108",
+                "before": "02108",
+                "findings": [],
+                "op": {
+                  "op": "zip_us"
+                }
+              }
+            ],
+            "value": "02108"
+          }
+        },
+        "normalized": {
+          "address": "10 Example St",
+          "city": "Example",
+          "location_id": "NORTH",
+          "npi": "1000000001",
+          "phone": "6175550100",
+          "phone_extension": "007",
+          "provider_name": "Synthetic Clinician",
+          "record_id": "SYN-001",
+          "reference_phone": "6175550199",
+          "state": "MA",
+          "zip": "02108"
+        },
+        "original": {
+          "City": "Example",
+          "Clinician Name": "  Synthetic   Clinician ",
+          "Directory Phone": "6175550199",
+          "NPI": "1000000001",
+          "Office Address": "10 Example St",
+          "Office Key": "NORTH",
+          "Office Tel": "+1 (617) 555-0100 ext 007",
+          "Postal": "02108",
+          "Record Key": "SYN-001",
+          "State": " ma ",
+          "Telephone": "6175550998",
+          "entity_type": "clinician"
+        },
+        "problems": []
+      },
+      "roles": [
+        "current_assertion"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+        "label": "Assembled synthetic-operations-payer directory.json",
+        "source": "synthetic-operations-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.208912+00:00",
+        "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {
+          "acquisition_id": "87fb0b8a5513432c9626dd3b55ce486a",
+          "completeness": "bounded",
+          "parser_target": "Plan-Net 1.2.0 subset",
+          "representation": "derived_assembled_searchset",
+          "resource_origins": {
+            "$.entry[0].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[1].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[2].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[3].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[4].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[5].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[6].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[3].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[7].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[4].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[8].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[5].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          "response_artifacts": [
+            "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+            "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785"
+          ],
+          "scope": "a7de37e5cbdd59d755f697b0b892ed0d032b7e1013aafacbb4e187d4e3a59dcb",
+          "source_base": "http://127.0.0.1:54610/",
+          "source_plan_net_version": "Synthetic Plan-Net subset; conformance unverified"
+        }
+      },
+      "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[0].resource",
+        "native_id": "Practitioner/synthetic-clinician",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [],
+          "resource_type": "Practitioner",
+          "source_id": "synthetic-clinician"
+        },
+        "original": {
+          "active": true,
+          "id": "synthetic-clinician",
+          "identifier": [
+            {
+              "system": "https://example.invalid/clinician-id",
+              "value": "SYNTHETIC-001"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/us-npi",
+              "value": "1000000001"
+            }
+          ],
+          "name": [
+            {
+              "family": "Example",
+              "given": [
+                "Synthetic"
+              ],
+              "use": "official"
+            }
+          ],
+          "resourceType": "Practitioner"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion",
+        "historical_field_decision"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+        "label": "Assembled synthetic-operations-payer directory.json",
+        "source": "synthetic-operations-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.208912+00:00",
+        "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {
+          "acquisition_id": "87fb0b8a5513432c9626dd3b55ce486a",
+          "completeness": "bounded",
+          "parser_target": "Plan-Net 1.2.0 subset",
+          "representation": "derived_assembled_searchset",
+          "resource_origins": {
+            "$.entry[0].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[1].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[2].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[3].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[4].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[5].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[6].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[3].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[7].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[4].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[8].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[5].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          "response_artifacts": [
+            "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+            "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785"
+          ],
+          "scope": "a7de37e5cbdd59d755f697b0b892ed0d032b7e1013aafacbb4e187d4e3a59dcb",
+          "source_base": "http://127.0.0.1:54610/",
+          "source_plan_net_version": "Synthetic Plan-Net subset; conformance unverified"
+        }
+      },
+      "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[1].resource",
+        "native_id": "Organization/synthetic-clinic",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [],
+          "resource_type": "Organization",
+          "source_id": "synthetic-clinic"
+        },
+        "original": {
+          "active": true,
+          "id": "synthetic-clinic",
+          "name": "Synthetic Example Clinic",
+          "resourceType": "Organization"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion",
+        "historical_field_decision"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+        "label": "Assembled synthetic-operations-payer directory.json",
+        "source": "synthetic-operations-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.208912+00:00",
+        "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {
+          "acquisition_id": "87fb0b8a5513432c9626dd3b55ce486a",
+          "completeness": "bounded",
+          "parser_target": "Plan-Net 1.2.0 subset",
+          "representation": "derived_assembled_searchset",
+          "resource_origins": {
+            "$.entry[0].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[1].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[2].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[3].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[4].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[5].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[6].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[3].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[7].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[4].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[8].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[5].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          "response_artifacts": [
+            "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+            "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785"
+          ],
+          "scope": "a7de37e5cbdd59d755f697b0b892ed0d032b7e1013aafacbb4e187d4e3a59dcb",
+          "source_base": "http://127.0.0.1:54610/",
+          "source_plan_net_version": "Synthetic Plan-Net subset; conformance unverified"
+        }
+      },
+      "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[2].resource",
+        "native_id": "Organization/synthetic-network",
+        "normalized": {
+          "meta": {
+            "profile": [
+              "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network"
+            ]
+          },
+          "native_assertions": [],
+          "resource_type": "Organization",
+          "source_id": "synthetic-network"
+        },
+        "original": {
+          "active": true,
+          "id": "synthetic-network",
+          "meta": {
+            "profile": [
+              "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network"
+            ]
+          },
+          "name": "Synthetic Example Network",
+          "resourceType": "Organization"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion",
+        "historical_field_decision"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+        "label": "Assembled synthetic-operations-payer directory.json",
+        "source": "synthetic-operations-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.208912+00:00",
+        "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {
+          "acquisition_id": "87fb0b8a5513432c9626dd3b55ce486a",
+          "completeness": "bounded",
+          "parser_target": "Plan-Net 1.2.0 subset",
+          "representation": "derived_assembled_searchset",
+          "resource_origins": {
+            "$.entry[0].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[1].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[2].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[3].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[4].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[5].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[6].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[3].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[7].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[4].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[8].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[5].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          "response_artifacts": [
+            "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+            "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785"
+          ],
+          "scope": "a7de37e5cbdd59d755f697b0b892ed0d032b7e1013aafacbb4e187d4e3a59dcb",
+          "source_base": "http://127.0.0.1:54610/",
+          "source_plan_net_version": "Synthetic Plan-Net subset; conformance unverified"
+        }
+      },
+      "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[3].resource",
+        "native_id": "Location/north",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [],
+          "resource_type": "Location",
+          "source_id": "north"
+        },
+        "original": {
+          "address": {
+            "city": "Example",
+            "country": "US",
+            "line": [
+              "10 Example St"
+            ],
+            "postalCode": "02108",
+            "state": "MA"
+          },
+          "id": "north",
+          "managingOrganization": {
+            "reference": "Organization/synthetic-clinic"
+          },
+          "name": "Synthetic NORTH",
+          "resourceType": "Location",
+          "status": "active",
+          "telecom": [
+            {
+              "system": "phone",
+              "use": "work",
+              "value": "6175550199"
+            }
+          ]
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion",
+        "historical_field_decision"
+      ]
+    },
+    {
+      "receipt": {
+        "id": "acquisition-87fb0b8a5513432c9626dd3b55ce486a",
+        "label": "Assembled synthetic-operations-payer directory.json",
+        "source": "synthetic-operations-payer",
+        "designation": "synthetic",
+        "received_at": "2026-11-15T01:00:16.208912+00:00",
+        "artifact_sha": "814104602a24d60726a63ab2a0c07f93aee4da9568c04fe87c98b81e53e72f7c",
+        "profile": "fhir-plannet-r4",
+        "duplicate_of": null,
+        "metadata": {
+          "acquisition_id": "87fb0b8a5513432c9626dd3b55ce486a",
+          "completeness": "bounded",
+          "parser_target": "Plan-Net 1.2.0 subset",
+          "representation": "derived_assembled_searchset",
+          "resource_origins": {
+            "$.entry[0].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[1].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[2].resource": [
+              {
+                "artifact_sha": "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/Location/?_count=1",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[3].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[0].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[4].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[1].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[5].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[2].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[6].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[3].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[7].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[4].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ],
+            "$.entry[8].resource": [
+              {
+                "artifact_sha": "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785",
+                "locator": "$.entry[5].resource",
+                "request_url": "http://127.0.0.1:54610/?_getpages=complete",
+                "retrieved_at": "2026-11-15T01:00:16.158229+00:00"
+              }
+            ]
+          },
+          "response_artifacts": [
+            "cd07c3e225ee7056f1e58b5ea5e05de8dbf05d6ab6912ae97f0c1596f3bb8d17",
+            "125692e465398e28f1d7d6f87964bb547a340054546ce0cb39a5decacb990785"
+          ],
+          "scope": "a7de37e5cbdd59d755f697b0b892ed0d032b7e1013aafacbb4e187d4e3a59dcb",
+          "source_base": "http://127.0.0.1:54610/",
+          "source_plan_net_version": "Synthetic Plan-Net subset; conformance unverified"
+        }
+      },
+      "attempt_id": "acquisition-attempt-87fb0b8a5513432c9626dd3b55ce486a",
+      "spec": {
+        "adapter_version": "fhir-plannet-r4-v1",
+        "native_projection_version": "fhir-plannet-r4-v1",
+        "profile": "fhir-plannet-r4"
+      },
+      "row": {
+        "locator": "$.entry[5].resource",
+        "native_id": "PractitionerRole/role-north",
+        "normalized": {
+          "meta": {},
+          "native_assertions": [
+            {
+              "address": {
+                "city": "Example",
+                "country": "US",
+                "line": [
+                  "10 Example St"
+                ],
+                "postalCode": "02108",
+                "state": "MA"
+              },
+              "address_path": "location[0]",
+              "clinician_locator": "$.entry[0].resource",
+              "location_locator": "$.entry[3].resource",
+              "location_status": "active",
+              "locator": "$.entry[5].resource",
+              "network_id": null,
+              "npi": "1000000001",
+              "phone": "6175550199",
+              "practitioner_active": true,
+              "provider_name": "Synthetic Example",
+              "role_active": true,
+              "role_period": null,
+              "rule_version": "fhir-plannet-r4-v1",
+              "source_network_reference": "Organization/synthetic-network",
+              "supporting_refs": [
+                {
+                  "field": "provider_name",
+                  "locator": "$.entry[0].resource",
+                  "path": "name[0]"
+                },
+                {
+                  "field": "address",
+                  "locator": "$.entry[3].resource",
+                  "path": "address"
+                },
+                {
+                  "field": "location_context",
+                  "locator": "$.entry[5].resource",
+                  "path": "location[0].reference"
+                },
+                {
+                  "field": "npi",
+                  "locator": "$.entry[0].resource",
+                  "path": "identifier"
+                },
+                {
+                  "field": "phone",
+                  "locator": "$.entry[3].resource",
+                  "path": "telecom[0].value"
+                },
+                {
+                  "field": "organization_context",
+                  "locator": "$.entry[1].resource",
+                  "path": "id"
+                },
+                {
+                  "field": "network_context",
+                  "locator": "$.entry[2].resource",
+                  "path": "id"
+                }
+              ]
+            }
+          ],
+          "resource_type": "PractitionerRole",
+          "source_id": "role-north"
+        },
+        "original": {
+          "active": true,
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
+              "valueReference": {
+                "reference": "Organization/synthetic-network"
+              }
+            }
+          ],
+          "id": "role-north",
+          "location": [
+            {
+              "reference": "Location/north"
+            }
+          ],
+          "organization": {
+            "reference": "Organization/synthetic-clinic"
+          },
+          "practitioner": {
+            "reference": "Practitioner/synthetic-clinician"
+          },
+          "resourceType": "PractitionerRole"
+        },
+        "problems": [],
+        "source_updated_at": null
+      },
+      "roles": [
+        "current_assertion",
+        "historical_field_decision"
+      ]
+    }
+  ],
+  "link_history": [
+    {
+      "seq": 1,
+      "id": "5bdc93a562ea43ffbfc5eabe947f4dc5",
+      "kind": "clinician",
+      "ref": "323a8a1aebe9f0511f0d17f9501d83cb56181341495892d52e861f5ca849ff71",
+      "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "practice_location_id": null,
+      "previous_id": null,
+      "decision_id": "7e641299158b4b4a90d7fe0ce6a817ca",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.834627+00:00"
+    },
+    {
+      "seq": 5,
+      "id": "a3bcde17262e46b0ac28a41e40a9d3cf",
+      "kind": "location",
+      "ref": "0b42c2129158a957038248e50b62fa84228773cb8a9f8124df35b36bac920ffe",
+      "clinician_id": null,
+      "practice_location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": null,
+      "decision_id": "4d2deaf50e34413eb30be3374f210f7e",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.843789+00:00"
+    },
+    {
+      "seq": 2,
+      "id": "6913b562dab04f7e99c40b8536072c64",
+      "kind": "clinician",
+      "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "practice_location_id": null,
+      "previous_id": null,
+      "decision_id": "7e641299158b4b4a90d7fe0ce6a817ca",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.834650+00:00"
+    },
+    {
+      "seq": 3,
+      "id": "56ac2258569d4ed4bbbc170b7b025d52",
+      "kind": "clinician",
+      "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "practice_location_id": null,
+      "previous_id": "6913b562dab04f7e99c40b8536072c64",
+      "decision_id": "1bb769d97a0043a9b9f2b92ef5ba283a",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.839437+00:00"
+    },
+    {
+      "seq": 6,
+      "id": "0b8645cef8fa4925a5768f76e67c9011",
+      "kind": "location",
+      "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "clinician_id": null,
+      "practice_location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": null,
+      "decision_id": "4d2deaf50e34413eb30be3374f210f7e",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.843809+00:00"
+    },
+    {
+      "seq": 7,
+      "id": "187a28a2c6c947deb197ce1aea119779",
+      "kind": "location",
+      "ref": "4f4432c5186d3c778d910d7a139d57a6520774c61c5b87a8300fff8a37a71037",
+      "clinician_id": null,
+      "practice_location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": "0b8645cef8fa4925a5768f76e67c9011",
+      "decision_id": "b128a2f55a084ef6b14cca2d55c655e1",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.852441+00:00"
+    },
+    {
+      "seq": 4,
+      "id": "4744b42d7384427fbf3ce4ecb74701e8",
+      "kind": "clinician",
+      "ref": "b9e900702f58d6ea1324a8411f19a0c3c9e1867a472c0ec1cb72148353c4f6d1",
+      "clinician_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "practice_location_id": null,
+      "previous_id": null,
+      "decision_id": "1bb769d97a0043a9b9f2b92ef5ba283a",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.839460+00:00"
+    },
+    {
+      "seq": 8,
+      "id": "7d7aff2d48ca45af9b0d8936e424aece",
+      "kind": "location",
+      "ref": "d810e2eaf2341025eee702b1846a9aa9dc9ef0368e5d2128a4966e4f56a59774",
+      "clinician_id": null,
+      "practice_location_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": null,
+      "decision_id": "b128a2f55a084ef6b14cca2d55c655e1",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.852469+00:00"
+    }
+  ],
+  "identity_decisions": [
+    {
+      "seq": 2,
+      "id": "1bb769d97a0043a9b9f2b92ef5ba283a",
+      "request_id": "79798a28c0f244fcb8e267738b9bd445",
+      "request_hash": "b1ba7adba7f395e573e1b9480d28949c74147a19e2330c479865e02bdff6322d",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "candidate_id": "8c629a33aeef8c3a78872e79b815b65983c4a04d9b34a3e10fc8678ed9eadf04",
+      "pair_key": "e14443b3748c3d24f7e2ebe858f287ac1d9750e19a9033ad1b9f4e539045a8cb",
+      "kind": "clinician",
+      "decision": "approve",
+      "target_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "previous_id": null,
+      "snapshot": "6cbe7a99af0526baaaa05042074eb6be219eec08da61ce7f053cb3302d800623",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.839404+00:00"
+    },
+    {
+      "seq": 3,
+      "id": "4d2deaf50e34413eb30be3374f210f7e",
+      "request_id": "ed94538ddaf84084a6757e2259a958d3",
+      "request_hash": "8c178877afa8842100ffe55c20cf498127cb1ac1dcc84ed947e831b706f42e8c",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "candidate_id": "22b99d79a07d6323c55c414595d783ea36d5885d62febbec5ebd4f7e13e73030",
+      "pair_key": "3cb9728c28d221cec4be11d0d2cd001fc4129203f7f2720ffffceb6e9085ba14",
+      "kind": "location",
+      "decision": "approve",
+      "target_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": null,
+      "snapshot": "0ddc20bfedb39f147f1d4ec7062d697ddd37470ec0d525d30edd25183cf7f26b",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.843763+00:00"
+    },
+    {
+      "seq": 1,
+      "id": "7e641299158b4b4a90d7fe0ce6a817ca",
+      "request_id": "a1dcc3eee10d46298ced79b313c13a57",
+      "request_hash": "70464a9fdafa7c46b954286923be41a931a9e5483b99a98725df60b2c99ff1a2",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "candidate_id": "0635c50843dfd1869c9581610511a3d77b38b05a2d03e53913701953af995140",
+      "pair_key": "ea28d00d37add236abce9d0f432b49b4b9445a41668df3ed760494cf2f1fe7de",
+      "kind": "clinician",
+      "decision": "approve",
+      "target_id": "3a0a1d774f654956918c85c9ec2fc2d5",
+      "previous_id": null,
+      "snapshot": "442c630c9c730a8c5cf2e4d8b27ec10d45908ee96091e4fb1c9fde653a1e367b",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.834594+00:00"
+    },
+    {
+      "seq": 4,
+      "id": "b128a2f55a084ef6b14cca2d55c655e1",
+      "request_id": "3417053a0d974596958d67e3d0cdc587",
+      "request_hash": "136241e0a2f5cbb2bddd4791ac94bdd3f9745f1276bda584341caa90e20be38e",
+      "run_id": "f30ae9edba804181bd28a5cf94946f70",
+      "candidate_id": "d67a231baecef2f4fa60d4df819fc10d73591854687a10c15c2fa638288d3b14",
+      "pair_key": "5a0a3bd0e5a257e0ef11690de08a0db5c3438f4d70ee51d2a04a056013f1fbda",
+      "kind": "location",
+      "decision": "approve",
+      "target_id": "6476b74b359d4ff6bb91aeaaf7ee9ecb",
+      "previous_id": null,
+      "snapshot": "b4b694c5e5f776a982dad5f5327d085b2fa12baee4778832b0a69256be6bfc95",
+      "actor": "Synthetic operations reviewer",
+      "reason": "Explicit review of synthetic source evidence",
+      "created_at": "2026-11-15T01:00:16.852396+00:00"
+    }
+  ],
+  "format_version": 1,
+  "source_context_notice": "Exact retained rows may include other native addresses as shared original context; only records/options define the selected clinician/location scope."
+}

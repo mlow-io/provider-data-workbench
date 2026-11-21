@@ -1,0 +1,267 @@
+{
+  "resourceType" : "OperationOutcome",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p class=\"res-header-id\"><b>OperationOutcome </b></p><table class=\"grid\"><tr><td><b>Severity</b></td><td><b>Location</b></td><td><b>Code</b></td><td><b>Details</b></td><td><b>Diagnostics</b></td><td><b>Source</b></td></tr><tr><td>Error</td><td>Bundle.entry[0].resource/*Practitioner/synthetic-clinician*/.identifier[0]</td><td>Validation rule failed</td><td>Constraint failed: us-core-17: 'NPI check digit must be valid (Luhn algorithm check)'</td><td/><td>InstanceValidator</td></tr><tr><td>Information</td><td>Bundle.entry[6].resource/*PractitionerRole/role-north*/.practitioner</td><td>Structural Issue</td><td>Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1</td><td/><td>InstanceValidator</td></tr><tr><td>Error</td><td>Bundle.entry[6].resource/*PractitionerRole/role-north*/.practitioner</td><td>Structural Issue</td><td>Unable to find a profile match for Practitioner/synthetic-clinician among choices: http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner</td><td/><td>InstanceValidator</td></tr><tr><td>Information</td><td>Bundle.entry[6].resource/*PractitionerRole/role-north*/.practitioner</td><td>Structural Issue</td><td>Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0</td><td/><td>InstanceValidator</td></tr><tr><td>Error</td><td>Bundle.entry[6].resource/*PractitionerRole/role-north*/</td><td>Validation rule failed</td><td>Constraint failed: pd-1: 'SHALL have contact information or a reference to an Endpoint' (defined in http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole)</td><td/><td>InstanceValidator</td></tr><tr><td>Information</td><td>Bundle.entry[7].resource/*PractitionerRole/role-south*/.practitioner</td><td>Structural Issue</td><td>Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1</td><td/><td>InstanceValidator</td></tr><tr><td>Error</td><td>Bundle.entry[7].resource/*PractitionerRole/role-south*/.practitioner</td><td>Structural Issue</td><td>Unable to find a profile match for Practitioner/synthetic-clinician among choices: http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner</td><td/><td>InstanceValidator</td></tr><tr><td>Information</td><td>Bundle.entry[7].resource/*PractitionerRole/role-south*/.practitioner</td><td>Structural Issue</td><td>Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0</td><td/><td>InstanceValidator</td></tr><tr><td>Error</td><td>Bundle.entry[7].resource/*PractitionerRole/role-south*/</td><td>Validation rule failed</td><td>Constraint failed: pd-1: 'SHALL have contact information or a reference to an Endpoint' (defined in http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole)</td><td/><td>InstanceValidator</td></tr></table></div>"
+  },
+  "extension" : [{
+    "url" : "http://hl7.org/fhir/tools/StructureDefinition/validator-version",
+    "valueString" : "FHIR Validation tool Version 7.0.5 (Git# 17db3661806b). Built 2026-11-05T23:27:05.236Z (8 days old)"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-file",
+    "valueString" : "tests/fixtures/intake/fhir-plannet/profile-graph.json"
+  }],
+  "issue" : [{
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 31
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 12
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner#us-core-17"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    }],
+    "severity" : "error",
+    "code" : "invariant",
+    "details" : {
+      "text" : "Constraint failed: us-core-17: 'NPI check digit must be valid (Luhn algorithm check)'"
+    },
+    "expression" : ["Bundle.entry[0].resource/*Practitioner/synthetic-clinician*/.identifier[0]"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 283
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 10
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "Details_for__matching_against_Profile_"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    }],
+    "severity" : "information",
+    "code" : "structure",
+    "details" : {
+      "text" : "Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1"
+    },
+    "expression" : ["Bundle.entry[6].resource/*PractitionerRole/role-north*/.practitioner"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 283
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 10
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "Reference_REF_CantMatchChoice"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    }],
+    "severity" : "error",
+    "code" : "structure",
+    "details" : {
+      "text" : "Unable to find a profile match for Practitioner/synthetic-clinician among choices: http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner"
+    },
+    "expression" : ["Bundle.entry[6].resource/*PractitionerRole/role-north*/.practitioner"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 283
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 10
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "Details_for__matching_against_Profile_"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    }],
+    "severity" : "information",
+    "code" : "structure",
+    "details" : {
+      "text" : "Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    },
+    "expression" : ["Bundle.entry[6].resource/*PractitionerRole/role-north*/.practitioner"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 268
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 8
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole#pd-1"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Location|1.2.0"
+    }],
+    "severity" : "error",
+    "code" : "invariant",
+    "details" : {
+      "text" : "Constraint failed: pd-1: 'SHALL have contact information or a reference to an Endpoint' (defined in http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole)"
+    },
+    "expression" : ["Bundle.entry[6].resource/*PractitionerRole/role-north*/"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 324
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 10
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "Details_for__matching_against_Profile_"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    }],
+    "severity" : "information",
+    "code" : "structure",
+    "details" : {
+      "text" : "Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1"
+    },
+    "expression" : ["Bundle.entry[7].resource/*PractitionerRole/role-south*/.practitioner"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 324
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 10
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "Reference_REF_CantMatchChoice"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    }],
+    "severity" : "error",
+    "code" : "structure",
+    "details" : {
+      "text" : "Unable to find a profile match for Practitioner/synthetic-clinician among choices: http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner"
+    },
+    "expression" : ["Bundle.entry[7].resource/*PractitionerRole/role-south*/.practitioner"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 324
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 10
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "Details_for__matching_against_Profile_"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    }],
+    "severity" : "information",
+    "code" : "structure",
+    "details" : {
+      "text" : "Details for Practitioner/synthetic-clinician matching against profile http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Practitioner|1.2.0"
+    },
+    "expression" : ["Bundle.entry[7].resource/*PractitionerRole/role-south*/.practitioner"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 309
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 8
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "InstanceValidator"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole#pd-1"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Location|1.2.0"
+    }],
+    "severity" : "error",
+    "code" : "invariant",
+    "details" : {
+      "text" : "Constraint failed: pd-1: 'SHALL have contact information or a reference to an Endpoint' (defined in http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole)"
+    },
+    "expression" : ["Bundle.entry[7].resource/*PractitionerRole/role-south*/"]
+  }]
+}

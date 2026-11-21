@@ -1,0 +1,128 @@
+FFFF..........                                                           [100%]
+=================================== FAILURES ===================================
+_ test_hap_advertised_paging_and_reference_aliases_fetch_only_published_origin _
+
+setup = (<provider_directory_truth_layer.intake_store.IntakeStore object at 0x10f92f380>, <provider_directory_truth_layer.fhir...tion.Acquisition object at 0x10faa46e0>, {}, [], [datetime.datetime(2026, 11, 14, 0, 0, tzinfo=datetime.timezone.utc)])
+
+    def test_hap_advertised_paging_and_reference_aliases_fetch_only_published_origin(setup):
+        store,_,_,_,clock=setup
+        alias='https://fhir-prov-dir-r4.api.hap.org:443'
+        reference=alias+'/Organization/clinic'
+        advertised=alias+'?_getpages=synthetic&_getpagesoffset=1&_count=1&_pretty=true&_bundletype=searchset'
+        source=Source()
+        seen=[]
+        pages=[
+            {'resourceType':'Bundle','type':'searchset','entry':[{'fullUrl':alias+'/Location/north','resource':{'resourceType':'Location','id':'north','status':'active','managingOrganization':{'reference':reference}}}], 'link':[{'relation':'next','url':advertised}]},
+            {'resourceType':'Bundle','type':'searchset','entry':[]},
+            {'resourceType':'Organization','id':'clinic','name':'Synthetic clinic'},
+        ]
+        def fetch(url,*_args):
+            seen.append(url)
+            return {'status':200,'headers':{},'body':json.dumps(pages[len(seen)-1]).encode(),'error':None,'truncated':False}
+        service=Acquisition(store,source=source,clock=lambda:clock[0],fetcher=fetch)
+        created=service.create({**ATTR,'resource_type':'Location'})
+        result=service.run_once(created['id'])
+>       assert result['state']=='queued',result['checkpoint']['error']
+E       AssertionError: Acquisition destination is outside the configured source
+E       assert 'failed' == 'queued'
+E         
+E         - queued
+E         + failed
+
+tests/test_fhir_acquisition.py:477: AssertionError
+_ test_only_declared_hap_default_https_aliases_normalize_to_published_origin[fhir-prov-dir-r4.api.hap.org] _
+
+setup = (<provider_directory_truth_layer.intake_store.IntakeStore object at 0x10f9ffed0>, <provider_directory_truth_layer.fhir...tion.Acquisition object at 0x10fba0050>, {}, [], [datetime.datetime(2026, 11, 14, 0, 0, tzinfo=datetime.timezone.utc)])
+authority = 'fhir-prov-dir-r4.api.hap.org'
+
+    @pytest.mark.parametrize('authority',['fhir-prov-dir-r4.api.hap.org','fhir-prov-dir-r4.api.hap.org:443','provider-directory-r4.api.hap.org:443'])
+    def test_only_declared_hap_default_https_aliases_normalize_to_published_origin(setup,authority):
+        store,*_=setup
+        service=Acquisition(store)
+>       assert service.validate_url('https://'+authority+'/Location/north')==service.source.base+'Location/north'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_fhir_acquisition.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <provider_directory_truth_layer.fhir_acquisition.Acquisition object at 0x10f9b6780>
+value = 'https://fhir-prov-dir-r4.api.hap.org/Location/north'
+
+    def validate_url(self, value):
+        if not isinstance(value,str) or len(value)>4096 or any(ord(c)<32 for c in value):
+            raise ValueError('Invalid acquisition URL')
+        url = urlsplit(value)
+        base = urlsplit(self.source.base)
+        if url.scheme != base.scheme or url.netloc != base.netloc or url.username or url.password or '#' in value or '%' in url.path or '\\' in value:
+>           raise ValueError('Acquisition destination is outside the configured source')
+E           ValueError: Acquisition destination is outside the configured source
+
+src/provider_directory_truth_layer/fhir_acquisition.py:103: ValueError
+_ test_only_declared_hap_default_https_aliases_normalize_to_published_origin[fhir-prov-dir-r4.api.hap.org:443] _
+
+setup = (<provider_directory_truth_layer.intake_store.IntakeStore object at 0x10fba02d0>, <provider_directory_truth_layer.fhir...tion.Acquisition object at 0x10b8e56e0>, {}, [], [datetime.datetime(2026, 11, 14, 0, 0, tzinfo=datetime.timezone.utc)])
+authority = 'fhir-prov-dir-r4.api.hap.org:443'
+
+    @pytest.mark.parametrize('authority',['fhir-prov-dir-r4.api.hap.org','fhir-prov-dir-r4.api.hap.org:443','provider-directory-r4.api.hap.org:443'])
+    def test_only_declared_hap_default_https_aliases_normalize_to_published_origin(setup,authority):
+        store,*_=setup
+        service=Acquisition(store)
+>       assert service.validate_url('https://'+authority+'/Location/north')==service.source.base+'Location/north'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_fhir_acquisition.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <provider_directory_truth_layer.fhir_acquisition.Acquisition object at 0x10fa3a570>
+value = 'https://fhir-prov-dir-r4.api.hap.org:443/Location/north'
+
+    def validate_url(self, value):
+        if not isinstance(value,str) or len(value)>4096 or any(ord(c)<32 for c in value):
+            raise ValueError('Invalid acquisition URL')
+        url = urlsplit(value)
+        base = urlsplit(self.source.base)
+        if url.scheme != base.scheme or url.netloc != base.netloc or url.username or url.password or '#' in value or '%' in url.path or '\\' in value:
+>           raise ValueError('Acquisition destination is outside the configured source')
+E           ValueError: Acquisition destination is outside the configured source
+
+src/provider_directory_truth_layer/fhir_acquisition.py:103: ValueError
+_ test_only_declared_hap_default_https_aliases_normalize_to_published_origin[provider-directory-r4.api.hap.org:443] _
+
+setup = (<provider_directory_truth_layer.intake_store.IntakeStore object at 0x10f9b7820>, <provider_directory_truth_layer.fhir...tion.Acquisition object at 0x10faad480>, {}, [], [datetime.datetime(2026, 11, 14, 0, 0, tzinfo=datetime.timezone.utc)])
+authority = 'provider-directory-r4.api.hap.org:443'
+
+    @pytest.mark.parametrize('authority',['fhir-prov-dir-r4.api.hap.org','fhir-prov-dir-r4.api.hap.org:443','provider-directory-r4.api.hap.org:443'])
+    def test_only_declared_hap_default_https_aliases_normalize_to_published_origin(setup,authority):
+        store,*_=setup
+        service=Acquisition(store)
+>       assert service.validate_url('https://'+authority+'/Location/north')==service.source.base+'Location/north'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_fhir_acquisition.py:507: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <provider_directory_truth_layer.fhir_acquisition.Acquisition object at 0x10faad590>
+value = 'https://provider-directory-r4.api.hap.org:443/Location/north'
+
+    def validate_url(self, value):
+        if not isinstance(value,str) or len(value)>4096 or any(ord(c)<32 for c in value):
+            raise ValueError('Invalid acquisition URL')
+        url = urlsplit(value)
+        base = urlsplit(self.source.base)
+        if url.scheme != base.scheme or url.netloc != base.netloc or url.username or url.password or '#' in value or '%' in url.path or '\\' in value:
+>           raise ValueError('Acquisition destination is outside the configured source')
+E           ValueError: Acquisition destination is outside the configured source
+
+src/provider_directory_truth_layer/fhir_acquisition.py:103: ValueError
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  <checkout>/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_fhir_acquisition.py::test_hap_advertised_paging_and_reference_aliases_fetch_only_published_origin
+FAILED tests/test_fhir_acquisition.py::test_only_declared_hap_default_https_aliases_normalize_to_published_origin[fhir-prov-dir-r4.api.hap.org]
+FAILED tests/test_fhir_acquisition.py::test_only_declared_hap_default_https_aliases_normalize_to_published_origin[fhir-prov-dir-r4.api.hap.org:443]
+FAILED tests/test_fhir_acquisition.py::test_only_declared_hap_default_https_aliases_normalize_to_published_origin[provider-directory-r4.api.hap.org:443]
+4 failed, 10 passed, 32 deselected, 1 warning in 7.66s

@@ -1,0 +1,87 @@
+{
+  "source": "HAP public directory",
+  "source_advertised_plan_net": "1.0.0; conformance not assessed",
+  "parser_target": "Plan-Net 1.2.0 subset",
+  "parser_version": "fhir-plannet-r4-v2",
+  "discovery_requests": 1,
+  "discovery_cancelled_without_receipt": true,
+  "filtered_capture_requests": 4,
+  "filtered_capture_pages": 1,
+  "supported_reference_reads": 3,
+  "http_statuses": [
+    200,
+    200,
+    200,
+    200
+  ],
+  "raw_response_sha256": [
+    "6b0985ad6f420d6bc574ccf45aaa57311edb1db062012b7d31e9c86972feb04f",
+    "8c0cf3b4bb81243749fee93ee57f8cde38d2ff8234b495f368a918fade57a5ed",
+    "ea07854736021a6fa39daf4d7e2c6da1554d79c116da21dd8a7aa2451750cc62",
+    "3afbbbd7c0c0086dd5c0f73f830152425df97ad5ffcee0b9c061598f4209ffc0"
+  ],
+  "derived_sha256": "f36f93cd3a5e8836f97c04dd9abb9d4d2b961e6e1c2b02976f8add630d6da7a9",
+  "raw_hashes_verified": true,
+  "exact_saved_parser_replay": true,
+  "search_validation_counts": {
+    "implicit_match_entries": 0,
+    "included_entries": 2,
+    "matched_entries": 1,
+    "outcome_entries": 0,
+    "resource_type": "PractitionerRole",
+    "scope": "captured_search_pages",
+    "version": 1
+  },
+  "resource_types": {
+    "PractitionerRole": 1,
+    "Practitioner": 1,
+    "Location": 1,
+    "Organization": 3
+  },
+  "resource_coverage": {
+    "assertion_count": 0,
+    "completeness": "unknown_saved_scope",
+    "eligible_count": 6,
+    "entry_count": 6,
+    "invalid_count": 0,
+    "links": [],
+    "supported_count": 6,
+    "unresolved_count": 1,
+    "unsupported_count": 0
+  },
+  "declared_role_network_references": 3,
+  "target_network_reference_maximum": 1,
+  "office_projections": 0,
+  "unsupported_unresolved_reference_types": [
+    "HealthcareService"
+  ],
+  "finding_counts": {
+    "unsupported_extension": 12,
+    "reference_unresolved": 1,
+    "unresolved_network_scope": 1
+  },
+  "explicitly_accepted_reference_observations": 6,
+  "old_attempt_preserved": true,
+  "restart_preserved": true,
+  "completed_capture_repeat_sent_no_request": true,
+  "local_table_counts": {
+    "network": 0,
+    "work_case": 0,
+    "feed_version": 0
+  },
+  "request_times": [
+    "2026-11-15T03:46:45.425959+00:00",
+    "2026-11-15T03:47:37.368050+00:00",
+    "2026-11-15T03:48:59.489470+00:00",
+    "2026-11-15T03:50:11.112980+00:00",
+    "2026-11-15T03:51:03.246460+00:00"
+  ],
+  "recorded_source_waits": [
+    "2026-11-15T03:47:15.425469+00:00",
+    "2026-11-15T03:48:07.366953+00:00",
+    "2026-11-15T03:49:29.488955+00:00",
+    "2026-11-15T03:50:41.112379+00:00",
+    "2026-11-15T03:51:33.245909+00:00"
+  ],
+  "limits": "Observed source graph only; no actual-source profile/terminology, identity, participation or phone-correction approval. Three Networks exceed the declared target projection cardinality; unsupported HealthcareService was not fetched. Actual payloads and native IDs stay in ignored owned storage."
+}

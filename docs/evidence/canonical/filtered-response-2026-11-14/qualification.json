@@ -1,0 +1,29 @@
+{
+  "designation": "synthetic",
+  "transport": "owned real loopback HTTP",
+  "http_requests": [
+    "/Location/?_count=1&_id=north",
+    "/Location/?_count=1&_id=ignored-filter"
+  ],
+  "query_validation": {
+    "version": 1,
+    "resource_type": "Location",
+    "resource_id": "north",
+    "matched_entries": 1,
+    "implicit_match_entries": 0,
+    "included_entries": 2,
+    "outcome_entries": 1,
+    "scope": "captured_search_pages"
+  },
+  "separate_reference_observations": 3,
+  "failed_http_status": 200,
+  "failed_capture_state": "failed",
+  "failed_capture_receipt": null,
+  "failed_body_sha256": "c183eff5ec1fa6658db2f8ac2ae2e080f26cbd6092fac4a0b55828939dbe5cce",
+  "approved_version_preserved": "62a11bc427d84b569a40b8ec5c15160e",
+  "approved_bytes_sha256": "02532a1869cd7905d3d7f22f00106c20e855ecf17ca891b04cf6f687dfbe195e",
+  "restart_query_report_preserved": true,
+  "work_cases_unchanged": true,
+  "integrity": "ok",
+  "foreign_key_errors": 0
+}

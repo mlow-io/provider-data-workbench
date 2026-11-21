@@ -1,0 +1,4 @@
+location_id,phone,zip,state,city,address,provider_name,npi,record_id
+EAST,6175550103,02110,MA,Example,30 Fiction Street,Synthetic Jordan Clinic,1234567891,SYNTHETIC-002
+SOUTH,6175550102,02109,MA,Example,20 Fiction Street,Synthetic Avery Clinic,1234567890,SYNTHETIC-001
+NORTH,6175550101,02108,MA,Example,10 Fiction Street,Synthetic Avery Clinic,1234567890,SYNTHETIC-001

@@ -1,0 +1,151 @@
+"""Read-only operational questions over the durable intake SQLite database."""
+
+from __future__ import annotations
+
+import argparse
+from contextlib import closing
+from datetime import date
+import json
+from pathlib import Path
+import sqlite3
+from urllib.parse import quote
+
+from .bundled_assets import assets
+
+
+SQL_DIR = assets().joinpath('sql')
+
+
+def _connect(path: Path) -> sqlite3.Connection:
+    if not path.is_file():
+        raise ValueError(f"Database does not exist: {path}")
+    # mode=ro prevents writes even when the caller supplies a writable database.
+    uri = "file:" + quote(str(path.resolve()), safe="/") + "?mode=ro"
+    conn = sqlite3.connect(uri, uri=True)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA query_only=ON")
+    return conn
+
+
+def _query(conn: sqlite3.Connection, name: str, parameters: dict | None = None) -> list[dict]:
+    statement = (SQL_DIR / f"{name}.sql").read_text(encoding="utf-8")
+    return [dict(row) for row in conn.execute(statement, parameters or {})]
+
+
+def _operator_date(value: object) -> str:
+    as_of = str(value or date.today().isoformat())
+    try:
+        if date.fromisoformat(as_of).isoformat() != as_of:
+            raise ValueError
+    except ValueError as error:
+        raise ValueError("--as-of must be an ISO date (YYYY-MM-DD)") from error
+    return as_of
+
+
+def _selected_attempt(conn: sqlite3.Connection, attempt_id: str) -> tuple[str, dict]:
+    row = conn.execute(
+        """SELECT a.id, a.state, a.preview, a.spec, a.receipt_id, r.source, r.profile, r.metadata
+           FROM attempt AS a JOIN receipt AS r ON r.id = a.receipt_id WHERE a.id = ?""",
+        (attempt_id,),
+    ).fetchone()
+    if row is None or row["state"] not in {"committed", "duplicate_delivery"}:
+        raise ValueError(f"Attempt {attempt_id!r} is not an accepted delivery")
+    canonical = row["id"]
+    if row["state"] == "duplicate_delivery":
+        canonical = json.loads(row["preview"]).get("reuses_attempt")
+        reused = conn.execute(
+            """SELECT a.state, a.spec, r.source, r.profile, r.metadata FROM attempt AS a
+               JOIN receipt AS r ON r.id = a.receipt_id WHERE a.id = ?""",
+            (canonical,),
+        ).fetchone()
+        if reused is None or reused["state"] != "committed":
+            raise ValueError(f"Attempt {attempt_id!r} has no committed reuse target")
+        if _scope(reused) != _scope(row):
+            raise ValueError("Duplicate delivery reuse target has incompatible scope")
+    return canonical, _scope(row)
+
+
+def _scope(row):
+    spec=json.loads(row['spec'])
+    return {'source':row['source'],'profile':row['profile'],'scope':json.loads(row['metadata']).get('scope'),
+            'roster_kind':spec.get('roster_kind','clinic'),
+            'networks':sorted({item['target_id'] for item in spec.get('binding_snapshot',{}).values() if item['kind']=='network'})}
+
+
+def _check_unique_keys(conn: sqlite3.Connection, attempt_id: str) -> None:
+    rows=conn.execute("""SELECT native_id,
+      coalesce(cast(json_extract(normalized,'$.participation.network_id') AS TEXT),'') network_key,
+      coalesce(cast(json_extract(normalized,'$.participation.provider_id') AS TEXT),'') provider_key,
+      coalesce(cast(json_extract(normalized,'$.participation.location_id') AS TEXT),
+               cast(json_extract(normalized,'$.location_id') AS TEXT),'') location_key,
+      max(json_type(normalized,'$.participation') IS NOT NULL) is_network,count(*) copies
+      FROM observation WHERE attempt_id=? GROUP BY native_id,network_key,provider_key,location_key""",(attempt_id,)).fetchall()
+    if any(row['native_id'] is None or not str(row['native_id']).strip() or row['copies']!=1 or
+           row['is_network'] and not all(row[key] for key in ['network_key','provider_key','location_key']) for row in rows):
+        raise ValueError(f"Attempt {attempt_id!r} has unresolved or duplicate source-native keys")
+
+
+def run(path: Path, question: str, **parameters: object) -> list[dict]:
+    """Run one validated question and return JSON-serializable rows without opening IntakeStore."""
+    with closing(_connect(path)) as conn:
+        # A single read transaction pins validation and result rows to one WAL snapshot.
+        conn.execute("BEGIN")
+        if question == "follow-up":
+            as_of = _operator_date(parameters.get("as_of"))
+            return _query(conn, "follow_up", {"as_of": as_of, "include_closed": int(bool(parameters.get("include_closed")))})
+        if question == "phone-review":
+            return _query(conn, "phone_review", {
+                "as_of": _operator_date(parameters.get("as_of")),
+                "overdue_only": int(bool(parameters.get("overdue_only"))),
+            })
+        if question == "lineage":
+            rows=_query(conn,"lineage",{'case_id':parameters['case_id']})
+            if conn.execute("SELECT 1 FROM sqlite_master WHERE name='participation_review_evidence'").fetchone():
+                review=_query(conn,'lineage_review',{'case_id':parameters['case_id']})
+                if review:rows=[row for row in rows if row['observation_id'] is not None]+review
+            return rows
+        if question == "latest-event":
+            return _query(conn, "latest_event")
+        if question == "compare":
+            left, left_scope = _selected_attempt(conn, str(parameters["left_attempt"]))
+            right, right_scope = _selected_attempt(conn, str(parameters["right_attempt"]))
+            if left_scope != right_scope:
+                raise ValueError("Selected deliveries must have the same source, profile, and scope")
+            if left == right:
+                raise ValueError("Selected deliveries resolve to the same accepted interpretation")
+            _check_unique_keys(conn, left)
+            _check_unique_keys(conn, right)
+            return _query(conn, "selected_delivery_diff", {"left_attempt": left, "right_attempt": right})
+        raise ValueError(f"Unknown question: {question}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--db", required=True, type=Path, help="Existing durable intake SQLite database")
+    commands = parser.add_subparsers(dest="question", required=True)
+    follow = commands.add_parser("follow-up", help="Cases needing assignment or overdue follow-up")
+    follow.add_argument("--as-of", help="ISO operator date; defaults to today")
+    follow.add_argument("--include-closed", action="store_true")
+    phone = commands.add_parser("phone-review", help="Open phone cases with timing and linked-evidence coverage")
+    phone.add_argument("--as-of", help="ISO operator date; defaults to today")
+    phone.add_argument("--overdue-only", action="store_true", help="Show only cases whose follow-up is before the operator date")
+    lineage = commands.add_parser("lineage", help="Receipt and row evidence for a case")
+    lineage.add_argument("--case-id", required=True)
+    commands.add_parser("latest-event", help="Latest event per case")
+    compare = commands.add_parser("compare", help="Compare two selected accepted attempts")
+    compare.add_argument("--left-attempt", required=True)
+    compare.add_argument("--right-attempt", required=True)
+    args = parser.parse_args(argv)
+    try:
+        options = vars(args).copy()
+        options.pop("db")
+        options.pop("question")
+        rows = run(args.db, args.question, **options)
+    except (ValueError, sqlite3.Error, OSError, KeyError) as error:
+        parser.error(str(error))
+    print(json.dumps(rows, indent=2, ensure_ascii=False))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

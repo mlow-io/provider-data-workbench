@@ -1,0 +1,164 @@
+.np-panel {
+  border: 1px solid #b8d2c6;
+  border-left: 4px solid #427d69;
+  border-radius: 8px;
+  background: #f8fcfa;
+  padding: 16px;
+  margin: 22px 0;
+  min-width: 0;
+}
+.np-heading,
+.np-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.np-panel h3 {
+  color: #29594c;
+}
+.np-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 0;
+}
+.np-panel input:not([type="checkbox"]),
+.np-panel select,
+.np-panel textarea {
+  padding: 8px;
+  border: 1px solid #adc6bf;
+  border-radius: 5px;
+  background: white;
+  color: #203c43;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.np-panel button {
+  white-space: normal;
+}
+.np-panel .np-check {
+  flex-direction: row;
+  align-items: center;
+  font-weight: 400;
+}
+.np-scroll {
+  overflow: auto;
+  max-height: 350px;
+  border: 1px solid #d6e5df;
+  background: white;
+}
+.np-scroll table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+.np-scroll th,
+.np-scroll td {
+  text-align: left;
+  padding: 9px;
+  border-bottom: 1px solid #e2ece7;
+  vertical-align: top;
+}
+.np-scroll thead th {
+  position: sticky;
+  top: 0;
+  background: #e9f3ee;
+}
+.np-scroll code {
+  overflow-wrap: anywhere;
+  display: block;
+  min-width: 150px;
+  max-width: 280px;
+  white-space: pre-wrap;
+}
+.np-fields {
+  border: 0;
+  padding: 0;
+  margin: 18px 0;
+  min-width: 0;
+}
+.np-fields legend {
+  font-size: 12px;
+  font-weight: 700;
+  color: #58756b;
+}
+.np-field {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(0, 2fr);
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #dce9e2;
+}
+.np-rules {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+.np-rules > label:not(.np-check) {
+  flex: 1 1 130px;
+}
+.np-review {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+.np-review label:last-child {
+  grid-column: 1 / -1;
+}
+.np-evidence {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.np-evidence > div {
+  min-width: 0;
+}
+.np-panel pre {
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 340px;
+  overflow: auto;
+  padding: 12px;
+  background: white;
+  border: 1px solid #dce9e2;
+  border-radius: 5px;
+}
+.np-counts {
+  font-weight: 700;
+  color: #29594c;
+}
+.np-panel details {
+  margin: 12px 0;
+}
+.np-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.np-panel :focus-visible {
+  outline: 3px solid #28725e;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .np-panel {
+    padding: 12px;
+  }
+  .np-field,
+  .np-review,
+  .np-evidence {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .np-review label:last-child {
+    grid-column: auto;
+  }
+  .np-actions > button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<checkout>/scripts/check_distribution.py", line 81, in <module>
+    main()
+    ~~~~^^
+  File "<checkout>/scripts/check_distribution.py", line 60, in main
+    raise RuntimeError(f'{distribution.name} contains {len(bundled)} assets, expected 12')
+RuntimeError: provider_directory_truth_layer-2.0.0.tar.gz contains 16 assets, expected 12

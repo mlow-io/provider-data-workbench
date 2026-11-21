@@ -1,0 +1,54 @@
+{
+  "installed_module": "<distribution-root>/sdist/lib/python3.13/site-packages/provider_directory_truth_layer/__init__.py",
+  "interpreter": "<distribution-root>/sdist/bin/python",
+  "default_qa_records": 12,
+  "consumer_contacts": [
+    {
+      "record_id": "SYN-001",
+      "location_id": "NORTH",
+      "npi": "1000000001",
+      "provider_name": "Synthetic Clinician",
+      "address": "10 Example St",
+      "city": "Example",
+      "state": "MA",
+      "zip": "02108",
+      "phone": "6175550100",
+      "phone_extension": "007"
+    },
+    {
+      "record_id": "SYN-001",
+      "location_id": "SOUTH",
+      "npi": "1000000001",
+      "provider_name": "Synthetic Clinician",
+      "address": "20 Example St",
+      "city": "Example",
+      "state": "MA",
+      "zip": "02108",
+      "phone": "6175550200",
+      "phone_extension": "008"
+    }
+  ],
+  "approved_sha256": "ff63c718c4d0d356bad710f5d8afc56cc678948a6df18925001e52937a888573",
+  "baseline": {
+    "name": "existing alias-only suggestions; no transforms",
+    "binding_expectations": 74,
+    "correct_bindings_or_abstentions": 63,
+    "corrections_needed": 11,
+    "cleaned_values_checked": 13,
+    "cleaned_value_errors": 7
+  },
+  "model_invocations": 0,
+  "sql_latest_events": 2,
+  "sql_state_unchanged": true,
+  "repeat_root_preserved": true,
+  "json_xlsx_equal": true,
+  "reopened_approved_version": "64ea4a7c095f405e9d730b5329ea8415",
+  "operations": {
+    "north_status": "reopened",
+    "south_unchanged": true,
+    "consumer_preserved_after_hold": true,
+    "restart_preserved": true,
+    "restore_preserved": true,
+    "backed_up_registered_artifacts": 12
+  }
+}

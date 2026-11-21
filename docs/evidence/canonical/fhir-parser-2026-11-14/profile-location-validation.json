@@ -1,0 +1,71 @@
+{
+  "resourceType" : "OperationOutcome",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p class=\"res-header-id\"><b>OperationOutcome </b></p><table class=\"grid\"><tr><td><b>Severity</b></td><td><b>Location</b></td><td><b>Code</b></td><td><b>Details</b></td><td><b>Diagnostics</b></td><td><b>Source</b></td></tr><tr><td>Warning</td><td>Location.address.state</td><td>Not Found</td><td>The System URI could not be determined for the code 'MA' in the ValueSet 'http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state|7.0.0': a definition for the CodeSystem 'https://www.usps.com/' it includes could not be found</td><td/><td>TerminologyEngine</td></tr><tr><td>Warning</td><td>Location.address.state</td><td>Invalid Code</td><td>The value provided ('MA') was not found in the value set 'USPS Two Letter Alphabetic Codes' (http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state|7.0.0), and a code SHALL come from this value set unless it has no suitable code (note that the validator cannot judge what is suitable)  (error message = The System URI could not be determined for the code 'MA' in the ValueSet 'http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state|7.0.0': a definition for the CodeSystem 'https://www.usps.com/' it includes could not be found)</td><td/><td>TerminologyEngine</td></tr></table></div>"
+  },
+  "extension" : [{
+    "url" : "http://hl7.org/fhir/tools/StructureDefinition/validator-version",
+    "valueString" : "FHIR Validation tool Version 7.0.5 (Git# 17db3661806b). Built 2026-11-05T23:27:05.236Z (8 days old)"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-file",
+    "valueString" : "tests/fixtures/intake/fhir-plannet/profile-location.json"
+  }],
+  "issue" : [{
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 11
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 18
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "TerminologyEngine"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "UNABLE_TO_INFER_CODESYSTEM_UNKNOWN_SYSTEM"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Location|1.2.0"
+    }],
+    "severity" : "warning",
+    "code" : "not-found",
+    "details" : {
+      "text" : "The System URI could not be determined for the code 'MA' in the ValueSet 'http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state|7.0.0': a definition for the CodeSystem 'https://www.usps.com/' it includes could not be found"
+    },
+    "expression" : ["Location.address.state"]
+  },
+  {
+    "extension" : [{
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+      "valueInteger" : 11
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+      "valueInteger" : 18
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+      "valueString" : "TerminologyEngine"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-message-id",
+      "valueCode" : "Terminology_TX_NoValid_17"
+    },
+    {
+      "url" : "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-context",
+      "valueString" : "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Location|1.2.0"
+    }],
+    "severity" : "warning",
+    "code" : "code-invalid",
+    "details" : {
+      "text" : "The value provided ('MA') was not found in the value set 'USPS Two Letter Alphabetic Codes' (http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state|7.0.0), and a code SHALL come from this value set unless it has no suitable code (note that the validator cannot judge what is suitable)  (error message = The System URI could not be determined for the code 'MA' in the ValueSet 'http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state|7.0.0': a definition for the CodeSystem 'https://www.usps.com/' it includes could not be found)"
+    },
+    "expression" : ["Location.address.state"]
+  }]
+}

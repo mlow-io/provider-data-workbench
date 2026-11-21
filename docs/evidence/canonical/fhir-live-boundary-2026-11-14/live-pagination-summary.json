@@ -1,0 +1,20 @@
+{
+  "state": "cancelled",
+  "partial": true,
+  "receipt_id": null,
+  "requests": 2,
+  "pages": 2,
+  "http_statuses": [
+    200,
+    200
+  ],
+  "published_origin_only": true,
+  "advertised_alias_retained": true,
+  "page_digests": [
+    "438fb99549c0e8392bf49edef4bfd6a877f77b5e971fd62bb950fd74a83ffc01",
+    "7232bfc74368820071cd6e4a98319f86723b307486a1018e2bc8b6c8b07bb27d"
+  ],
+  "raw_hashes_valid": true,
+  "error": null,
+  "limit": "Deliberately cancelled after two actual search pages. No complete-directory receipt, reference acceptance, cases or approved clinic version."
+}

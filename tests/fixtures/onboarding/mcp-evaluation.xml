@@ -1,0 +1,17 @@
+<evaluation>
+  <!-- Prepare a new root with scripts/prepare_onboarding_evaluation.py and attach
+       its MCP server. Each independent task uses the retained delivery labeled
+       synthetic-evaluation.csv and its proposed Frozen synthetic evaluation rules.
+       All questions are read-only. Expected values are hand-authored fixture truth;
+       an actual model run must record model/client, answers, abstentions and errors. -->
+  <qa_pair><question>Find the synthetic evaluation delivery and its stored proposed rules. Inspect the target schema and preview those rules against the retained interpretation. How many rows would be valid?</question><answer>2</answer></qa_pair>
+  <qa_pair><question>Locate the frozen five-row delivery, inspect its proposed recipe and preview it. How many rows must remain quarantined rather than become accepted source observations?</question><answer>3</answer></qa_pair>
+  <qa_pair><question>Profile the evaluation delivery, find its proposed phone rules and preview them. What separate phone extension belongs to source record 001?</question><answer>007</answer></qa_pair>
+  <qa_pair><question>Read the evaluation recipe's explicit date format and preview the source delivery. What ISO source-update date does record 001 produce?</question><answer>2026-04-03</answer></qa_pair>
+  <qa_pair><question>Use the evaluation profile and proposed rules to inspect record 001's postal transformation. What five-character ZIP is retained?</question><answer>02108</answer></qa_pair>
+  <qa_pair><question>Find the evaluation source and its proposed recipe. Preview the name transformations and report the normalized provider name of source record 001.</question><answer>Alex Synthetic</answer></qa_pair>
+  <qa_pair><question>Find the phone source column through the evaluation recipe, then inspect the complete column profile. How many cells in that source column are missing?</question><answer>1</answer></qa_pair>
+  <qa_pair><question>Inspect the evaluation schema, proposed recipe and preview. Which source record has a SOUTH location, valid ZIP+4, and a valid phone without a derived extension?</question><answer>005</answer></qa_pair>
+  <qa_pair><question>Locate the evaluation delivery, inspect its current state and list its compatible recipes. How many approved recipe revisions exist before any operator decisions?</question><answer>0</answer></qa_pair>
+  <qa_pair><question>Find the evaluation receipt and preview its proposed rules. For source record 003, identify the mandatory canonical field whose missing value prevents acceptance.</question><answer>npi</answer></qa_pair>
+</evaluation>

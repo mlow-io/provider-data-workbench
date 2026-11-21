@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/mlow-io/provider-directory-workbench",
+  "adoption_checkpoint": "e59c9f80ff0d51aeb23965148daaa5c7ae8681ca",
+  "previous_public_main": "572f891803423019eed916589287bc17d0a2c912",
+  "qualified_application_revision": "5848d6edb7f53d7e42b01ba95d9b6ea42cd89d21",
+  "ci_run": "https://github.com/mlow-io/provider-directory-workbench/actions/runs/41723418456",
+  "method": "locally authored fast-forward",
+  "author_noreply": true,
+  "committer_noreply": true,
+  "private_ancestry_published": false,
+  "superseded_sql_pr_state": "CLOSED",
+  "human_walkthrough": "pending"
+}

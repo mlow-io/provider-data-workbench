@@ -1,0 +1,27 @@
+python3 -m pytest
+============================= test session starts ==============================
+platform darwin -- Python 3.13.2, pytest-9.2.0, pluggy-1.7.0
+rootdir: <checkout>
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0
+collected 869 items
+
+tests/test_approved_consumer.py .........................                [  2%]
+tests/test_change_impact.py ...............                              [  4%]
+tests/test_change_impact_evaluation.py .....                             [  5%]
+tests/test_comparison.py ............................................... [ 10%]
+.................................................                        [ 16%]
+tests/test_demo_launcher.py .........                                    [ 17%]
+tests/test_employer_readiness.py ................                        [ 19%]
+tests/test_export.py ......                                              [ 19%]
+tests/test_fhir_acquisition.py ......................................... [ 24%]
+...................                                                      [ 26%]
+tests/test_fhir_filtered_response.py ................................... [ 30%]
+                                                                         [ 30%]
+tests/test_fhir_graph.py ........                                        [ 31%]
+tests/test_fhir_intake.py .............................................. [ 36%]
+................................                                         [ 40%]
+tests/test_fhir_reference_json.py ..........                             [ 41%]
+tests/test_fhir_store.py ....................                            [ 44%]
+tests/test_field_reconciliation.py .........

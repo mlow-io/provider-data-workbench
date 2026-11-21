@@ -1,0 +1,93 @@
+{
+  "synthetic": true,
+  "status": "authored expectations for planned parser; not a profile-validation result",
+  "input": "north-south.json",
+  "resource_entries": 9,
+  "supported_resource_entries": 8,
+  "unsupported_resource_entries": 1,
+  "clinician_projections": 1,
+  "location_projections": 2,
+  "unresolved_reference_paths": [
+    "$.entry[7].resource.practitioner.reference"
+  ],
+  "no_npi_locations": [
+    "north",
+    "south"
+  ],
+  "not_inferred": [
+    "reviewed_identity",
+    "local_network_binding",
+    "clinic_dataset_approval",
+    "termination"
+  ],
+  "office_assertions": [
+    {
+      "office": "NORTH",
+      "role": "role-north",
+      "location": "north",
+      "phone_original": "617-555-0100",
+      "phone_comparison": "6175550100",
+      "postal_code": "02108",
+      "clinician_locator": "$.entry[0].resource",
+      "role_locator": "$.entry[5].resource",
+      "location_locator": "$.entry[3].resource",
+      "phone_path": "$.entry[3].resource.telecom[0].value",
+      "network_locator": "$.entry[2].resource"
+    },
+    {
+      "office": "SOUTH",
+      "role": "role-south",
+      "location": "south",
+      "phone_original": "617-555-0200",
+      "phone_comparison": "6175550200",
+      "postal_code": "02108",
+      "clinician_locator": "$.entry[0].resource",
+      "role_locator": "$.entry[6].resource",
+      "location_locator": "$.entry[4].resource",
+      "phone_path": "$.entry[4].resource.telecom[0].value",
+      "network_locator": "$.entry[2].resource"
+    }
+  ],
+  "planned_negative_variants": [
+    {
+      "id": "ambiguous-reference",
+      "change": "Duplicate NORTH with conflicting telecom and the same fullUrl",
+      "expected": "No automatic NORTH projection; retain both entries and ambiguous target finding"
+    },
+    {
+      "id": "multi-location-role",
+      "change": "Give role-north both NORTH and SOUTH location references",
+      "expected": "No automatic location projection for role-north; retain role-level evidence"
+    },
+    {
+      "id": "unknown-modifier",
+      "change": "Add an unknown modifierExtension to NORTH",
+      "expected": "NORTH operational projection blocked; original retained"
+    },
+    {
+      "id": "malformed-entry",
+      "change": "Append a non-object Bundle entry",
+      "expected": "Count and retain malformed entry finding; never silently drop"
+    },
+    {
+      "id": "empty-result",
+      "change": "Use a searchset with an empty entry array",
+      "expected": "Successful empty interpretation; no eligible-resource acceptance"
+    },
+    {
+      "id": "external-reference",
+      "change": "Reference a Location outside the supplied Bundle",
+      "expected": "Unresolved; no network request"
+    },
+    {
+      "id": "stale-attempt",
+      "change": "Reinterpret after preview then submit old expected_attempt",
+      "expected": "409 and no decision or observation change"
+    },
+    {
+      "id": "repeat-delivery",
+      "change": "Deliver identical bytes twice under the same source/profile/scope",
+      "expected": "Separate receipts and acceptance decisions; reuse eligible original observations"
+    }
+  ]
+}

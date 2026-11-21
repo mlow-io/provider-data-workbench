@@ -1,0 +1,327 @@
+{
+  "fixture_id": "investigation-authored-v1",
+  "designation": "Synthetic authored investigation examples; supplemental development labels, not held-out or production accuracy",
+  "label_authoring": {
+    "is_matching_output": false,
+    "method": "Manual fictional identities and explicit uncertainties assigned before evaluation"
+  },
+  "sources": {
+    "clinic": [
+      {
+        "record_id": "clinic:same-a",
+        "entity_type": "clinician",
+        "name": "Synthetic Robin Same",
+        "npi": "1000000001",
+        "phone": "6175550100",
+        "source_native_id": "same-a",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "10 Example St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      },
+      {
+        "record_id": "clinic:multi-north",
+        "entity_type": "clinician",
+        "name": "Synthetic Taylor Multi",
+        "npi": "1000000003",
+        "phone": "6175550100",
+        "source_native_id": "multi-north",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "30 North St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      },
+      {
+        "record_id": "clinic:missing",
+        "entity_type": "clinician",
+        "name": "Synthetic Casey Missing",
+        "npi": null,
+        "phone": "6175550100",
+        "source_native_id": "missing",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "50 Missing St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      },
+      {
+        "record_id": "clinic:conflict",
+        "entity_type": "clinician",
+        "name": "Synthetic Morgan Conflict",
+        "npi": "1000000005",
+        "phone": "6175550100",
+        "source_native_id": "conflict",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "60 Conflict St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      },
+      {
+        "record_id": "clinic:address",
+        "entity_type": "clinician",
+        "name": "Synthetic Alex Address",
+        "npi": "1000000007",
+        "phone": "6175550100",
+        "source_native_id": "address",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "70 Practice St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      }
+    ],
+    "payer": [
+      {
+        "record_id": "payer:same-b",
+        "entity_type": "clinician",
+        "name": "Synthetic Robin Same",
+        "npi": "1000000002",
+        "phone": "6175550100",
+        "source_native_id": "same-b",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "20 Example St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      },
+      {
+        "record_id": "payer:multi-south",
+        "entity_type": "clinician",
+        "name": "Synthetic Taylor Multi",
+        "npi": "1000000003",
+        "phone": "6175550100",
+        "source_native_id": "multi-south",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "40 South St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      },
+      {
+        "record_id": "payer:missing",
+        "entity_type": "clinician",
+        "name": "Synthetic Casey Missing",
+        "npi": "1000000004",
+        "phone": "6175550100",
+        "source_native_id": "missing",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "50 Missing St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      },
+      {
+        "record_id": "payer:conflict",
+        "entity_type": "clinician",
+        "name": "Synthetic Morgan Conflict",
+        "npi": "1000000006",
+        "phone": "6175550100",
+        "source_native_id": "conflict",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "60 Conflict St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          }
+        ],
+        "selected_address": {
+          "path": "addresses[0]",
+          "index": 0
+        }
+      }
+    ],
+    "public_reference": [
+      {
+        "record_id": "public_reference:address",
+        "entity_type": "clinician",
+        "name": "Synthetic Alex Address",
+        "npi": "1000000007",
+        "phone": "6175550100",
+        "source_native_id": "address",
+        "native_addresses": [
+          {
+            "path": "addresses[0]",
+            "index": 0,
+            "kind": "practice",
+            "line1": "70 Practice St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "01"
+          },
+          {
+            "path": "addresses[1]",
+            "index": 1,
+            "kind": "practice",
+            "line1": "80 Other St",
+            "city": "Example",
+            "state": "MA",
+            "zip": "02108",
+            "suite": "02"
+          }
+        ]
+      }
+    ]
+  },
+  "expected_clinician_links": [
+    {
+      "clinician_id": "multi",
+      "records": [
+        "clinic:multi-north",
+        "payer:multi-south"
+      ],
+      "reason": "Same fictional clinician across two offices"
+    },
+    {
+      "clinician_id": "missing",
+      "records": [
+        "clinic:missing",
+        "payer:missing"
+      ],
+      "reason": "Authored same clinician despite missing source identifier"
+    },
+    {
+      "clinician_id": "address",
+      "records": [
+        "clinic:address",
+        "public_reference:address"
+      ],
+      "reason": "Clinician identity does not select one of multiple addresses"
+    }
+  ],
+  "expected_location_links": [],
+  "expected_clinician_nonlinks": [
+    {
+      "records": [
+        "clinic:same-a",
+        "payer:same-b"
+      ],
+      "scope": "clinician",
+      "reason": "Distinct fictional clinicians with equal names"
+    }
+  ],
+  "expected_location_nonlinks": [
+    {
+      "records": [
+        "clinic:multi-north",
+        "payer:multi-south"
+      ],
+      "scope": "location",
+      "reason": "Distinct offices remain separate"
+    }
+  ],
+  "expected_unresolved": [
+    {
+      "records": [
+        "clinic:conflict",
+        "payer:conflict"
+      ],
+      "scope": "clinician_and_location",
+      "reason": "Insufficient evidence to resolve contradictory identifiers"
+    },
+    {
+      "records": [
+        "clinic:address",
+        "public_reference:address"
+      ],
+      "scope": "location",
+      "reason": "No reviewed address choice for multi-address reference"
+    }
+  ]
+}

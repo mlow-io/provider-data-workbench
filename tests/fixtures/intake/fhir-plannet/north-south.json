@@ -1,0 +1,186 @@
+{
+  "resourceType": "Bundle",
+  "id": "synthetic-directory-example",
+  "type": "searchset",
+  "entry": [
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/Practitioner/synthetic-clinician",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "synthetic-clinician",
+        "active": true,
+        "identifier": [
+          {
+            "system": "https://example.invalid/clinician-id",
+            "value": "SYNTHETIC-001"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Example",
+            "given": [
+              "Synthetic"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/Organization/synthetic-clinic",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "synthetic-clinic",
+        "active": true,
+        "name": "Synthetic Example Clinic"
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/Organization/synthetic-network",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "synthetic-network",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/plannet-Network"
+          ]
+        },
+        "active": true,
+        "name": "Synthetic Example Network"
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/Location/north",
+      "resource": {
+        "resourceType": "Location",
+        "id": "north",
+        "status": "active",
+        "name": "Synthetic NORTH",
+        "address": {
+          "line": [
+            "10 Example St"
+          ],
+          "city": "Example",
+          "state": "MA",
+          "postalCode": "02108",
+          "country": "US"
+        },
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "617-555-0100",
+            "use": "work"
+          }
+        ],
+        "managingOrganization": {
+          "reference": "Organization/synthetic-clinic"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/Location/south",
+      "resource": {
+        "resourceType": "Location",
+        "id": "south",
+        "status": "active",
+        "name": "Synthetic SOUTH",
+        "address": {
+          "line": [
+            "20 Example St"
+          ],
+          "city": "Example",
+          "state": "MA",
+          "postalCode": "02108",
+          "country": "US"
+        },
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "617-555-0200",
+            "use": "work"
+          }
+        ],
+        "managingOrganization": {
+          "reference": "Organization/synthetic-clinic"
+        }
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/PractitionerRole/role-north",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "role-north",
+        "active": true,
+        "practitioner": {
+          "reference": "Practitioner/synthetic-clinician"
+        },
+        "organization": {
+          "reference": "Organization/synthetic-clinic"
+        },
+        "location": [
+          {
+            "reference": "Location/north"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
+            "valueReference": {
+              "reference": "Organization/synthetic-network"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/PractitionerRole/role-south",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "role-south",
+        "active": true,
+        "practitioner": {
+          "reference": "Practitioner/synthetic-clinician"
+        },
+        "organization": {
+          "reference": "Organization/synthetic-clinic"
+        },
+        "location": [
+          {
+            "reference": "Location/south"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/davinci-pdex-plan-net/StructureDefinition/network-reference",
+            "valueReference": {
+              "reference": "Organization/synthetic-network"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/PractitionerRole/unresolved-role",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "id": "unresolved-role",
+        "practitioner": {
+          "reference": "Practitioner/not-present"
+        },
+        "location": [
+          {
+            "reference": "Location/north"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "https://directory.example.invalid/fhir/InsurancePlan/unsupported-plan",
+      "resource": {
+        "resourceType": "InsurancePlan",
+        "id": "unsupported-plan",
+        "name": "Synthetic unsupported plan"
+      }
+    }
+  ]
+}

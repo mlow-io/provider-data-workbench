@@ -1,0 +1,9 @@
+{
+  "designation": "hand-authored synthetic heldout normalization examples; no real clinicians",
+  "recipe": {"version": 1, "mapping": {"phone": "Call", "zip": "Postal", "state": "Region", "source_updated_at": "Changed", "npi": "Identifier"}, "transforms": {"phone": ["phone_us"], "zip": ["zip_us"], "state": ["state_us"], "source_updated_at": [{"op": "date", "format": "%d/%m/%Y"}]}, "required": ["npi"]},
+  "examples": [
+    {"original": {"Call": "+1 (212) 555-0193 ext. 007", "Postal": "00501-0042", "Region": "ny", "Changed": "04/03/2026", "Identifier": "0000000007"}, "expected": {"phone": "2125550193", "phone_extension": "007", "zip": "00501-0042", "state": "NY", "source_updated_at": "2026-03-04", "npi": "0000000007"}, "problem_count": 0},
+    {"original": {"Call": "12125550193", "Postal": "501", "Region": "New York", "Changed": "03/14/2026", "Identifier": "NA"}, "expected": {"phone": "12125550193", "zip": "501", "state": "New York", "source_updated_at": "03/14/2026", "npi": "NA"}, "problem_count": 4},
+    {"original": {"Call": null, "Postal": "", "Region": " ", "Changed": null, "Identifier": null}, "expected": {"phone": null, "zip": "", "state": " ", "source_updated_at": null, "npi": null}, "problem_count": 1}
+  ]
+}

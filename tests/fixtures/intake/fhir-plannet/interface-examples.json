@@ -1,0 +1,110 @@
+{
+  "status": "proposed D1.2 interfaces; not implemented",
+  "upload": {
+    "method": "POST",
+    "path": "/api/intakes/files",
+    "query": {
+      "filename": "north-south.json",
+      "source": "synthetic-plan-net",
+      "designation": "synthetic",
+      "profile": "fhir-plannet-r4"
+    },
+    "body_fixture": "north-south.json"
+  },
+  "acceptance": {
+    "method": "POST",
+    "path": "/api/intakes/RECEIPT_ID/commit",
+    "body": {
+      "expected_attempt": "ATTEMPT_ID",
+      "policy": "reference_resources",
+      "actor": "Synthetic analyst",
+      "reason": "Reviewed bounded reference evidence",
+      "request_id": "synthetic-acceptance-001"
+    }
+  },
+  "preview_addition": {
+    "native": {
+      "format_version": 1,
+      "profile": "fhir-plannet-r4",
+      "validation": {
+        "structural": "assessed",
+        "profile": "not_run",
+        "terminology": "not_run"
+      },
+      "coverage": {
+        "entry_count": 9,
+        "supported_count": 8,
+        "unsupported_count": 1,
+        "completeness": "unknown_saved_scope"
+      },
+      "references": [],
+      "assertions": [],
+      "findings": []
+    }
+  },
+  "north_projection": {
+    "clinician_ref_inputs": [
+      "ATTEMPT_ID",
+      "$.entry[0].resource",
+      ""
+    ],
+    "ref_inputs": [
+      "ATTEMPT_ID",
+      "$.entry[5].resource",
+      "location[0]"
+    ],
+    "locator": "$.entry[5].resource",
+    "address_path": "location[0]",
+    "entity_kind": "clinician",
+    "provider_name": "Synthetic Example",
+    "npi": null,
+    "phone": "617-555-0100",
+    "network_id": null,
+    "source_network_reference": "Organization/synthetic-network",
+    "supporting_refs": [
+      {
+        "attempt_id": "ATTEMPT_ID",
+        "locator": "$.entry[0].resource",
+        "path": "name[0]",
+        "field": "provider_name"
+      },
+      {
+        "attempt_id": "ATTEMPT_ID",
+        "locator": "$.entry[3].resource",
+        "path": "telecom[0].value",
+        "field": "phone"
+      },
+      {
+        "attempt_id": "ATTEMPT_ID",
+        "locator": "$.entry[3].resource",
+        "path": "address",
+        "field": "address"
+      },
+      {
+        "attempt_id": "ATTEMPT_ID",
+        "locator": "$.entry[5].resource",
+        "path": "location[0].reference",
+        "field": "location_context"
+      },
+      {
+        "attempt_id": "ATTEMPT_ID",
+        "locator": "$.entry[1].resource",
+        "path": "id",
+        "field": "organization_context"
+      },
+      {
+        "attempt_id": "ATTEMPT_ID",
+        "locator": "$.entry[2].resource",
+        "path": "id",
+        "field": "network_context"
+      }
+    ]
+  },
+  "stale_acceptance": {
+    "status": 409,
+    "body": {
+      "detail": "Interpretation changed; review the current preview"
+    },
+    "writes": 0
+  }
+}

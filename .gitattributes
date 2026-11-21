@@ -1,0 +1,5 @@
+# Preserve retained tool-output bytes and their recorded digests across checkouts.
+# Source and authored Markdown still use normal whitespace checks.
+docs/evidence/**/*.json -text -whitespace
+docs/evidence/**/*.txt -text -whitespace
+docs/evidence/**/*.log -text -whitespace

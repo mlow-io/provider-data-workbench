@@ -1,0 +1,885 @@
+"""Durable bounded intake service. Artifacts are bytes; receipts are deliveries.
+
+The service deliberately uses explicit mapping and operator-confirmed location links.
+It never infers that a bounded source's absence terminates a provider.
+"""
+from __future__ import annotations
+
+import csv
+import hashlib
+import io
+import json
+import os
+import re
+import sqlite3
+import uuid
+from contextlib import closing
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from openpyxl import load_workbook
+
+from .storage import connect, database_path, storage_root
+from .normalize import normalize_phone
+
+MAX_BYTES = 10 * 1024 * 1024
+MAX_ROWS = 20_000
+FIELDS = ['record_id', 'npi', 'provider_name', 'address', 'address_line2', 'suite', 'city', 'state', 'zip', 'phone', 'location_id', 'listing_id', 'reference_phone', 'specialty', 'status', 'source_updated_at']
+REQUIRED = ['npi', 'provider_name', 'address', 'city', 'state', 'zip', 'phone']
+VERSION = 13
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def uid() -> str:
+    return uuid.uuid4().hex
+
+
+def packed(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, ensure_ascii=False, allow_nan=False)
+
+
+def digest(value: Any) -> str:
+    return hashlib.sha256(packed(value).encode()).hexdigest()
+
+
+class Conflict(ValueError):
+    pass
+
+
+SCHEMA = [
+    '''create table artifact (sha text primary key, size integer not null, storage_key text not null);
+    create table receipt (id text primary key, label text not null, source text not null,
+      designation text not null, received_at text not null, artifact_sha text references artifact(sha),
+      profile text not null, duplicate_of text references receipt(id), metadata text not null);
+    create table attempt (id text primary key, receipt_id text not null references receipt(id),
+      spec text not null, fingerprint text not null, state text not null, preview text not null,
+      created_at text not null, committed_at text, decision text);
+    create index attempt_fingerprint on attempt(fingerprint);
+    create table observation (id text primary key, attempt_id text not null references attempt(id),
+      native_id text, locator text not null, original text not null, normalized text not null,
+      provider_id text, location_id text, source_updated_at text, retrieved_at text not null,
+      human_verified_at text);
+    create table relationship (id integer primary key, observation_id text not null references observation(id),
+      provider_id text not null, location_id text not null, actor text not null, reason text not null, occurred_at text not null);
+    create table work_case (id text primary key, kind text not null, identity_key text unique,
+      provider_name text not null, location_id text, field_name text not null, issue text not null,
+      risk_level text not null, risk_reason text not null, status text not null,
+      owner text, follow_up text, version integer not null default 0, evidence text not null,
+      proposal text, observed text, created_at text not null, updated_at text not null);
+    create table work_evidence (case_id text references work_case(id), observation_id text references observation(id),
+      primary key(case_id, observation_id));
+    create table work_event (id integer primary key, case_id text not null references work_case(id),
+      action text not null, actor text not null, reason text not null, payload text not null,
+      from_status text not null, to_status text not null, occurred_at text not null);
+    create trigger work_event_no_update before update on work_event begin select raise(abort,'Append-only events'); end;
+    create trigger work_event_no_delete before delete on work_event begin select raise(abort,'Append-only events'); end;
+    create table schema_migration (version integer primary key, applied_at text not null);
+    '''
+]
+
+
+class IntakeStore:
+    @classmethod
+    def open_existing(cls, path: Path, root: Path):
+        """Attach an agent to an initialized service without startup recovery.
+
+        A second process must not mark the running HTTP service's processing
+        attempts interrupted or migrate its live database underneath it.
+        """
+        path, root = Path(path).resolve(), Path(root).resolve()
+        if not path.is_file() or not (root / 'artifacts').is_dir():
+            raise ValueError('Open the selected workbench first; database and artifacts are required')
+        with closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)) as conn:
+            if conn.execute('PRAGMA user_version').fetchone()[0] != VERSION:
+                raise ValueError('Open the selected workbench to upgrade its schema before attaching MCP')
+        store = cls.__new__(cls)
+        store.path, store.root, store.artifacts = path, root, root / 'artifacts'
+        return store
+
+    def __init__(self, path: Path | None = None, root: Path | None = None):
+        self.path = path or database_path()
+        self.root = root or storage_root()
+        self.artifacts = self.root / 'artifacts'
+        self.artifacts.mkdir(parents=True, exist_ok=True)
+        self.migrate()
+        self.reconcile_artifacts()
+
+    def reconcile_artifacts(self):
+        # Staged/orphan bytes are retained for inspection, never mistaken for accepted data.
+        with self.db() as conn:
+            known = {r[0] for r in conn.execute('select storage_key from artifact')}
+        present = {p.name for p in self.artifacts.iterdir() if p.is_file()}
+        report = {'checked_at': now(), 'staged': sorted(k for k in present if k.endswith('.staged')),
+                  'unregistered': sorted(k for k in present-known if not k.endswith('.staged')),
+                  'missing_registered': sorted(known-present), 'policy': 'Retained for inspection; never auto-delete or accept'}
+        (self.root / 'artifact-recovery.json').write_text(packed(report))
+        return report
+
+    def db(self):
+        return connect(self.path)
+
+    def migrate(self):
+        with self.db() as conn:
+            version = conn.execute('pragma user_version').fetchone()[0]
+            if version > VERSION:
+                raise ValueError(f'Unsupported future schema {version}; supported {VERSION}')
+            if version == 0:
+                # Back up before adding anything to a legacy database. Never fabricate old originals.
+                tables = conn.execute("select name from sqlite_master where type='table'").fetchall()
+                if tables:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v1.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript('BEGIN IMMEDIATE;\n' + SCHEMA[0] + "\ninsert into schema_migration values (1, datetime('now'));\npragma user_version=1;\nCOMMIT;")
+            if version < 2:
+                if version == 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v2.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE; ALTER TABLE relationship ADD COLUMN location_index integer; INSERT INTO schema_migration VALUES (2, datetime('now')); PRAGMA user_version=2; COMMIT;")
+            if version < 3:
+                from .recurring import MIGRATION_3
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v3.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_3 + "\nINSERT INTO schema_migration VALUES (3, datetime('now')); PRAGMA user_version=3; COMMIT;")
+            if version < 4:
+                from .network_store import MIGRATION_4
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v4.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_4 + "\nINSERT INTO schema_migration VALUES (4, datetime('now')); PRAGMA user_version=4; COMMIT;")
+            if version < 5:
+                from .onboarding_service import MIGRATION_5
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v5.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_5 + "\nINSERT INTO schema_migration VALUES (5, datetime('now')); PRAGMA user_version=5; COMMIT;")
+            if version < 6:
+                from .reconciliation_store import MIGRATION_6
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v6.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_6 + "\nINSERT INTO schema_migration VALUES (6, datetime('now')); PRAGMA user_version=6; COMMIT;")
+            if version < 7:
+                from .identity_review import MIGRATION_7
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v7.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_7 + "\nINSERT INTO schema_migration VALUES (7, datetime('now')); PRAGMA user_version=7; COMMIT;")
+            if version < 8:
+                from .field_reconciliation import MIGRATION_8
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v8.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_8 + "\nINSERT INTO schema_migration VALUES (8, datetime('now')); PRAGMA user_version=8; COMMIT;")
+            if version < 9:
+                from .change_impact import MIGRATION_9
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v9.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_9 + "\nINSERT INTO schema_migration VALUES (9, datetime('now')); PRAGMA user_version=9; COMMIT;")
+            if version < 10:
+                from .follow_up import MIGRATION_10
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v10.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_10 + "\nINSERT INTO schema_migration VALUES (10, datetime('now')); PRAGMA user_version=10; COMMIT;")
+            if version < 11:
+                from .managed_feed import MIGRATION_11
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v11.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_11 + "\nINSERT INTO schema_migration VALUES (11, datetime('now')); PRAGMA user_version=11; COMMIT;")
+            if version < 12:
+                from .fhir_acquisition import MIGRATION_12
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v12.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_12 + "\nINSERT INTO schema_migration VALUES (12, datetime('now')); PRAGMA user_version=12; COMMIT;")
+            if version < 13:
+                from .mapping_assistant import MIGRATION_13
+                if version >= 1:
+                    backup = self.path.with_name(self.path.name + '.pre-intake-v13.bak')
+                    if not backup.exists():
+                        with closing(sqlite3.connect(backup)) as target:
+                            conn.backup(target)
+                conn.executescript("BEGIN IMMEDIATE;\n" + MIGRATION_13 + "\nINSERT INTO schema_migration VALUES (13, datetime('now')); PRAGMA user_version=13; COMMIT;")
+            # Managed attempts belong to persisted claims, not HTTP startup recovery.
+            conn.execute("update attempt set state='interrupted' where state='processing' AND id NOT IN (SELECT attempt_id FROM feed_job WHERE attempt_id IS NOT NULL)")
+
+    def retain(self, payload: bytes) -> str:
+        if not payload or len(payload) > MAX_BYTES:
+            raise ValueError('Artifact must contain 1 byte to 10 MiB')
+        sha = hashlib.sha256(payload).hexdigest()
+        dest = self.artifacts / sha
+        if not dest.exists():
+            stage = self.artifacts / (sha + '.' + uid() + '.staged')
+            with stage.open('xb') as stream:
+                stream.write(payload)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(stage, dest)
+        with self.db() as conn:
+            conn.execute('insert or ignore into artifact values (?,?,?)', (sha, len(payload), sha))
+        return sha
+
+    def receive(self, payload: bytes, filename: str, source='clinic', designation='synthetic', profile='flat', metadata=None):
+        if designation not in {'synthetic', 'public', 'local'}:
+            raise ValueError('Choose synthetic, public, or local designation')
+        if profile not in {'flat', 'nppes', 'cms', 'fhir-plannet-r4'}:
+            raise ValueError('Supported JSON profiles: flat, nppes, cms, fhir-plannet-r4')
+        if not source.strip():
+            raise ValueError('A source namespace/scope is required')
+        source = source.strip()
+        metadata = metadata or {}
+        if profile == 'fhir-plannet-r4' and metadata.get('completeness') == 'full':
+            raise ValueError('Saved FHIR searchsets cannot declare full-directory completeness')
+        sha = self.retain(payload)
+        receipt_id = uid()
+        with self.db() as conn:
+            candidates = conn.execute('SELECT id,metadata FROM receipt WHERE artifact_sha=? AND source=? AND profile=? ORDER BY received_at,id',(sha,source,profile))
+            duplicate = next((row for row in candidates if json.loads(row['metadata']).get('scope') == metadata.get('scope')),None)
+            conn.execute('insert into receipt values (?,?,?,?,?,?,?,?,?)', (receipt_id, Path(filename).name, source.strip(), designation, now(), sha, profile, duplicate[0] if duplicate else None, packed(metadata or {})))
+        with self.db() as conn:
+            candidates = conn.execute("SELECT a.spec,r.metadata FROM attempt a JOIN receipt r ON r.id=a.receipt_id WHERE r.artifact_sha=? AND r.source=? AND r.profile=? AND a.state='committed' ORDER BY a.committed_at DESC,a.id DESC",(sha,source,profile))
+            prior = next((row for row in candidates if json.loads(row['metadata']).get('scope') == metadata.get('scope')),None)
+        settings = {k:v for k,v in json.loads(prior[0]).items() if k not in {'adapter_version','profile','baseline_attempt_id'}} if prior else {}
+        if settings.get('mapping_revision_id'):
+            settings = {'mapping_revision_id': settings['mapping_revision_id']}
+        self.mapping(receipt_id, {} if profile == 'fhir-plannet-r4' else settings)
+        return self.detail(receipt_id)
+
+    def rows(self, receipt: dict, spec: dict):
+        path = self.artifacts / receipt['artifact_sha']
+        payload = path.read_bytes()
+        if hashlib.sha256(payload).hexdigest() != receipt['artifact_sha']:
+            raise ValueError('Retained artifact digest mismatch')
+        label = receipt['label'].lower()
+        if label.endswith('.json') or receipt['profile'] != 'flat':
+            from .intake_adapters import parse_json
+            rows = parse_json(payload, receipt['profile'])
+            if len(rows) > MAX_ROWS:
+                raise ValueError('Row limit is 20,000; split the artifact')
+            return rows, [], [], True
+        if label.endswith('.xlsx'):
+            # Reject expanded zip bombs before openpyxl inflates XML.
+            import zipfile
+            with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+                if sum(x.file_size for x in archive.infolist()) > 100 * MAX_BYTES:
+                    raise ValueError('Workbook expanded size exceeds 1 GiB')
+            workbook = load_workbook(io.BytesIO(payload), read_only=True, data_only=False)
+            sheets = workbook.sheetnames
+            sheet = spec.get('sheet') or sheets[0]
+            if sheet not in sheets:
+                workbook.close()
+                raise ValueError('Select a worksheet from the retained workbook')
+            header_row = int(spec.get('header_row', 1))
+            if header_row < 1 or header_row > 100:
+                raise ValueError('Header row must be between 1 and 100')
+            worksheet = workbook[sheet]
+            iterator = worksheet.iter_rows(min_row=header_row)
+            header_cells = next(iterator, ())
+            headers = [str(c.value or '').strip() for c in header_cells]
+            rows = []
+            for rowno, cells in enumerate(iterator, start=header_row + 1):
+                if all(c.value is None for c in cells):
+                    continue
+                formulas = [c.coordinate for c in cells if c.data_type == 'f']
+                values = [format(int(c.value), '0' + str(len(c.number_format)) + 'd') if isinstance(c.value, (int,float)) and re.fullmatch(r'0+', c.number_format) else str(c.value) if c.value is not None else '' for c in cells]
+                original = dict(zip(headers, values))
+                original['_cells'] = [{'cell': c.coordinate, 'type': c.data_type, 'number_format': c.number_format, 'value': str(c.value) if c.value is not None else None} for c in cells]
+                rows.append({'original': original, 'locator': f'{sheet}!{rowno}', 'problems': [f'Formula cells are not executed: {", ".join(formulas)}'] if formulas else []})
+                if len(rows) > MAX_ROWS:
+                    workbook.close()
+                    raise ValueError('Row limit is 20,000; split the artifact')
+            workbook.close()
+            return rows, headers, sheets, False
+        if not label.endswith('.csv'):
+            raise ValueError('Supported files: CSV, XLSX, or explicit-profile JSON')
+        encoding = spec.get('encoding', 'utf-8-sig')
+        if encoding not in {'utf-8-sig', 'utf-8', 'cp1252'}:
+            raise ValueError('Supported encodings: utf-8-sig, utf-8, cp1252')
+        delimiter = spec.get('delimiter', ',')
+        if delimiter not in {',', ';', '\t', '|'}:
+            raise ValueError('Choose comma, semicolon, tab, or pipe delimiter')
+        reader = csv.DictReader(io.StringIO(payload.decode(encoding)), delimiter=delimiter)
+        headers = reader.fieldnames or []
+        rows = []
+        for index, row in enumerate(reader, 2):
+            problems = ['Row has more cells than headers'] if None in row else []
+            row.pop(None, None)
+            rows.append({'original': row, 'locator': f'row:{index}', 'problems': problems})
+            if len(rows) > MAX_ROWS:
+                raise ValueError('Row limit is 20,000; split the artifact')
+        return rows, headers, [], False
+
+    def catalog(self):
+        from .network_store import catalog
+        with self.db() as conn:
+            return catalog(conn)
+
+    def create_catalog(self, kind, payload):
+        from .network_store import create_catalog
+        return create_catalog(self, kind, payload)
+
+    def bind_source(self, payload):
+        from .network_store import bind_source
+        return bind_source(self, payload)
+
+    def saved_mappings(self, receipt_id):
+        from .recurring import scope
+        with self.db() as conn:
+            receipt = self._receipt(conn, receipt_id)
+            items = [dict(row) for row in conn.execute(
+                'SELECT * FROM mapping_revision WHERE source=? AND profile=? ORDER BY created_at DESC,id DESC',
+                (receipt['source'], receipt['profile'])) if json.loads(row['scope']) == scope(receipt)]
+        for row in items:
+            for key in ('scope', 'settings', 'required_headers'):
+                row[key] = json.loads(row[key])
+        return {'items': items}
+
+    def save_mapping(self, receipt_id, payload):
+        from .recurring import PARSING_FIELDS, scope
+        actor, reason, name = (self.required(payload, key) for key in ('actor', 'reason', 'name'))
+        with self.db() as conn:
+            conn.execute('begin immediate')
+            receipt = self._receipt(conn, receipt_id)
+            attempt = conn.execute('SELECT * FROM attempt WHERE receipt_id=? ORDER BY created_at DESC,id DESC LIMIT 1', (receipt_id,)).fetchone()
+            if attempt is None or payload.get('expected_attempt') != attempt['id']:
+                raise Conflict('Interpretation changed; review the current preview before saving a mapping')
+            preview, spec = json.loads(attempt['preview']), json.loads(attempt['spec'])
+            if attempt['state'] not in {'preview_ready', 'committed', 'duplicate_delivery'} or not preview.get('headers'):
+                raise ValueError('A ready tabular mapped preview is required before saving')
+            settings = {key: value for key, value in spec.items() if key in PARSING_FIELDS}
+            settings['mapping'] = preview['mapping']
+            revision = {'id': uid(), 'name': name, 'source': receipt['source'], 'profile': receipt['profile'],
+                        'scope': scope(receipt), 'settings': settings,
+                        'required_headers': sorted(set(preview['mapping'].values())),
+                        'actor': actor, 'reason': reason, 'created_at': now()}
+            conn.execute('INSERT INTO mapping_revision VALUES (?,?,?,?,?,?,?,?,?,?)',
+                         (revision['id'], name, receipt['source'], receipt['profile'], packed(revision['scope']),
+                          packed(settings), packed(revision['required_headers']), actor, reason, revision['created_at']))
+        return revision
+
+    def mapping(self, receipt_id: str, settings: dict, *, managed=None, attempt_id=None):
+        from .recurring import scope, latest_baseline
+        from .network_store import binding_snapshot
+        with self.db() as conn:
+            native_receipt = self._receipt(conn, receipt_id)
+        if native_receipt['profile'] == 'fhir-plannet-r4':
+            if managed is not None:
+                raise ValueError('FHIR resources cannot use managed clinic processing')
+            from .fhir_store import interpret
+            return interpret(self, receipt_id, settings)
+        settings = dict(settings)
+        expected_attempt = settings.pop('expected_attempt', None)
+        settings.pop('binding_snapshot', None)
+        settings.pop('managed_feed_id', None)
+        settings.pop('baseline_attempt_id', None)  # Baselines are always pinned by the service.
+        required_headers = []
+        with self.db() as conn:
+            receipt = self._receipt(conn, receipt_id)
+            feed_id = json.loads(receipt['metadata']).get('managed_feed_id')
+            if feed_id and (managed is None or managed.get('feed_id') != feed_id):
+                raise ValueError('Managed feed receipts require managed job reprocessing')
+            if managed is not None:
+                job = conn.execute('SELECT feed_id FROM feed_job WHERE receipt_id=? AND attempt_id=?', (receipt_id, attempt_id)).fetchone()
+                if job is None or job['feed_id'] != feed_id:
+                    raise ValueError('Managed attempt must belong to the pinned feed job')
+            if settings.get('mapping_revision_id'):
+                revision_id = settings['mapping_revision_id']
+                # Revision settings are immutable: changing columns requires a new revision.
+                if set(settings) - {'mapping_revision_id', 'adapter_version', 'profile'}:
+                    raise ValueError('Saved mapping settings cannot be overridden; review a new revision')
+                revision = conn.execute('SELECT * FROM mapping_revision WHERE id=?', (revision_id,)).fetchone()
+                if revision is None:
+                    raise KeyError('Mapping revision not found')
+                if (revision['source'], revision['profile'], json.loads(revision['scope'])) != (receipt['source'], receipt['profile'], scope(receipt)):
+                    raise ValueError('Mapping revision has incompatible source, profile or scope')
+                required_headers = json.loads(revision['required_headers'])
+                settings = {**json.loads(revision['settings']), 'mapping_revision_id': revision_id}
+            recipe = None
+            if settings.get('recipe_revision_id'):
+                from .onboarding_service import resolve_recipe
+                recipe = resolve_recipe(conn, receipt, settings['recipe_revision_id'])['definition']
+                if receipt['profile'] != 'flat' or settings.get('roster_kind') == 'network':
+                    raise ValueError('Recipes currently target clinic CSV/XLSX/flat JSON')
+                settings['mapping'] = recipe['mapping']
+            recurring = receipt['profile'] == 'flat' and receipt['label'].lower().endswith(('.csv', '.xlsx'))
+            snapshot = binding_snapshot(conn, receipt, settings)
+            resolved_settings = {**settings, 'binding_snapshot': snapshot} if settings.get('roster_kind') == 'network' else settings
+            baseline = latest_baseline(conn, receipt, resolved_settings) if recurring else None
+            if managed is not None:
+                baseline = conn.execute('SELECT a.*,r.label FROM attempt a JOIN receipt r ON r.id=a.receipt_id WHERE a.id=?', (managed['baseline_attempt_id'],)).fetchone() if managed['baseline_attempt_id'] else None
+                baseline = dict(baseline) if baseline else None
+                resolved_settings['managed_feed_id'] = managed['feed_id']
+        from .comparison import RULE_VERSION
+        spec = {**resolved_settings, 'adapter_version': '1', 'profile': receipt['profile'],
+                'comparison_rule_version': RULE_VERSION}
+        if recurring:
+            spec['baseline_attempt_id'] = baseline['id'] if baseline else None
+        attempt_id = attempt_id or uid()
+        fingerprint = digest([receipt['source'], json.loads(receipt['metadata']).get('scope'), receipt['artifact_sha'], {key: value for key, value in spec.items() if key != 'baseline_attempt_id'}])
+        with self.db() as conn:
+            conn.execute('BEGIN IMMEDIATE')
+            if expected_attempt is not None:
+                from .onboarding_service import OnboardingService
+                OnboardingService._check_attempt(conn, receipt_id, expected_attempt)
+            conn.execute('insert or ignore into attempt values (?,?,?,?,?,?,?,?,?)', (attempt_id, receipt_id, packed(spec), fingerprint, 'processing', '{}', now(), None, None))
+        try:
+            rows, headers, sheets, native = self.rows(receipt, spec)
+            if recipe is not None and native:
+                headers = sorted({key for row in rows for key in row['original']})
+            if len(set(headers)) != len(headers) or any(not h for h in headers):
+                raise ValueError('Headers must be nonblank and unique; choose another header row')
+            from .network_store import NETWORK_FIELDS
+            mapping = {k:v for k,v in settings.get('mapping', {}).items() if v} or {key: key for key in [*FIELDS, *NETWORK_FIELDS] if key in headers}
+            missing = [] if native and recipe is None else [key for key in REQUIRED if key not in mapping]
+            unknown = [value for value in mapping.values() if value not in headers] if not native or recipe is not None else []
+            missing_headers = sorted(set(required_headers) - set(headers))
+            header_error = ('Required headers missing: ' + ', '.join(missing_headers)) if missing_headers else ('Mapped columns do not exist: ' + ', '.join(unknown)) if unknown else None
+            from .interpretation import interpret
+            interpret(rows, mapping, native, recipe)
+            from .network_store import interpret_rows
+            interpret_rows(rows, spec)
+            from .comparison import cleanse
+            from .comparison_inputs import make_records
+            for row in rows:
+                row['comparison_values'] = [cleanse(record) for record in make_records(receipt, attempt_id, [row], spec)]
+            from .recurring import mark_duplicate_keys, compare
+            if recurring or recipe is not None:
+                mark_duplicate_keys(rows)
+            if managed is not None:
+                from .recurring import identity
+                for row in rows:
+                    if identity(row) is None:
+                        row['problems'].append('Managed contract requires source record and location keys')
+            if recurring:
+                with self.db() as conn:
+                    comparison = compare(conn, receipt, rows, spec, baseline)
+            else:
+                comparison = self.compare_delivery(receipt, rows)
+            scope_error = 'Review explicit network roster scope and source bindings before acceptance' if json.loads(receipt['metadata']).get('expected_roster_kind') == 'network' and spec.get('roster_kind') != 'network' else None
+            preview = {'comparison': comparison, 'headers': headers, 'sheets': sheets, 'mapping': mapping, 'rows': rows,
+                       'valid_count': sum(not r['problems'] for r in rows), 'quarantined_count': sum(bool(r['problems']) for r in rows),
+                       'total': len(rows), 'mapping_revision_id': spec.get('mapping_revision_id'),
+                       'recipe_revision_id': spec.get('recipe_revision_id'),
+                       'state': 'needs_mapping' if missing or header_error or scope_error else 'preview_ready',
+                       'error': ('Map required fields: ' + ', '.join(missing)) if missing else header_error or scope_error}
+            with self.db() as conn:
+                prior = conn.execute("select id from attempt where fingerprint=? and state='committed' order by created_at limit 1", (fingerprint,)).fetchone()
+                if prior:
+                    preview['reuses_attempt'] = prior[0]
+                conn.execute('update attempt set state=?,preview=? where id=?', (preview['state'], packed(preview), attempt_id))
+        except Exception as exc:
+            # Keep a failed receipt for visible correction/retry. No source data is committed.
+            with self.db() as conn:
+                conn.execute("update attempt set state='failed',preview=? where id=?", (packed({'state': 'failed', 'error': str(exc), 'rows': [], 'headers': [], 'sheets': [], 'mapping': {}, 'valid_count': 0, 'quarantined_count': 0, 'total': 0}), attempt_id))
+        return self.detail(receipt_id)
+
+    @staticmethod
+    def _receipt(conn, receipt_id):
+        row = conn.execute('select * from receipt where id=?', (receipt_id,)).fetchone()
+        if row is None:
+            raise KeyError('Receipt not found')
+        return dict(row)
+
+    def compare_delivery(self, receipt, rows):
+        def key(row):
+            norm = row['normalized']
+            return (str(row.get('native_id')), str(norm.get('location_id') or '')) if row.get('native_id') else None
+        previous = {}
+        with self.db() as conn:
+            old = conn.execute("select o.*, r.metadata as receipt_metadata from observation o join attempt a on a.id=o.attempt_id join receipt r on r.id=a.receipt_id where r.source=? order by o.retrieved_at", (receipt['source'],))
+            for row in old:
+                if json.loads(row['receipt_metadata']).get('scope') != json.loads(receipt['metadata']).get('scope'):
+                    continue
+                item = self.observation(dict(row))
+                if key(item):
+                    previous[key(item)] = item['normalized']
+        current = set()
+        counts = {'new': 0, 'changed': 0, 'unchanged': 0, 'unresolved': 0}
+        for row in rows:
+            native = key(row)
+            if native is None:
+                counts['unresolved'] += 1
+                row['comparison'] = 'unresolved'
+            else:
+                current.add(native)
+                status = 'new' if native not in previous else 'unchanged' if previous[native] == row['normalized'] else 'changed'
+                counts[status] += 1
+                row['comparison'] = status
+        counts['missing_from_this_delivery'] = len(set(previous) - current)
+        counts['absence_meaning'] = 'Bounded delivery only; absence does not imply termination or removal'
+        return counts
+
+    def detail(self, receipt_id, attempt_id=None):
+        with self.db() as conn:
+            # Pin the attempt, its observations and linked work to one read snapshot.
+            conn.execute('BEGIN')
+            receipt = self._receipt(conn, receipt_id)
+            receipt['metadata'] = json.loads(receipt['metadata'])
+            attempts = [dict(r) for r in conn.execute('select * from attempt where receipt_id=? order by created_at,id', (receipt_id,))]
+            for attempt in attempts:
+                attempt['spec'] = json.loads(attempt['spec'])
+                attempt['preview'] = json.loads(attempt['preview'])
+            receipt['attempts'] = attempts
+            selected = attempts[-1] if attempts else None
+            if attempt_id is not None:
+                selected = next((attempt for attempt in attempts if attempt['id'] == attempt_id), None)
+                if selected is None:
+                    raise KeyError('Interpretation attempt does not belong to this receipt')
+                receipt['latest_attempt_id'] = attempts[-1]['id']
+                receipt['is_current_attempt'] = selected['id'] == receipt['latest_attempt_id']
+            receipt['preview'] = selected['preview'] if selected else None
+            receipt['state'] = selected['state'] if selected else ('failed' if receipt['metadata'].get('error') else 'reference_only')
+            receipt['attempt_id'] = selected['id'] if selected else None
+            evidence_attempt_id = receipt['attempt_id']
+            if receipt['preview'] and receipt['preview'].get('reuses_attempt'):
+                evidence_attempt_id = receipt['preview']['reuses_attempt']
+            receipt['observations'] = [self.observation(dict(r)) for r in conn.execute('select * from observation where attempt_id=?', (evidence_attempt_id,))]
+            for observation in receipt['observations']:
+                normalization = conn.execute('SELECT recipe_id,provenance FROM observation_normalization WHERE observation_id=?', (observation['id'],)).fetchone()
+                if normalization:
+                    observation['normalization'] = {'recipe_id': normalization['recipe_id'], 'fields': json.loads(normalization['provenance'])}
+                    assistance = conn.execute('''SELECT a.* FROM assistant_run a JOIN recipe_revision r ON r.id=?
+                        WHERE a.proposal_id=r.id OR a.proposal_id=r.parent_id''', (normalization['recipe_id'],)).fetchone()
+                    if assistance:
+                        config = json.loads(assistance['config'])
+                        context = json.loads(assistance['context'])
+                        result = json.loads(assistance['result'])
+                        observation['normalization']['assistant'] = {
+                            'run_id': assistance['id'], 'proposal_id': assistance['proposal_id'],
+                            'provider': config['provider'], 'model': config['model'],
+                            'prompt_version': config['prompt_version'], 'schema_version': config['schema_version'],
+                            'request_sha': assistance['request_sha'], 'response_sha': assistance['response_sha'],
+                            'input_artifact_sha': context['artifact_sha'], 'sample_locators': context['sample_locators'],
+                            'sample_policy': context['sample_policy'], 'usage': result.get('usage'),
+                            'conservative_estimated_usd': result.get('conservative_estimated_usd'),
+                            'notice': 'Model proposal; approval and source acceptance are separate decisions.'}
+                comparison = conn.execute('SELECT rule_version,evidence FROM observation_comparison WHERE observation_id=?', (observation['id'],)).fetchone()
+                if comparison:
+                    observation['comparison_values'] = {'rule_version': comparison['rule_version'], 'records': json.loads(comparison['evidence'])}
+                observation['relationships'] = [dict(r) for r in conn.execute('select * from relationship where observation_id=? order by id', (observation['id'],))]
+            receipt['linked_cases'] = [dict(r) for r in conn.execute('''SELECT DISTINCT c.* FROM work_case c WHERE c.id IN
+                (SELECT w.case_id FROM work_evidence w JOIN observation o ON o.id=w.observation_id WHERE o.attempt_id=?
+                 UNION SELECT e.case_id FROM participation_review_evidence e WHERE e.attempt_id=?)''', (evidence_attempt_id,evidence_attempt_id))]
+            return receipt
+
+    @staticmethod
+    def observation(row):
+        row['original'] = json.loads(row['original'])
+        row['normalized'] = json.loads(row['normalized'])
+        return row
+
+    def inbox(self, offset=None, limit=None):
+        paged=offset is not None or limit is not None
+        if paged:
+            from .reconciliation_store import page_parameters
+            offset=0 if offset is None else offset
+            limit=20 if limit is None else limit
+            page_parameters(offset,limit)
+        with self.db() as conn:
+            conn.execute('BEGIN')
+            query="""select r.*, a.id as attempt_id, a.state from receipt r
+              left join attempt a on a.id=(select id from attempt where receipt_id=r.id order by created_at desc,id desc limit 1)
+              order by r.received_at desc,r.id desc"""
+            rows = conn.execute(query+' LIMIT ? OFFSET ?' if paged else query,(limit,offset) if paged else ())
+            items = []
+            for row in rows:
+                item = dict(row)
+                item['metadata'] = json.loads(item['metadata'])
+                item['state'] = item['state'] or ('failed' if item['metadata'].get('error') else 'reference_only')
+                items.append(item)
+            total=conn.execute('SELECT count(*) FROM receipt').fetchone()[0] if paged else None
+        return {'items':items,'total':total,'next_offset':offset+limit if offset+limit<total else None} if paged else {'items':items}
+
+    def commit(self, receipt_id, payload):
+        with self.db() as conn:
+            conn.execute('begin immediate')
+            selected_attempt = self.commit_in_transaction(conn, receipt_id, payload)
+        return self.detail(receipt_id, attempt_id=selected_attempt) if selected_attempt else self.detail(receipt_id)
+
+    def commit_in_transaction(self, conn, receipt_id, payload, *, managed=False):
+        """Accept within the caller's transaction; managed promotion commits with it."""
+        receipt = self._receipt(conn, receipt_id)
+        if receipt['profile'] == 'fhir-plannet-r4':
+            from .fhir_store import accept
+            return accept(self, conn, receipt, payload)
+        actor = self.required(payload, 'actor')
+        reason = self.required(payload, 'reason')
+        policy = payload.get('policy')
+        if policy not in {'valid_rows', 'reject'}:
+            raise ValueError('Choose valid_rows or reject acceptance policy')
+        receipt = self._receipt(conn, receipt_id)
+        if json.loads(receipt['metadata']).get('managed_feed_id') and not managed:
+            raise ValueError('Managed feed candidates require dataset-version approval')
+        attempt = dict(conn.execute('select * from attempt where receipt_id=? order by created_at desc,id desc limit 1', (receipt_id,)).fetchone())
+        if payload.get('expected_attempt') is not None and payload['expected_attempt'] != attempt['id']:
+            raise Conflict('Interpretation changed since preview; refresh before acceptance')
+        if attempt['state'] in {'committed', 'duplicate_delivery', 'rejected'}:
+            return
+        if attempt['state'] != 'preview_ready' and policy != 'reject':
+            raise ValueError('A valid mapped preview is required before acceptance')
+        preview = json.loads(attempt['preview'])
+        spec = json.loads(attempt['spec'])
+        if spec.get('managed_feed_id') and not managed:
+            raise ValueError('Managed feed candidates require dataset-version approval')
+        if not managed and policy == 'valid_rows' and 'baseline_attempt_id' in spec:
+            from .recurring import latest_baseline
+            baseline = latest_baseline(conn, receipt, spec)
+            if spec['baseline_attempt_id'] != (baseline['id'] if baseline else None):
+                raise Conflict('Accepted baseline changed since preview; refresh comparison and review before acceptance')
+        previous = conn.execute("select id from attempt where fingerprint=? and state='committed' limit 1", (attempt['fingerprint'],)).fetchone()
+        if policy == 'valid_rows' and spec.get('roster_kind') == 'network':
+            from .network_store import check_bindings
+            check_bindings(conn, spec['binding_snapshot'])
+        state = 'rejected' if policy == 'reject' else 'committed'
+        if previous and state == 'committed':
+            state = 'duplicate_delivery'
+            preview['reuses_attempt'] = previous[0]
+        elif state == 'committed':
+            explicit_empty = spec.get('roster_kind') == 'network' and preview['total'] == 0 and preview['comparison'].get('baseline') is not None and json.loads(receipt['metadata']).get('completeness') == 'full'
+            if not preview['valid_count'] and not explicit_empty:
+                raise ValueError('No valid rows to accept; correct mapping or reject')
+            for row in preview['rows']:
+                if row['problems']:
+                    continue
+                observation_id = uid()
+                norm = row['normalized']
+                provider = 'NPI:' + str(norm['npi']) if re.fullmatch(r'\d{10}', str(norm.get('npi',''))) else None
+                # A supplied source location ID scopes evidence within its namespace, not across organizations.
+                location = receipt['source'] + ':' + str(norm['location_id']) if norm.get('location_id') else None
+                if spec.get('roster_kind') == 'network':
+                    provider = norm['participation']['provider_id']
+                    location = norm['participation']['location_id']
+                conn.execute('insert into observation values (?,?,?,?,?,?,?,?,?,?,?)', (observation_id, attempt['id'], row.get('native_id'), row['locator'], packed(row['original']), packed(norm), provider, location, row.get('source_updated_at') or norm.get('source_updated_at'), receipt['received_at'], None))
+                if spec.get('recipe_revision_id'):
+                    conn.execute('INSERT INTO observation_normalization VALUES (?,?,?)',
+                                 (observation_id, spec['recipe_revision_id'], packed(row['normalization'])))
+                if row.get('comparison_values') is not None:
+                    conn.execute('INSERT INTO observation_comparison VALUES (?,?,?)',
+                                 (observation_id, spec['comparison_rule_version'], packed(row['comparison_values'])))
+                observation = {'id': observation_id, 'native_id': row.get('native_id'), 'locator': row['locator'], 'original': row['original'], 'normalized': norm, 'provider_id': provider, 'location_id': location}
+                if spec.get('roster_kind') == 'network':
+                    from .network_store import link_participation
+                    observation['attempt_id'] = attempt['id']
+                    observation['comparison'] = row.get('comparison')
+                    link_participation(self, conn, receipt, observation, spec)
+                else:
+                    self.link_work(conn, receipt, observation)
+        if state == 'committed':
+            from .network_review import record_comparison_work
+            record_comparison_work(self,conn,receipt,attempt,preview,spec)
+        conn.execute('update attempt set state=?,preview=?,committed_at=?,decision=? where id=?', (state, packed(preview), now(), packed({'policy':policy,'actor':actor,'reason':reason}), attempt['id']))
+
+    def link_work(self, conn, receipt, observation):
+        norm = observation['normalized']
+        provider, location = observation['provider_id'], observation['location_id']
+        # Only source-native record + explicit source location provides stable operational scope.
+        stable = [receipt['source'], provider, location, norm.get('listing_id') or observation['native_id']] if provider and location and (norm.get('listing_id') or observation['native_id']) else None
+        findings = []
+        existing_fields = set()
+        if stable:
+            # Later observations belong to existing work even after the issue disappears.
+            # Evidence alone must never verify or close an operator's correction.
+            for field in ['phone', 'record', 'location_id', 'record_id']:
+                for kind in ['qa', 'correction']:
+                    prior = conn.execute('select id from work_case where identity_key=?', (digest([stable, kind, field]),)).fetchone()
+                    if prior:
+                        conn.execute('insert or ignore into work_evidence values (?,?)', (prior[0], observation['id']))
+                        existing_fields.add(field)
+        if not location:
+            findings.append(('qa', 'location_id', 'Location relationship needs review', 'medium', 'No explicit operating-location relationship'))
+        if not observation['native_id']:
+            findings.append(('qa', 'record_id', 'Source-native identity unresolved', 'medium', 'Row position is provenance, not identity'))
+        if location and norm.get('reference_phone') and normalize_phone(str(norm['reference_phone'])) != norm.get('phone'):
+            findings.append(('correction', 'phone', 'Location phone differs from submitted reference', 'high', 'Patients may be unable to contact this operating location'))
+        if not findings and not existing_fields:
+            findings.append(('qa', 'record', 'Review accepted source observation', 'low', 'Human source-evidence review'))
+        for kind, field, issue, risk, risk_reason in findings:
+            key = digest([stable, kind, field]) if stable else None
+            case = conn.execute('select id from work_case where identity_key=?', (key,)).fetchone() if key else None
+            case_id = case[0] if case else uid()
+            evidence = {'original': observation['original'], 'normalized': norm, 'locator': observation['locator'], 'receipt_id': receipt['id'], 'observation_id': observation['id'], 'listing_value': norm.get(field), 'reference_value': norm.get('reference_' + field), 'source': receipt['source'], 'designation': receipt['designation'], 'provider_id': provider, 'location_id': location}
+            if not case:
+                conn.execute('insert into work_case values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', (case_id, kind, key, str(norm.get('provider_name','')), location, field, issue, risk, risk_reason, 'new', None, None, 0, packed(evidence), None, None, now(), now()))
+            conn.execute('insert or ignore into work_evidence values (?,?)', (case_id, observation['id']))
+
+    def work(self, network_id=None, organization_id=None, location_id=None):
+        where,follow_where,parameters,follow_parameters=[],[],[],[]
+        filters=[('network_id',network_id),('organization_id',organization_id),('practice_location_id',location_id)]
+        for column,value in filters:
+            if value is not None:
+                where.append('s.'+column+'=?');parameters.append(value)
+                key='location_id' if column=='practice_location_id' else column
+                follow_where.append("json_extract(f.evidence,'$.scope."+key+"')=?");follow_parameters.append(value)
+        condition=(' WHERE (('+' AND '.join(where)+') OR EXISTS(SELECT 1 FROM follow_up_association f WHERE f.case_id=c.id AND '+' AND '.join(follow_where)+'))') if where else ''
+        with self.db() as conn:
+            conn.execute('BEGIN')
+            rows=[dict(row) for row in conn.execute("""SELECT c.*,s.network_id,n.label network_label,
+                s.organization_id,o.label organization_label,s.practice_location_id,l.label location_label
+                FROM work_case c LEFT JOIN case_scope s ON s.case_id=c.id
+                LEFT JOIN network n ON n.id=s.network_id LEFT JOIN organization o ON o.id=s.organization_id
+                LEFT JOIN practice_location l ON l.id=s.practice_location_id"""+condition+"""
+                ORDER BY CASE c.risk_level WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END,
+                CASE WHEN c.follow_up < date('now') THEN 0 ELSE 1 END,c.created_at,c.id""",parameters+follow_parameters)]
+            from .follow_up import case_scopes
+            for row in rows:
+                row['source']=json.loads(row.pop('evidence'))['source']
+                scopes=case_scopes(conn,row['id'])
+                matching=[scope for scope in scopes if all(value is None or scope[column]==value for column,value in filters)]
+                row['follow_up_scopes']=matching if where else scopes
+                legacy_matches=all(value is None or row[column]==value for column,value in filters)
+                if matching and (row['network_id'] is None or not legacy_matches):
+                    for column in ('network_id','network_label','organization_id','organization_label','practice_location_id','location_label'):
+                        values={scope[column] for scope in matching}
+                        row[column]=next(iter(values)) if len(values)==1 else None
+        return {'items':rows}
+
+    def case(self, case_id):
+        with self.db() as conn:
+            row = conn.execute('select * from work_case where id=?', (case_id,)).fetchone()
+            if row is None:
+                raise KeyError('Work case not found')
+            case = dict(row)
+            case['evidence'] = json.loads(case['evidence'])
+            from .network_review import case_scope, review_evidence
+            case['scope'] = case_scope(conn,case_id)
+            from .follow_up import case_scopes
+            case['follow_up_scopes']=case_scopes(conn,case_id)
+            case['participation_review'] = review_evidence(conn,case_id)
+            case['history'] = [{**dict(r), 'payload': json.loads(r['payload'])} for r in conn.execute('select * from work_event where case_id=? order by id', (case_id,))]
+            case['later_evidence'] = [self.observation(dict(r)) for r in conn.execute('select o.* from observation o join work_evidence w on w.observation_id=o.id where w.case_id=? and (o.id != ? or ? IS NULL) order by o.retrieved_at', (case_id, case['evidence'].get('observation_id'),case['evidence'].get('observation_id')))]
+            return case
+
+    @staticmethod
+    def required(payload, field):
+        value = payload.get(field)
+        if value is None or not str(value).strip():
+            raise ValueError(field + ' is required')
+        return str(value).strip()
+
+    def event(self, case_id, payload):
+        actor, reason = self.required(payload,'actor'), self.required(payload,'reason')
+        with self.db() as conn:
+            conn.execute('begin immediate')
+            row = conn.execute('select * from work_case where id=?', (case_id,)).fetchone()
+            if row is None:
+                raise KeyError('Work case not found')
+            case = dict(row)
+            if payload.get('follow_up'):
+                from datetime import date
+                try:
+                    if date.fromisoformat(payload['follow_up']).isoformat() != payload['follow_up']:
+                        raise ValueError('Follow-up date is not canonical')
+                except (TypeError, ValueError) as exc:
+                    raise ValueError('Follow-up must use YYYY-MM-DD') from exc
+            if payload.get('expected_version') != case['version']:
+                raise Conflict('Case changed since it was opened. Refresh evidence; your draft is retained.')
+            action, status = payload.get('action'), case['status']
+            target = status
+            proposal, observed = case['proposal'], case['observed']
+            rules = {'triage': ({'new','reopened','deferred','needs_information'},'triaged'), 'approve': ({'triaged'},'approved'), 'submit': ({'approved'},'pending_verification'), 'verify': ({'pending_verification'},'verified'), 'defer': ({'new','triaged','reopened'},'deferred'), 'resolve': ({'new','triaged','needs_information'},'resolved')}
+            if action == 'outreach':
+                from .outreach import validate_outreach
+                payload = validate_outreach(payload)
+            elif action in {'assign','needs_information'}:
+                if action == 'assign':
+                    self.required(payload,'owner')
+                else:
+                    target = 'needs_information'
+            elif action in rules:
+                allowed, target = rules[action]
+                if status not in allowed:
+                    raise Conflict(f'Cannot {action} a {status} case')
+                if case['kind'] == 'qa' and action in {'approve','submit','verify'}:
+                    raise ValueError('QA disposition is separate from correction verification')
+                if case['kind'] == 'correction' and action == 'resolve':
+                    raise ValueError('Correction requires observed verification')
+                if action == 'approve':
+                    proposal = self.required(payload,'proposal')
+                    if len(normalize_phone(proposal)) != 10:
+                        raise ValueError('Proposed phone must contain ten digits')
+                if action == 'submit':
+                    self.required(payload,'submission_reference')
+                if action == 'verify':
+                    observed = self.required(payload,'observed')
+                    if len(normalize_phone(observed)) != 10:
+                        raise ValueError('Observed phone must contain ten digits')
+                    self.required(payload,'verification_note')
+                    if normalize_phone(observed) != normalize_phone(proposal):
+                        target = 'reopened'
+            else:
+                raise ValueError('Unsupported workflow action')
+            conn.execute('update work_case set status=?,owner=?,follow_up=?,proposal=?,observed=?,version=version+1,updated_at=? where id=? and version=?', (target,payload.get('owner',case['owner']),payload.get('follow_up',case['follow_up']),proposal,observed,now(),case_id,case['version']))
+            conn.execute('insert into work_event (case_id,action,actor,reason,payload,from_status,to_status,occurred_at) values (?,?,?,?,?,?,?,?)', (case_id,action,actor,reason,packed(payload),status,target,now()))
+        return self.case(case_id)
+
+    def relationship(self, payload):
+        actor, reason = self.required(payload,'actor'), self.required(payload,'reason')
+        provider, location = self.required(payload,'provider_id'), self.required(payload,'location_id')
+        with self.db() as conn:
+            conn.execute('begin immediate')
+            row = conn.execute('select * from observation where id=?',(payload.get('observation_id'),)).fetchone()
+            if row is None:
+                raise KeyError('Observation not found')
+            norm = json.loads(row['normalized'])
+            if provider != 'NPI:' + str(norm.get('npi','')):
+                raise ValueError('Provider relationship must use the exact observed NPI; ambiguous identity remains unresolved')
+            locations = norm.get('locations', [])
+            index = payload.get('location_index')
+            if len(locations) > 1 and index is None:
+                raise ValueError('Choose a native location index; a provider observation can contain several locations')
+            if index is not None:
+                if not isinstance(index, int) or index < 0 or index >= len(locations):
+                    raise ValueError('Native location index is out of range')
+                if locations[index].get('purpose') == 'MAILING':
+                    raise ValueError('Mailing evidence cannot establish an operating location')
+                norm = {**norm, **locations[index]}
+            conn.execute('insert into relationship (observation_id,provider_id,location_id,actor,reason,occurred_at,location_index) values (?,?,?,?,?,?,?)',(row['id'],provider,location,actor,reason,now(),index))
+            if len(locations) <= 1:
+                conn.execute('update observation set provider_id=?,location_id=? where id=?',(provider,location,row['id']))
+            receipt = dict(conn.execute('select r.* from receipt r join attempt a on a.receipt_id=r.id where a.id=?',(row['attempt_id'],)).fetchone())
+            observation = self.observation(dict(row)); observation.update(provider_id=provider,location_id=location,normalized=norm)
+            if index is not None:
+                observation['locator'] += '.' + locations[index].get('source_path', f'locations[{index}]')
+            self.link_work(conn,receipt,observation)
+        return {'observation_id': row['id'], 'provider_id':provider,'location_id':location,'actor':actor,'reason':reason}
+
+    def link(self, payload):
+        from urllib.parse import urlparse
+        url = self.required(payload,'url')
+        if urlparse(url).scheme not in {'http','https'}:
+            raise ValueError('Evidence links must use http or https')
+        receipt_id = uid()
+        with self.db() as conn:
+            conn.execute('insert into receipt values (?,?,?,?,?,?,?,?,?)',(receipt_id,self.required(payload,'title'),self.required(payload,'source'),'local',now(),None,'flat',None,packed({**payload,'assertion':'User supplied, not fetched or verified'})))
+        return self.detail(receipt_id)

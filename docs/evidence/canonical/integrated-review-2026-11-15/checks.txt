@@ -1,0 +1,3 @@
+Checked 63 Markdown documents; 0 local link or entrypoint errors
+Checked 12 bundled assets against authoritative files
+Staged source/Markdown whitespace passed with scoped raw-evidence attributes.

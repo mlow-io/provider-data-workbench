@@ -1,0 +1,16 @@
+
+> directory-review-console@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 <checkout>/web
+
+
+ Test Files  18 passed (18)
+      Tests  130 passed (130)
+   Start at  19:00:05
+   Duration  3.54s (tests 63%, environment 24%, import 6%, setup 4%, transform 1%)
+
+    Isolate  18 workers spawned · ~468ms startup each (spawn + environment, per file)
+             at least ~468ms faster with isolate: false — reuses workers across files instead of one per file
+

@@ -1,0 +1,57 @@
+{
+  "designation": "synthetic",
+  "parser_version": "fhir-plannet-r4-v2",
+  "resource_count": 8,
+  "resource_order": [
+    "Practitioner/synthetic-clinician",
+    "Organization/synthetic-clinic",
+    "Organization/synthetic-payer",
+    "Organization/synthetic-network",
+    "Location/north",
+    "Location/south",
+    "PractitionerRole/role-north",
+    "PractitionerRole/role-south"
+  ],
+  "match_roles": [
+    "role-north",
+    "role-south"
+  ],
+  "npi": "1000000004",
+  "provider_name": "Synthetic Example",
+  "source_network_reference": "Organization/synthetic-network",
+  "network_parent": "Organization/synthetic-payer",
+  "local_network_id": null,
+  "roles": [
+    {
+      "id": "role-north",
+      "role_locator": "$.entry[6].resource",
+      "location_locator": "$.entry[4].resource",
+      "phone": "617-555-0100",
+      "address_line": "10 Example St",
+      "zip": "02108",
+      "supporting_locators": [
+        "$.entry[0].resource",
+        "$.entry[1].resource",
+        "$.entry[3].resource",
+        "$.entry[4].resource",
+        "$.entry[6].resource"
+      ]
+    },
+    {
+      "id": "role-south",
+      "role_locator": "$.entry[7].resource",
+      "location_locator": "$.entry[5].resource",
+      "phone": "617-555-0200",
+      "address_line": "20 Example St",
+      "zip": "02108",
+      "supporting_locators": [
+        "$.entry[0].resource",
+        "$.entry[1].resource",
+        "$.entry[3].resource",
+        "$.entry[5].resource",
+        "$.entry[7].resource"
+      ]
+    }
+  ],
+  "role_contact_phone": "617-555-0300"
+}
