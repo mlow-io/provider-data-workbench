@@ -47,6 +47,10 @@ def mount(app, store):
     def version(version_id: str):
         return feeds.version(version_id)
 
+    @app.get('/api/feed-versions/{version_id}/quality-report')
+    def quality_report(version_id: str):
+        return JSONResponse(feeds.quality_report(version_id), headers={'Content-Disposition': f'attachment; filename=quality-review-{version_id}.json'})
+
     @app.get('/api/feed-versions/{version_id}/field-materialization')
     def field_materialization_choices(version_id: str, offset: int = 0, limit: int = 20):
         from .field_materialization import FieldMaterialization

@@ -42,3 +42,5 @@ PYTHONPATH=src python3 scripts/evaluation/independent/run.py --root /tmp/provide
 Choose a new invocation-owned root. The runner rejects existing storage, validates the frozen case digest, creates isolated synthetic receipts and writes `result.json`. It makes no external call. Replay confirms service behavior for saved predictions; it is not another inference sample. Retain compact results, then retire only the owned fixture storage. To repeat the inference experiment, independently author and freeze a new hidden key and new cases before a separate proposer sees their inputs.
 
 Case authors must not propose or grade their own predictions. Adversarial cells must be visible at prediction time to support any claim about their handling. Production-model and participant trials keep their separate evidence/permission boundaries.
+
+The replay reviewer is limited to the nine target fields in this challenge. Proposals that add another canonical field are rejected before storage/review; extend the frozen expectations before evaluating a broader mapping. The original captured proposals contain no extra fields, so this guard does not alter their historical 54/54 result.

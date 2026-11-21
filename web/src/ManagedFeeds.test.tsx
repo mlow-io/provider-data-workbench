@@ -64,6 +64,8 @@ test("held candidate leaves prior approved version available and requires separa
   render(<ManagedFeeds />);
   await openCandidate();
   expect(screen.getByRole("link", { name: "Download current approved JSON" })).toHaveAttribute("href", "/api/feed-versions/approved-1/export");
+  expect(screen.getByRole("link", { name: "Download complete quality report JSON" })).toHaveAttribute("href", "/api/feed-versions/candidate-2/quality-report");
+  expect(screen.getByText(/It is review evidence, not an approved dataset export/)).toBeVisible();
   expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeDisabled();
   expect(calls.filter(call => call.body)).toHaveLength(0);
   expect(screen.getByText(/Period: 2026-11-02/)).toBeVisible();

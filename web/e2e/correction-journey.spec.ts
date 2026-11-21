@@ -63,6 +63,13 @@ test('reviewed phone creates a separately approved candidate with complete corre
   expect((await get(`/api/feeds/${feed.id}/current`)).version_id).toBe(base);
   const candidate = new URL(page.url()).searchParams.get('version')!;
   expect(candidate).not.toBe(base);
+  const qualityDownload = page.waitForEvent('download');
+  await page.getByRole('link', { name: 'Download complete quality report JSON' }).click();
+  const quality = JSON.parse(readFileSync((await (await qualityDownload).path())!, 'utf8'));
+  expect(quality).toMatchObject({version_id: candidate, feed_id: feed.id, state: 'candidate', notice: 'Review evidence only; not an approved dataset export'});
+  expect(quality.report.counts.valid).toBe(2);
+  expect(quality).not.toHaveProperty('records');
+  expect((await get(`/api/feeds/${feed.id}/current`)).version_id).toBe(base);
   await page.getByRole('button',{name:'Approve dataset version'}).click();
   await expect(page.getByRole('heading',{name:'Dataset review · approved'})).toBeVisible();
   expect((await get(`/api/feeds/${feed.id}/current`)).version_id).toBe(candidate);

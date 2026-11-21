@@ -55,6 +55,9 @@ def run(root):
     require(sha(HERE / 'cases.json') == proposals['provenance']['cases_sha256'], 'Cases changed after proposals were frozen')
     expectations = {case['id']: case for case in key['cases']}
     require(set(expectations) == {case['id'] for case in cases} == set(proposals['proposals']), 'Case identities differ')
+    # The synthetic reviewer may approve only what this frozen key evaluates.
+    for proposal in proposals['proposals'].values():
+        require(not set(proposal['mapping']) - set(FIELDS), 'Proposal maps undeclared target fields; extend the frozen evaluation before review')
     root.mkdir(parents=True)
     store = IntakeStore(root / 'directory.sqlite3', root)
     service = OnboardingService(store)

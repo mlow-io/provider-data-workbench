@@ -440,7 +440,7 @@ Acquisition applies the same strict bounded UTF-8 decoder to search and standalo
 
 ## Bounded approved workbook preview
 
-`GET /api/feed-versions/{version_id}/review-preview?limit=5` uses the same approved-version/optional `location_id`/`expected_snapshot` checks as review-export. `limit` is 1–50; default 5. It returns complete snapshot counts and the full export's token, but bounds `directory`, `unresolved_issues` and `sources` independently. `preview` contains `limit`, `returned`, `truncated` and `complete_export=false`; manifest/approval detail is omitted. Counts describe complete populations, not the lengths of the sample arrays. Full JSON and XLSX remain at review-export; the workbook request still requires expected_snapshot. See [the workbook contract](REVIEW_WORKBOOK_CONTRACT.md).
+`GET /api/feed-versions/{version_id}/review-preview?limit=5` uses the same approved-version/optional `location_id`/`expected_snapshot` checks as review-export. `limit` is 1–50; default 5. It returns complete snapshot counts and the full export's token, but bounds `directory`, `unresolved_issues`, `sources` and `corrections` independently. `preview` contains `limit`, `returned`, `truncated` and `complete_export=false`; manifest/approval detail is omitted. Counts describe complete populations, not the lengths of the sample arrays. Full JSON and XLSX remain at review-export; the workbook request still requires expected_snapshot. See [the workbook contract](REVIEW_WORKBOOK_CONTRACT.md).
 
 ## Reviewed office-phone candidate materialization (S1.3)
 
@@ -453,3 +453,9 @@ The ordinary `POST /api/feed-versions/{id}/decide` is still required to approve 
 Approved review-export uses [format 2](REVIEW_WORKBOOK_CONTRACT.md), adding extensions and traceable corrections. UI downloads complete JSON or XLSX with the same full snapshot token; five-row samples do not limit either download.
 
 For a subsequent source version, `report.effective_corrections` distinguishes incoming assertions from corrected baseline values while `report.comparison` retains source-to-source history. It includes pinned `baseline_version`, counts, total and phone/extension entries with native keys and locators. Interactive version detail caps entries at 50 with `entry_count`; full approved-dataset exports retain all. Differing/missing/invalid/ambiguous assertions produce the ordinary `effective_correction_drift` hold and require explicit acknowledgement before source approval.
+
+## Complete version quality report
+
+`GET /api/feed-versions/{version_id}/quality-report` downloads `quality-review-{version_id}.json` for a candidate, approved or rejected version. Missing versions return 404. The response is `{version_id, feed_id, state, report_hash, report, notice}`. The report retains every source/effective-correction comparison entry and finding; it is not the 50-entry interactive sample. The version/report hash pin immutable quality evidence; `state` is the dataset decision at read time.
+
+The notice identifies review evidence, not an approved dataset export. No records/quarantine consumer envelope is returned and no state changes occur. Comparison entries can include normalized provider values needed for review; this is not a confidentiality boundary. The existing approved-dataset export remains unavailable before approval, and acknowledgment is still separate from approval. The delivery UI links this complete evidence before its decision controls.

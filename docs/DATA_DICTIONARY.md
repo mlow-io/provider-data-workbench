@@ -341,3 +341,7 @@ The report is recomputed from digest-verified retained pages before publication;
 ## Native parser revision R2
 
 `fhir-plannet-r4-v2` is an interpretation version, not a schema version or source `meta.versionId`. Its supported Network profile set is the bare canonical or exact `|1.2.0`; unknown explicit versions remain unresolved. The Plan-Net 1.2 subset permits at most one Network-reference extension per role projection. Multiple references remain in original/native evidence with a cardinality finding; no preferred network or office cross-product is invented. Old v1 attempts/observations remain immutable until a separately reviewed new interpretation. The [eight-resource qualification](evidence/canonical/provider-graph-2026-11-14/README.md) retains NORTH/SOUTH export locators and explicit local binding boundaries.
+
+## Derived roster and review projections (no schema migration)
+
+Reviewed-phone candidates reuse the managed-feed version/job/delivery tables. Immutable version rows and manifests retain materialization lineage as specified in [S1.3](FIELD_MATERIALIZATION_SPEC.md); the effective-correction comparison lives in the persisted quality report. The complete quality-report HTTP attachment projects that report, its hash, version/feed IDs and current decision state. It creates no new table or acceptance event. Report values are review evidence; they are not an approved-dataset envelope. See [the API](API_REFERENCE.md#complete-version-quality-report) and [review workbook format 2](REVIEW_WORKBOOK_CONTRACT.md).

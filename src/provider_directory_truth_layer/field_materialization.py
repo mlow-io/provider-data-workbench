@@ -16,8 +16,9 @@ class FieldMaterialization:
         self.store = store
         self.fields = FieldReconciliation(store)
 
-    def _selection(self, conn, base, clinician_id, location_id, snapshot, decision_id):
-        view = self.fields._view(conn, clinician_id, location_id)
+    def _selection(self, conn, base, clinician_id, location_id, snapshot, decision_id, *, view=None):
+        if view is None:
+            view = self.fields._view(conn, clinician_id, location_id)
         if not view['inputs_fresh'] or view['snapshot'] != snapshot:
             raise Conflict('Reviewed source, link or field snapshot changed; inspect again')
         field = next(f for f in view['fields'] if f['field'] == 'phone')
@@ -87,7 +88,7 @@ class FieldMaterialization:
                 if field['status'] != 'selected':
                     continue
                 try:
-                    item = self._selection(conn, base, scope['clinician_id'], scope['location_id'], view['snapshot'], field['decision']['id'])
+                    item = self._selection(conn, base, scope['clinician_id'], scope['location_id'], view['snapshot'], field['decision']['id'], view=view)
                 except (ValueError, KeyError, Conflict):
                     continue
                 item.update(clinician_label=view['clinician']['label'], location_label=view['location']['label'])

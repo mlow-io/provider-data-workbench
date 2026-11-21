@@ -554,6 +554,19 @@ class ManagedFeed:
                 effective['entries'] = effective['entries'][:50]
         return result
 
+    def quality_report(self, version_id):
+        """Return complete quality evidence; dataset-consumption approval stays separate."""
+        with self.store.db() as conn:
+            row = conn.execute('''SELECT v.id, v.feed_id, v.report_hash, v.report, d.decision
+                                  FROM feed_version v LEFT JOIN feed_decision d ON d.version_id=v.id
+                                  WHERE v.id=?''', (version_id,)).fetchone()
+            if row is None:
+                raise KeyError('Dataset version not found')
+            return {'version_id': row['id'], 'feed_id': row['feed_id'],
+                    'state': row['decision'] or 'candidate', 'report_hash': row['report_hash'],
+                    'report': json.loads(row['report']),
+                    'notice': 'Review evidence only; not an approved dataset export'}
+
     def review(self, version_id, payload):
         actor, reason = required(payload, 'actor'), required(payload, 'reason')
         with self.store.db() as conn:
