@@ -19,7 +19,7 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener, HTTPSHand
 
 import certifi
 
-VERSION = "intake-public-v1"
+VERSION = "intake-public-v2"
 MAX_BYTES = 10 * 1024 * 1024
 MAX_RECORDS = 200
 NPPES_URL = "https://npiregistry.cms.hhs.gov/api/"
