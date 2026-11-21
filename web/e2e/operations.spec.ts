@@ -1,3 +1,4 @@
+import { textContrast } from './support/contrast';
 import { expect, test } from '@playwright/test';
 import { spawn, execFileSync, type ChildProcess } from 'node:child_process';
 import { mkdtemp, readFile } from 'node:fs/promises';
@@ -73,11 +74,26 @@ test('combined retained workflow exposes held data, native findings, scoped NORT
     const exportReview=page.getByRole('region',{name:'Approved export review',exact:true});
     await expect(exportReview.getByText('Directory rows',{exact:true})).toBeVisible();
     await expect(exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true})).toBeEnabled();
+    const primaryExport = exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true});
+    if (info.project.name === 'mobile') expect((await primaryExport.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    const normalContrast = await textContrast(primaryExport);
+    await primaryExport.hover();
+    const hoverContrast = await textContrast(primaryExport);
+    expect(normalContrast).toBeGreaterThanOrEqual(4.5);
+    expect(hoverContrast).toBeGreaterThanOrEqual(4.5);
+    await info.attach('export-control-contrast', {body:JSON.stringify({normal:normalContrast,hover:hoverContrast}),contentType:'application/json'});
     const workbookDownload=page.waitForEvent('download');
     await exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true}).click();
     const workbookPath=info.outputPath('approved-review.xlsx');await (await workbookDownload).saveAs(workbookPath);
     expect((await readFile(workbookPath)).subarray(0,2).toString()).toBe('PK');
     await expect(exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true})).toBeEnabled();
+    if (info.project.name === 'mobile') {
+      const issueTable = exportReview.getByRole('region',{name:'Unresolved export issues',exact:true});
+      await issueTable.focus();
+      await page.keyboard.press('ArrowRight');
+      await expect.poll(()=>issueTable.evaluate(element=>element.scrollLeft)).toBeGreaterThan(0);
+      await issueTable.evaluate(element=>{element.scrollLeft=0;});
+    }
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     await page.evaluate(()=>scrollTo(0,0));
     await page.screenshot({path:info.outputPath('compact-delivery-overview.png')});

@@ -149,3 +149,23 @@ test("deep-linked delivery opens its detail and returning to the list restores f
   mounted.unmount();
   act(() => window.history.replaceState({}, "", "/"));
 });
+
+
+test("returning to deliveries does not steal focus from the operator's next control", async () => {
+  api();
+  const frames: FrameRequestCallback[] = [];
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => { frames.push(callback); return frames.length; });
+  window.history.replaceState({}, "", "?view=feeds&feed=feed-1&version=candidate-2");
+  render(<ManagedFeeds />);
+  const detail = await screen.findByRole("region", { name: "Dataset review · candidate" });
+  await waitFor(() => expect(detail).toHaveFocus());
+  const back = screen.getByRole("button", { name: /Back to deliveries/ });
+  back.focus();
+  fireEvent.click(back);
+  const next = screen.getByRole("button", { name: /candidate · 2026-11-02/ });
+  next.focus();
+  act(() => { for (const frame of frames.splice(0)) frame(16); });
+  expect(next).toHaveFocus();
+  fireEvent.click(next);
+  await waitFor(() => expect(detail).toHaveFocus());
+});

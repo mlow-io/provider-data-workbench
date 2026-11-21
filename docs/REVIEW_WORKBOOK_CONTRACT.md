@@ -61,3 +61,9 @@ Resolve original bytes through `GET /api/intakes/{receipt_id}/artifact`, validat
 - AI-08: concurrent WAL writer between first read and work-case reads proves one consistent database snapshot rather than a mixture of old and new work state.
 
 Remaining scope: adaptive one-off imports do not acquire dataset approval through this endpoint; managed-feed approval is the existing consumable boundary. Field-reconciliation decisions are not automatically promoted into a candidate dataset. Recipient-specific upload templates and FHIR export are deferred. AI-09 requires separate populated UI/browser evidence and owner review.
+
+## Implemented bounded preview extension
+
+`GET /api/feed-versions/{version_id}/review-preview?limit=5` returns at most 50 rows of each sample array, with the same full-snapshot token, complete counts and scope as review-export. The default limit is 5; valid limits are 1–50. `preview` declares the requested limit, returned populations and truncated arrays. The UI labels samples explicitly and downloads the complete workbook through review-export with expected_snapshot. Full JSON/XLSX export remains complete. The server still constructs and hashes the full consistent snapshot, so bounded response size does not imply bounded server work; measure both at 100 and 1,000 records.
+
+Preview section samples are independent and do not promise complete source-reference closure; use the complete JSON/workbook for that purpose. Omitting manifest/approval detail from the preview response does not change the full snapshot hash. Invalid limits return 422 and a stale expected_snapshot returns 409 under the existing handlers. Tests inspect complete XLSX output using a sample token and independently verify the HTTP response bounds.

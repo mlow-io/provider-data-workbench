@@ -99,7 +99,7 @@ Evaluate against current deterministic suggestions on a frozen, held-out set of 
 
 ## Selected UI migration target
 
-The prior release is an incremental React/CSS interface. The [workbench migration plan](docs/UI_WORKBENCH_MIGRATION.md) defines the proposed React/Vite + shadcn/ui/Tailwind migration with an official shell block, table/inspector layout and staged U1 revisions. WM-01–08 are additional acceptance targets. NEXT selects UI-W0 design/compatibility planning before production dependency changes; this is not an installed capability.
+The shared shell and primary delivery/import/mapping/reconciliation controls now use React/Vite, official shadcn Radix Nova primitives and Tailwind. The [migration contract](docs/UI_WORKBENCH_MIGRATION.md) retains staged U1 revisions and WM-01–12. The [100/1,000-record qualification](docs/UI_QUALIFICATION.md) records measured engineering checks, actual downloads and remaining owner/human/supporting-surface limits. No 10,000-record qualification is selected. NEXT resumes reviewed-field candidate materialization after this bounded qualification; installed components do not by themselves establish usability or complete legacy retirement.
 
 ## Web interface and data-management requirements
 Source setup, received delivery, interpretation preview, quality findings, reviewed links, dataset approval, investigation and exports must be reachable through the existing navigation with selected source/version context intact. Each screen states the current scope, next useful action and blocked/partial/stale state. A reviewer can trace an exported value to its original resource/row, applied rule and decision without using SQL.

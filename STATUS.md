@@ -30,6 +30,12 @@ The core non-AI operations demonstration and all R1–R4 engineering follow-ups 
 The [UI migration](docs/UI_WORKBENCH_MIGRATION.md) is now implemented for the shared shell and primary delivery/import/mapping/reconciliation controls using official shadcn Radix Nova and Tailwind 4. Delivery table/inspector, mobile detail return, evidence tabs and route code splitting are connected to existing services. [The migration receipt](docs/evidence/canonical/workbench-migration-2026-11-21/README.md) records checks and limits. Supporting legacy surfaces and measured scale/interaction/owner-human acceptance gates remain open; component-system adoption does not close them.
 
 
+## Selected UI/performance qualification
+
+The [qualification receipt](docs/evidence/canonical/ui-qualification-2026-11-21/README.md) records production-build measurements at 100/1,000 synthetic records, bounded five-row preview responses with complete counts/tokens, independently inspected full workbooks, actual touch/keyboard/list-detail behavior, repeated-navigation heap observations and a separate slowed CPU/network trial. No 10,000-record run was performed. Python 907 and frontend 144 tests pass; full browser 74 and final affected 16 scenarios pass. The receipt records scope and failures separately. Source/reference demo code was inspected without importing its private Site identity or browser-local storage design.
+
+The new preview reduces transfer but still computes the full snapshot. Primary hover contrast and coarse-pointer target sizing were refined during qualification. Owner visual/human gates and supporting legacy retirement remain separate. The user prioritized this qualification before correction features; correction/agent-evaluation drafts are retained separately and excluded from this release.
+
 ## Latest adaptive release verification
 
 - Python: 906 passed with propagated checkout source path.

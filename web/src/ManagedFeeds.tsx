@@ -83,7 +83,12 @@ export function ManagedFeeds() {
   function returnToDeliveries() {
     focusDetailRef.current = false;
     setFocusDetail(false);
-    requestAnimationFrame(() => { if (!focusDetailRef.current) listRef.current?.focus(); });
+    requestAnimationFrame(() => {
+      const focused = document.activeElement;
+      // Restore focus only while it is still in the hidden detail. A user who
+      // already moved to a list or navigation control keeps that new focus.
+      if (!focusDetailRef.current && (focused === document.body || inspectorRef.current?.contains(focused))) listRef.current?.focus();
+    });
   }
 
   async function loadRegistry() {

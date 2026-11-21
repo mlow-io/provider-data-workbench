@@ -1,10 +1,10 @@
 # Roadmap
 
-Updated 2026-11-21. **Ingestion-first product evolution supersedes the November 19 PX1-first order.** Build one adaptable provider-data workbench with explicit module boundaries. Import breadth, reviewed cleaning/mapping and preserved decisions are the foundation; contact review proves the first complete workflow, followed by licensing, identity and network operations. [SPEC](SPEC.md) defines global behavior; [S1](docs/ADAPTIVE_INGESTION_SPEC.md) is the draft next-release contract; [STATUS](STATUS.md) reports actual outcomes.
+Updated 2026-11-21. **Ingestion-first product evolution supersedes the November 19 PX1-first order.** Build one adaptable provider-data workbench with explicit module boundaries. Import breadth, reviewed cleaning/mapping and preserved decisions are the foundation; contact review proves the first complete workflow, followed by licensing, identity and network operations. [SPEC](SPEC.md) defines global behavior; [S1](docs/ADAPTIVE_INGESTION_SPEC.md) retains the selected release contract and unclosed goals; [STATUS](STATUS.md) reports actual outcomes.
 
 ## Selected workbench migration
 
-The incremental S1.1 UI does not complete component-system adoption. [UI-W0–W5](docs/UI_WORKBENCH_MIGRATION.md) now sequences a populated design spike, shadcn/Tailwind foundation, one complete delivery workbench, import/mapping migration, remaining discrepancy/provider tools and retirement/qualification. Each stage has a U1 spec revision and WM acceptance gates. The shared shell and primary delivery/import/mapping/reconciliation components are implemented; STATUS and the migration receipt identify remaining qualification/supporting-surface gates. NEXT selects performance and supporting-surface qualification. Resume field-candidate materialization after UI-W2 qualification; preserve all later domain milestones and separate actual-model/human gates.
+The incremental S1.1 UI does not complete component-system adoption. [UI-W0–W5](docs/UI_WORKBENCH_MIGRATION.md) now sequences a populated design spike, shadcn/Tailwind foundation, one complete delivery workbench, import/mapping migration, remaining discrepancy/provider tools and retirement/qualification. Each stage has a U1 spec revision and WM acceptance gates. The shared shell and primary delivery/import/mapping/reconciliation components are implemented; STATUS and the migration receipt identify remaining qualification/supporting-surface gates. The [100/1,000-record engineering qualification](docs/UI_QUALIFICATION.md) records actual preview/export and responsiveness checks. NEXT resumes field-candidate materialization; supporting legacy retirement and owner/human evidence remain explicit gates. preserve all later domain milestones and separate actual-model/human gates.
 
 ## Active planning and first release
 
@@ -38,7 +38,7 @@ Before each milestone: inspect current code and STATUS; draft the named revision
 
 After each milestone: inspect outputs and history, run required affected checks, retain failures and limits, update STATUS and the acceptance map, and draft the next revision. Keep one active milestone. The next agent may choose implementation details within agreed contracts; it must not redefine record meaning, remove approval boundaries or quietly broaden source/model scope.
 
-Use one application, Python/FastAPI, React/TypeScript, SQLite and retained artifacts until requirements justify change. UI component selection is finalized during P0; shadcn/ui is the current candidate. Do not add infrastructure solely to increase the technology list.
+Use one application, Python/FastAPI, React/TypeScript, SQLite and retained artifacts until requirements justify change. The primary client now uses official shadcn Radix Nova primitives and Tailwind; qualify changes against the selected workbench contracts. Do not add infrastructure solely to increase the technology list.
 
 ## Proposed provider research and exchange extension
 

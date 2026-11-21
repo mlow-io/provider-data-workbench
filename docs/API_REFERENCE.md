@@ -437,3 +437,7 @@ Native parser `fhir-plannet-r4-v2` recognizes the bare Plan-Net Network canonica
 ## Retained FHIR JSON consistency (R4)
 
 Acquisition applies the same strict bounded UTF-8 decoder to search and standalone-reference bodies, before requested identity checks or assembly. Duplicate properties, nonfinite numbers, excessive depth/nodes or bytes fail visibly with the exact original response retained. Publication also re-decodes digest-verified retained bodies, including queued pre-fix references; old completed receipts remain unchanged. UTF-8 BOM remains accepted. No response/acceptance schema or native parser-v2 projection changes. See [the source contract](PUBLIC_DATA_SOURCES.md#strict-retained-json-consistency-r4).
+
+## Bounded approved workbook preview
+
+`GET /api/feed-versions/{version_id}/review-preview?limit=5` uses the same approved-version/optional `location_id`/`expected_snapshot` checks as review-export. `limit` is 1–50; default 5. It returns complete snapshot counts and the full export's token, but bounds `directory`, `unresolved_issues` and `sources` independently. `preview` contains `limit`, `returned`, `truncated` and `complete_export=false`; manifest/approval detail is omitted. Counts describe complete populations, not the lengths of the sample arrays. Full JSON and XLSX remain at review-export; the workbook request still requires expected_snapshot. See [the workbook contract](REVIEW_WORKBOOK_CONTRACT.md).

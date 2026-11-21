@@ -98,6 +98,18 @@ def snapshot(path: Path, version_id: str, location_id: str | None = None, expect
         return result
 
 
+def preview(path: Path, version_id: str, location_id: str | None = None, expected_snapshot: str | None = None, limit: int = 5) -> dict:
+    """Bound transfer while retaining the complete snapshot's counts and token."""
+    if not 1 <= limit <= 50:
+        raise ValueError('Preview limit must be between 1 and 50')
+    data = snapshot(path, version_id, location_id, expected_snapshot)
+    arrays = ('directory', 'unresolved_issues', 'sources')
+    result = {key: value for key, value in data.items() if key not in (*arrays, 'manifest', 'approval')}
+    result.update({key: data[key][:limit] for key in arrays})
+    result['preview'] = {'limit': limit, 'returned': {key: len(result[key]) for key in arrays}, 'truncated': {key: len(data[key]) > limit for key in arrays}, 'complete_export': False}
+    return result
+
+
 def workbook(data: dict) -> bytes:
     """Render only materialized data; literal strings prevent formula execution."""
     book = Workbook()

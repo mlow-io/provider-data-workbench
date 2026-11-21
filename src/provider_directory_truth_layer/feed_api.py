@@ -59,6 +59,11 @@ def mount(app, store):
     def export(version_id: str):
         return JSONResponse(feeds.export(version_id), headers={'Content-Disposition': f'attachment; filename=approved-dataset-{version_id}.json'})
 
+    @app.get('/api/feed-versions/{version_id}/review-preview')
+    def review_preview(version_id: str, location_id: str | None = None, expected_snapshot: str | None = None, limit: int = 5):
+        from .review_workbook import preview
+        return preview(store.path, version_id, location_id, expected_snapshot, limit)
+
     @app.get('/api/feed-versions/{version_id}/review-export')
     def review_export(version_id: str, format: str = 'json', location_id: str | None = None, expected_snapshot: str | None = None):
         from .review_workbook import snapshot, workbook

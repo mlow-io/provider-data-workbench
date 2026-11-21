@@ -265,3 +265,27 @@ def test_record_grain_and_office_namespaces_do_not_invent_clinician_identity(tmp
                 target = directory[issue['directory_row_id']]
                 assert issue['office_key'] == target['office_key']
                 assert issue['source_record_key'] == target['source_record_key']
+
+
+def test_bounded_preview_keeps_full_snapshot_counts_and_download_scope(tmp_path):
+    from provider_directory_truth_layer.review_workbook import preview
+    store, _, _, _, version = ready(tmp_path)
+    whole = snapshot(store.path, version)
+    sample = preview(store.path, version, limit=1)
+    assert sample['counts'] == whole['counts']
+    assert sample['snapshot_id'] == whole['snapshot_id']
+    assert len(sample['directory']) == len(sample['sources']) == 1
+    assert sample['preview']['truncated']['directory']
+    assert not sample['preview']['complete_export']
+    assert 'manifest' not in sample and 'approval' not in sample
+    full = snapshot(store.path, version, expected_snapshot=sample['snapshot_id'])
+    book = load_workbook(io.BytesIO(workbook(full)))
+    assert len(sheet_rows(book, 'Directory')) == whole['counts']['directory']
+    client = TestClient(create_workbench(store.path, store.root, demo=False))
+    response = client.get(f'/api/feed-versions/{version}/review-preview?limit=1')
+    assert response.status_code == 200
+    assert response.json()['preview']['returned']['directory'] == 1
+    for limit in [0, 51]:
+        assert client.get(f'/api/feed-versions/{version}/review-preview?limit={limit}').status_code == 422
+    with pytest.raises(Conflict):
+        preview(store.path, version, expected_snapshot='stale', limit=1)

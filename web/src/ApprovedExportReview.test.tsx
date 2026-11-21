@@ -11,6 +11,8 @@ test("previews approved scope and rejects a workbook when its issue snapshot cha
   expect(fetcher).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Preview approved workbook" }));
   await screen.findByText(/Open issues as of/);
+  expect(fetcher.mock.calls[0][0]).toContain("review-preview?limit=5");
+  expect(screen.getByText(/download includes all 2 approved directory rows/)).toBeVisible();
   expect(screen.getByText("Unresolved issues")).toBeInTheDocument();
   expect(screen.getByRole("status")).toHaveTextContent("1 cross-scope case excluded");
   expect(screen.getByRole("status")).toHaveTextContent("another dataset scope");

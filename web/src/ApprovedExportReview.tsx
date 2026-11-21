@@ -9,6 +9,7 @@ type ExportPreview = {
   snapshot_at: string;
   counts: { directory: number; unresolved_issues: number; sources: number; quarantined_rows: number; excluded_cross_scope_cases?: number };
   scope_notice?: string;
+  preview?: {limit: number; returned: Record<string, number>; truncated: Record<string, boolean>; complete_export: false};
   directory: Record<string, unknown>[];
   unresolved_issues?: Record<string, unknown>[];
 };
@@ -33,7 +34,7 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
     const requestGeneration = ++generation.current;
     setBusy(true); setError(""); setPreview(null);
     try {
-      const data = await (await check(await fetch(base))).json() as ExportPreview;
+      const data = await (await check(await fetch(`${base.replace("review-export", "review-preview")}?limit=5`))).json() as ExportPreview;
       if (generation.current === requestGeneration) {
         if (data.version_id !== versionId) throw new Error("Export preview does not match the selected dataset version.");
         setPreview(data);
@@ -69,6 +70,8 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
         <div><dt>Quarantined rows</dt><dd>{preview.counts.quarantined_rows}</dd></div>
       </dl>
       {!!preview.counts.excluded_cross_scope_cases && <p className="iw-notice" role="status">{preview.counts.excluded_cross_scope_cases} cross-scope {preview.counts.excluded_cross_scope_cases === 1 ? "case" : "cases"} excluded. {preview.scope_notice || "This issue list is limited to the selected dataset scope."}</p>}
+      <p className="iw-muted">Preview samples up to {preview.preview?.limit ?? 5} rows per section; the download includes all {preview.counts.directory} approved directory rows.</p>
+      <p className="iw-muted mf-scroll-hint">Scroll wide tables sideways to see all columns.</p>
       <p className="iw-muted">Open issues as of {preview.snapshot_at}. Directory, unresolved issues and sources remain separate workbook sheets.</p>
       {preview.directory.length > 0 && <details><summary>Inspect directory sample ({Math.min(preview.directory.length, 5)} rows)</summary>
         <div className="mf-evidence-table" role="region" aria-label="Approved directory export sample" tabIndex={0}><Table><TableHeader><TableRow>{sampleFields.map(field => <TableHead key={field} scope="col">{field.replaceAll("_", " ")}</TableHead>)}</TableRow></TableHeader><TableBody>{preview.directory.slice(0, 5).map((row, index) => <TableRow key={index}>{sampleFields.map(field => <TableCell key={field}>{row[field] === null ? "Null" : typeof row[field] === "object" ? JSON.stringify(row[field]) : String(row[field] ?? "Absent")}</TableCell>)}</TableRow>)}</TableBody></Table></div>

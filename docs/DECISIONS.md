@@ -234,3 +234,7 @@ Retain the React/Vite and shadcn/Tailwind proposal with existing TanStack librar
 ## 2026-11-21 — Component-system implementation
 
 Owner authorized migration after reviewing the visual/performance plan. Select official shadcn Radix Nova primitives, Tailwind 4, Lucide and locally served IBM Plex Sans; compose the inspected Sidebar pattern with actual application navigation. Preserve Table 8, routing and all approval services. Move major workspaces behind lazy boundaries, explicitly layer legacy CSS and retire competing primary control selectors as touched. Keep small-preview/full-export payload behavior visible as a performance follow-up. Bounded workers now default to GPT-6.1 Terra medium, with high for interaction/integration complexity, following the owner's corrected preference.
+
+## 2026-11-21 — Qualify the existing UI before correction features
+
+The owner prioritized UI/performance completion at 100 and 1,000 records and explicitly excluded 10,000-record testing. Isolate the correction and coached agent-evaluation drafts from the qualification release. Add a bounded sample endpoint over the existing full read-only export snapshot; retain full tokens/counts and complete JSON/XLSX behavior. Record production browser timing, finite heap and slowed-condition observations rather than inferring speed from bundle sizes. Strengthen primary hover contrast and coarse-pointer targets, and retain actual download/keyboard checks in the flow. The separate static CRUD reference informed interaction clarity; its storage, account data and code were not copied.

@@ -84,3 +84,5 @@ python3 scripts/sync_bundled_assets.py
 Tests use owned disposable storage. [Operator procedures](docs/operations_governance/sop_provider_remediation.md) cover stopped backup/restore. Private preparation, credentials and actual-source runtime data stay outside the repository.
 
 The component-system migration adds a responsive sidebar, delivery table/inspector, evidence tabs and shared intake/mapping/reconciliation controls. Major workspaces load on demand. The [migration record](docs/evidence/canonical/workbench-migration-2026-11-21/README.md) retains frontend/build/browser checks, inspected synthetic captures and remaining performance/supporting-surface limits.
+
+The [UI qualification protocol](docs/UI_QUALIFICATION.md) includes a reproducible production-build benchmark at 100 and 1,000 synthetic records, bounded previews and complete workbook inspection. [The results and flows](docs/evidence/canonical/ui-qualification-2026-11-21/README.md) retain raw metrics, captures and limits.

@@ -51,3 +51,12 @@
   width: 16px; min-width: 16px; height: 16px; min-height: 16px;
   padding: 0; flex-shrink: 0; accent-color: var(--primary);
 }
+
+/* Keep compact desktop controls while making coarse-pointer actions reachable. */
+@media (pointer: coarse) {
+  .wb-app button,
+  .wb-app [role="tab"],
+  .wb-app [data-slot="input"],
+  .wb-app [data-slot="native-select"] { min-height: 44px; }
+  .wb-app button { min-width: 44px; }
+}

@@ -68,3 +68,9 @@
   .mf-detail-return { display: inline-flex; margin-bottom: .75rem; }
 }
 @media (max-width: 500px) { .mf-form, .mf-meta { grid-template-columns: minmax(0, 1fr); } .mf-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .mf-actions [data-slot="button"] { white-space: normal; height: auto; min-height: 44px; } }
+
+/* The named, focusable frame owns scrolling, including keyboard arrow input. */
+.mf-evidence-table { overflow-x: auto; }
+.mf-evidence-table > [data-slot="table-container"] { overflow: visible; }
+.mf-scroll-hint { display: none; }
+@media (max-width: 767px) { .mf-scroll-hint { display: block; } }

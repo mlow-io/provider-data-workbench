@@ -85,3 +85,9 @@ Remove stale capability statements from current docs. Keep historical receipts d
 | UX5 | An analyst can reach the original evidence and export selected work; visible summaries agree with actual serialized outputs. |
 
 Use P0 to specify the populated ingestion-to-export journey and P1 to implement its approved first slice. Apply its components and interaction rules to provider records, investigation, exchanges and sources as those slices are touched. Build operations reporting from its [separate measure contract](OPERATIONAL_MEASURES.md). Human observation remains distinct from automated browser checks.
+
+## Qualified review and export flow
+
+The [100/1,000-record qualification](UI_QUALIFICATION.md) records the current populated review/handoff journey and its measured bounds. Source and delivery context stay visible; complete population counts precede samples. The workbook preview displays at most five rows per section and explicitly states that the download includes the complete selected approved population. Its token comes from the full consistent snapshot; stale work requires refreshing the preview. Candidate state and dataset approval remain separate.
+
+On narrow screens the operator returns to the delivery list, activates a version with Enter and receives inspector focus. Wide preview tables have an explicit sideways-scroll hint, and their focusable frames support Arrow Right. Returning to the list preserves any focus move the operator already made. Coarse-pointer controls have a 44 px minimum; the primary export action has checked normal/hover contrast. Inspect actual [narrow export](evidence/canonical/ui-qualification-2026-11-21/export-1000-narrow.png) and [desktop delivery](evidence/canonical/ui-qualification-2026-11-21/delivery-1000-desktop.png) captures. Owner feedback and uncoached observation remain separate from these automated checks.
