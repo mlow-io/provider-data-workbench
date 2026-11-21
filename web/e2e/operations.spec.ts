@@ -64,9 +64,22 @@ test('combined retained workflow exposes held data, native findings, scoped NORT
     const pending=page.waitForEvent('download');await page.getByRole('link',{name:'Download current approved JSON',exact:true}).click();
     const approvedPath=info.outputPath('approved.json');await (await pending).saveAs(approvedPath);
     const consumer=JSON.parse(execFileSync('python3',['-m','provider_directory_truth_layer.cli','consume-approved',approvedPath,
-      '--expected-version',report.approved_version_id,'--expected-feed',report.feed_id],{cwd:path.resolve('..'),encoding:'utf8'}));
+      '--expected-version',report.approved_version_id,'--expected-feed',report.feed_id],{cwd:path.resolve('..'),env:{...process.env,PYTHONPATH:'src'},encoding:'utf8'}));
     expect(consumer.contacts.map((row:any)=>[row.location_id,row.phone,row.phone_extension,row.zip])).toEqual([
       ['NORTH','6175550100','007','02108'],['SOUTH','6175550200','008','02108']]);
+    await page.goto(`${frontendBase}/?view=feeds&feed=${report.feed_id}&version=${report.approved_version_id}`);
+    await page.getByRole('button',{name:'Preview approved workbook',exact:true}).click();
+    const exportReview=page.getByRole('region',{name:'Approved export review',exact:true});
+    await expect(exportReview.getByText('Directory rows',{exact:true})).toBeVisible();
+    await expect(exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true})).toBeEnabled();
+    const workbookDownload=page.waitForEvent('download');
+    await exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true}).click();
+    const workbookPath=info.outputPath('approved-review.xlsx');await (await workbookDownload).saveAs(workbookPath);
+    expect((await readFile(workbookPath)).subarray(0,2).toString()).toBe('PK');
+    await expect(exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true})).toBeEnabled();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await exportReview.screenshot({path:info.outputPath('approved-export-task.png')});
+    await page.screenshot({path:info.outputPath('operations-approved-export-review.png'),fullPage:true});
     await page.goto(`${frontendBase}/?view=intake&receipt=${report.acquired_receipt_id}`);
     const native=page.getByRole('region',{name:'Native FHIR evidence',exact:true});
     await expect(native.getByText(/1 invalid resources/)).toBeVisible();

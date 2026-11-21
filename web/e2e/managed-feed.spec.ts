@@ -26,7 +26,7 @@ test('managed recurring feed requires separate contract and dataset review, pres
     writeFileSync(join(inbox,`${id}.manifest.json`),JSON.stringify({delivery_id:id,period,as_of:period,snapshot:'full',filename:`${id}.csv`,sha256:createHash('sha256').update(data).digest('hex')}));
   }
   await page.goto('/?view=feeds');
-  await expect(page.getByRole('heading',{name:'Review the delivery. Approve the version.'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Review deliveries'})).toBeVisible();
   await page.getByLabel('Reviewer',{exact:true}).fill(actor.actor);
   await page.getByLabel('Decision reason',{exact:true}).fill(actor.reason);
   await page.getByText('Register a clinic CSV feed',{exact:true}).click();
@@ -43,12 +43,12 @@ test('managed recurring feed requires separate contract and dataset review, pres
   await page.getByRole('button',{name:'Enable with this contract',exact:true}).click();
   deliver('baseline.csv','baseline','2026-10-05');
   await page.getByRole('button',{name:'Check deliveries and process one job'}).click();
-  await expect(page.getByText('Delivery check completed. Review the job and candidate results below.',{exact:true})).toBeVisible();
+  await expect(page.getByText('Delivery check completed. Review the processing history and candidate results.',{exact:true})).toBeVisible();
   const registry = await (await page.request.get('/api/feeds')).json();
   const feed = registry.items.find((item: {source:string})=>item.source===source);
   expect(feed.versions).toHaveLength(1);
   const firstId = feed.versions[0].id;
-  await page.getByRole('button').filter({has:page.locator('code',{hasText:firstId})}).click();
+  await page.locator(`button[data-version-id="${firstId}"]`).click();
   await expect(page.getByRole('heading',{name:'Dataset review · candidate'})).toBeVisible();
   expect((await page.request.get(`/api/feed-versions/${firstId}/export`)).status()).toBe(422);
   await page.getByRole('button',{name:'Approve dataset version',exact:true}).click();
@@ -61,10 +61,10 @@ test('managed recurring feed requires separate contract and dataset review, pres
   await testInfo.attach('first-approved-dataset.json',{body:original,contentType:'application/json'});
   deliver('row_drop.csv','changed','2026-10-12');
   await page.getByRole('button',{name:'Check deliveries and process one job'}).click();
-  await expect(page.getByText('Delivery check completed. Review the job and candidate results below.',{exact:true})).toBeVisible();
+  await expect(page.getByText('Delivery check completed. Review the processing history and candidate results.',{exact:true})).toBeVisible();
   const nextFeed = await (await page.request.get(`/api/feeds/${feed.id}`)).json();
   const secondId = nextFeed.versions.at(-1).id;
-  await page.getByRole('button').filter({has:page.locator('code',{hasText:secondId})}).click();
+  await page.locator(`button[data-version-id="${secondId}"]`).click();
   await expect(page.getByRole('button',{name:'Approve dataset version',exact:true})).toBeDisabled();
   expect((await (await page.request.get(`/api/feeds/${feed.id}/current`)).json()).version_id).toBe(firstId);
   await page.screenshot({path:testInfo.outputPath('held-candidate.png'),fullPage:true});
@@ -105,7 +105,7 @@ test('quarantined rows require review and hard header failures remain blocked in
   const first=feed.versions[0].id;
   await page.goto('/?view=feeds');
   await page.getByRole('button',{name:new RegExp(`Synthetic quality ${testInfo.project.name}`)}).click();
-  await page.getByRole('button').filter({has:page.locator('code',{hasText:first})}).click();
+  await page.locator(`button[data-version-id="${first}"]`).click();
   await page.getByLabel('Reviewer',{exact:true}).fill(actor.actor);
   await page.getByLabel('Decision reason',{exact:true}).fill(actor.reason);
   await expect(page.getByRole('button',{name:'Approve dataset version',exact:true})).toBeDisabled();
@@ -116,10 +116,10 @@ test('quarantined rows require review and hard header failures remain blocked in
   expect(exported.records).toHaveLength(2);expect(exported.quarantine).toHaveLength(1);
   deliver('header_drift.csv','drift','2026-10-12');
   await page.getByRole('button',{name:'Check deliveries and process one job'}).click();
-  await expect(page.getByText('Delivery check completed. Review the job and candidate results below.',{exact:true})).toBeVisible();
+  await expect(page.getByText('Delivery check completed. Review the processing history and candidate results.',{exact:true})).toBeVisible();
   feed=await (await page.request.get(`/api/feeds/${feed.id}`)).json();
   const second=feed.versions.at(-1).id;
-  await page.getByRole('button').filter({has:page.locator('code',{hasText:second})}).click();
+  await page.locator(`button[data-version-id="${second}"]`).click();
   await expect(page.getByText('Missing required headers: phone',{exact:true})).toBeVisible();
   await expect(page.getByRole('button',{name:'Approve dataset version',exact:true})).toBeDisabled();
   await expect(page.getByRole('button',{name:/Acknowledge headers_missing/})).toHaveCount(0);
@@ -131,18 +131,18 @@ test('quarantined rows require review and hard header failures remain blocked in
 });
 
 
-test('default entry opens source operations and an invalid version never selects another dataset', async ({ page }) => {
+test('default entry opens the work queue and an invalid version never selects another dataset', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Review the delivery. Approve the version.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Provider work queue' })).toBeVisible();
   await page.goto('/?view=feeds&version=unknown-retained-version');
   await expect(page.getByRole('alert')).toContainText('A dataset version needs its feed context');
   await expect(page.getByRole('heading', { name: /Dataset review/ })).toHaveCount(0);
   await page.getByRole('link', { name: 'Legacy QA', exact: true }).click();
-  await expect(page.getByText('Decide with evidence, not automation.')).toBeVisible();
+  await expect(page.getByText('Batch exception review')).toBeVisible();
   await page.goBack();
   await expect(page.getByRole('alert')).toContainText('A dataset version needs its feed context');
   await page.goForward();
-  await expect(page.getByText('Decide with evidence, not automation.')).toBeVisible();
+  await expect(page.getByText('Batch exception review')).toBeVisible();
 });
 
 test('unavailable registry does not look empty and recovers on reload', async ({ page }) => {

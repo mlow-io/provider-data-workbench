@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import "./intake.css";
+import { EvidenceComparison } from "./EvidenceComparison";
 import { navigateWorkspace, useWorkspaceQuery, workspaceHref, useWorkspaceActionGuard } from "./workspaceNavigation";
 import type { NativePreview } from "./NativeEvidencePanel";
 const NativeEvidencePanel = lazy(() => import("./NativeEvidencePanel").then(module => ({ default: module.NativeEvidencePanel })));
@@ -242,18 +243,20 @@ export function IntakeWorkbench({ page }: { page: IntakePage }) {
   return (
     <main className="iw-shell">
       <header className="iw-heading">
-        <p className="iw-eyebrow">Provider directory · Intake Workbench 2.0</p>
+        <p className="iw-eyebrow">Provider data operations</p>
         <h1>
           {page === "intake"
-            ? "Ingest provider data. Keep the evidence."
+            ? "Receive provider data"
             : page === "work"
-              ? "A durable place for the next decision."
-              : "Know where each observation came from."}
+              ? "Provider work queue"
+              : "Sources and capture history"}
         </h1>
         <p>
           {page === "intake"
-            ? "Import differently shaped provider files, review explicit normalization rules, and retain original source records alongside human decisions. Public reference data is not certified directory truth."
-            : "Review directory changes at the right clinic location, so patients can reach the practice. Retain source evidence and record each decision. Public reference data is not certified directory truth."}
+            ? "Receive a file, select its supported profile, then review mappings and quality findings before accepting rows."
+            : page === "work"
+              ? "Choose a clinician and office, inspect the discrepancy, and record the next decision or follow-up."
+              : "Inspect reference-source captures, retained responses and their declared coverage."}
         </p>
       </header>
       {page === "intake" ? (
@@ -565,7 +568,7 @@ function IntakeInbox() {
         </div>
       </section>
       <section className="iw-split">
-        <div className="iw-card">
+        <div className="iw-card iw-inbox">
           <div className="iw-title">
             <h2>Intake inbox</h2>
             <button onClick={() => void receipts.refresh()}>Refresh</button>
@@ -742,6 +745,27 @@ function ReceiptDetail({
         <span>{detail.source}</span>
         <span>{detail.designation}</span>
       </div>
+      <section className="iw-import-context" aria-label="Import review progress">
+        <ol className="iw-stages">
+          <li>1. Evidence received</li>
+          <li aria-current={detail.state === "needs_mapping" ? "step" : undefined}>2. Map and inspect</li>
+          <li aria-current={detail.state === "preview_ready" ? "step" : undefined}>3. Review acceptance</li>
+          <li aria-current={["committed", "duplicate_delivery"].includes(detail.state ?? "") ? "step" : undefined}>4. Accepted evidence</li>
+        </ol>
+        {preview && <dl className="iw-quality-counts">
+          <div><dt>Source rows</dt><dd>{preview.total ?? "Unknown"}</dd></div>
+          <div><dt>Valid rows</dt><dd>{preview.valid_count ?? "Unknown"}</dd></div>
+          <div><dt>Quarantined</dt><dd>{preview.quarantined_count ?? "Unknown"}</dd></div>
+        </dl>}
+        <p>{detail.state === "needs_mapping"
+          ? "Next: review column mapping and parsing, then reprocess this retained file."
+          : detail.state === "preview_ready"
+            ? "Next: inspect original and interpreted values, resolve mapping concerns, then explicitly accept valid rows or reject this intake."
+            : ["committed", "duplicate_delivery"].includes(detail.state ?? "")
+              ? "Next: inspect source observations and linked work. Intake acceptance does not approve a dataset or verify a listing."
+              : "Review the delivery state and retained evidence below before making a decision."}</p>
+        {detail.attempt_id && <details><summary>Current interpretation identity</summary><code>{detail.attempt_id}</code></details>}
+      </section>
       {Boolean(detail.metadata?.demo_sample) && (
         <aside className="iw-notice" aria-label="Synthetic sample next step">
           <strong>Synthetic example — no real clinicians or payer updates.</strong>
@@ -959,16 +983,7 @@ function ReceiptDetail({
                 {(row.problems?.length ?? 0) > 0 && (
                   <Json value={row.problems} />
                 )}
-                <div className="iw-two">
-                  <section>
-                    <h4>Original evidence</h4>
-                    <Json value={row.original} />
-                  </section>
-                  <section>
-                    <h4>Normalized interpretation</h4>
-                    <Json value={row.normalized} />
-                  </section>
-                </div>
+                <EvidenceComparison original={row.original} interpreted={row.normalized} mapping={preview.mapping} />
               </details>
             ))}
           </div>
@@ -1245,7 +1260,7 @@ function WorkQueue() {
       <section className="iw-card">
         <div className="iw-title">
           <div>
-            <h2>Work queue</h2>
+            <h2>Find work to review</h2>
             <p>
               Showing up to 200 matching items; search to narrow large
               queues.{" "}
@@ -1350,7 +1365,7 @@ function WorkQueue() {
           {resource.loading && <p role="status">{resource.data ? "Refreshing work; showing previously loaded results…" : "Loading work…"}</p>}
           {resource.error && resource.data && <p>Showing previously loaded work; the latest refresh failed and these results may be out of date.</p>}
           {!resource.loading && !resource.error && resource.data && items.length === 0 && (
-            <p className="iw-empty">No work matches these filters.</p>
+            <div className="iw-empty"><p>No work matches these filters.</p><p>Receive a provider file to create reviewable evidence, or broaden the filters above.</p><a className="wb-empty-action" href="?view=intake">Receive a provider file</a></div>
           )}
           <ul className="iw-list">
             {items.slice(0, 200).map((item: WorkCase) => (
@@ -1467,16 +1482,7 @@ function WorkDetail({
         {detail.risk_reason}
       </p>
       <h3>Evidence comparison</h3>
-      <div className="iw-two">
-        <section>
-          <h4>Original evidence</h4>
-          <Json value={detail.evidence?.original} />
-        </section>
-        <section>
-          <h4>Normalized interpretation</h4>
-          <Json value={detail.evidence?.normalized} />
-        </section>
-      </div>
+      <EvidenceComparison original={detail.evidence?.original} interpreted={detail.evidence?.normalized} />
       <dl className="iw-facts">
         <dt>Source locator</dt>
         <dd>{JSON.stringify(detail.evidence?.locator)}</dd>

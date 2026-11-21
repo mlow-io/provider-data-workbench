@@ -87,3 +87,23 @@ test('a failed partial response is labeled a retained prefix rather than a compl
   expect(screen.getByRole('link',{name:'Retained response prefix'})).toBeVisible();
   expect(screen.queryByRole('link',{name:'Original model response'})).not.toBeInTheDocument();
 });
+
+test('approved mapping examples require separate opt-in and remain part of creation intent',async()=>{
+  const bodies:Record<string,unknown>[]=[];
+  vi.stubGlobal('fetch',vi.fn(async(_url:string,init?:RequestInit)=>{
+    if(init){bodies.push(JSON.parse(String(init.body)));return new Response(JSON.stringify(queued));}
+    return new Response(JSON.stringify(registry));
+  }));
+  render(<MappingAssistantPanel receiptId="receipt-1" attemptId="attempt-1" onProposalReady={async()=>{}} />);
+  await open();fill();
+  const examples=screen.getByLabelText('Include reviewed mapping definitions from this source and scope as model examples');
+  expect(examples).not.toBeChecked();
+  fireEvent.click(screen.getByRole('button',{name:'Queue model mapping'}));
+  await screen.findByText('queued',{exact:true});
+  expect(bodies[0]).not.toHaveProperty('include_approved_examples');
+  fireEvent.click(examples);
+  fireEvent.click(screen.getByRole('button',{name:'Queue model mapping'}));
+  await waitFor(()=>expect(bodies).toHaveLength(2));
+  expect(bodies[1]).toMatchObject({include_approved_examples:true,external_processing:true});
+  expect(bodies[1].request_id).not.toBe(bodies[0].request_id);
+});

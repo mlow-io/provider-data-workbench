@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./recurring-import.css";
 
 type Cell = unknown;
-type ChangeField = { field: string; old: Cell; new: Cell };
+type ChangeField = { field: string; old: Cell; new: Cell; old_present?: boolean; new_present?: boolean };
 type ChangeStatus = "new" | "changed" | "unchanged" | "unresolved" | "blocked_invalid" | "missing";
 type ChangeEntry = {
   key: string | null;

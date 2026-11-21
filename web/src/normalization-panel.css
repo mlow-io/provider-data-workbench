@@ -1,8 +1,8 @@
 .np-panel {
-  border: 1px solid #b8d2c6;
-  border-left: 4px solid #427d69;
-  border-radius: 8px;
-  background: #f8fcfa;
+  border: 1px solid #c4cfd9;
+  border-left: 4px solid #577a9e;
+  border-radius: 4px;
+  background: #f6f8fa;
   padding: 16px;
   margin: 22px 0;
   min-width: 0;
@@ -15,7 +15,7 @@
   flex-wrap: wrap;
 }
 .np-panel h3 {
-  color: #29594c;
+  color: #294a6b;
 }
 .np-panel label {
   display: flex;
@@ -28,11 +28,12 @@
 .np-panel input:not([type="checkbox"]),
 .np-panel select,
 .np-panel textarea {
-  padding: 8px;
-  border: 1px solid #adc6bf;
+  padding: 10px;
+  min-height: 44px;
+  border: 1px solid #b8c7d5;
   border-radius: 5px;
   background: white;
-  color: #203c43;
+  color: #172c3c;
   min-width: 0;
   width: 100%;
   max-width: 100%;
@@ -49,7 +50,7 @@
 .np-scroll {
   overflow: auto;
   max-height: 350px;
-  border: 1px solid #d6e5df;
+  border: 1px solid #d6dcdf;
   background: white;
 }
 .np-scroll table {
@@ -61,13 +62,13 @@
 .np-scroll td {
   text-align: left;
   padding: 9px;
-  border-bottom: 1px solid #e2ece7;
+  border-bottom: 1px solid #e2e7eb;
   vertical-align: top;
 }
 .np-scroll thead th {
   position: sticky;
   top: 0;
-  background: #e9f3ee;
+  background: #edf1f5;
 }
 .np-scroll code {
   overflow-wrap: anywhere;
@@ -85,14 +86,14 @@
 .np-fields legend {
   font-size: 12px;
   font-weight: 700;
-  color: #58756b;
+  color: #5b6e7e;
 }
 .np-field {
   display: grid;
   grid-template-columns: minmax(130px, 1fr) minmax(0, 2fr);
   gap: 14px;
   padding: 14px 0;
-  border-bottom: 1px solid #dce9e2;
+  border-bottom: 1px solid #dce3e9;
 }
 .np-rules {
   display: flex;
@@ -128,12 +129,12 @@
   overflow: auto;
   padding: 12px;
   background: white;
-  border: 1px solid #dce9e2;
+  border: 1px solid #dce3e9;
   border-radius: 5px;
 }
 .np-counts {
   font-weight: 700;
-  color: #29594c;
+  color: #294a6b;
 }
 .np-panel details {
   margin: 12px 0;
@@ -143,7 +144,7 @@
   font-weight: 600;
 }
 .np-panel :focus-visible {
-  outline: 3px solid #28725e;
+  outline: 3px solid #bb741f;
   outline-offset: 3px;
 }
 @media (max-width: 700px) {
@@ -162,3 +163,7 @@
     width: 100%;
   }
 }
+.np-profiles { list-style: none; padding: 0; display: grid; gap: 12px; }
+.np-profiles li { padding: 14px; background: #fff; border: 1px solid #d6dcdf; border-radius: 4px; }
+.np-profiles li > span { display: block; margin: 4px 0 10px; color: #536976; font-size: 12px; }
+.np-profiles li p { font-size: 12px; overflow-wrap: anywhere; }

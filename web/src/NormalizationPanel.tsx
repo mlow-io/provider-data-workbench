@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import "./normalization-panel.css";
+import { EvidenceComparison } from "./EvidenceComparison";
 const MappingAssistantPanel = lazy(() => import("./MappingAssistantPanel").then(module => ({ default: module.MappingAssistantPanel })));
 
 type Operation = { op: string; format?: string };
@@ -48,6 +49,12 @@ type Preview = {
     locator: unknown;
     problems: string[];
   }[];
+};
+type Compatibility = {
+  notice: string;
+  total: number;
+  next_offset: number | null;
+  items: { revision_id: string; name: string; status: string; reusable: boolean; missing_mapped_columns: string[]; ambiguous_columns?: string[]; added_columns: string[]; removed_columns: string[] }[];
 };
 type Props = {
   receiptId: string;
@@ -153,6 +160,7 @@ function NormalizationDraft({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [status, setStatus] = useState("");
+  const [compatibility, setCompatibility] = useState<Compatibility | null>(null);
   const alive = useRef(true);
   const appliedInitialized = useRef(false);
   useEffect(() => {
@@ -564,16 +572,7 @@ function NormalizationDraft({
                           Sample row {index + 1} ·{" "}
                           {row.problems.length ? "Needs review" : "Valid"}
                         </summary>
-                        <div className="np-evidence">
-                          <div>
-                            <h4>Original</h4>
-                            <pre>{show(row.original)}</pre>
-                          </div>
-                          <div>
-                            <h4>Normalized</h4>
-                            <pre>{show(row.normalized)}</pre>
-                          </div>
-                        </div>
+                        <EvidenceComparison original={row.original} interpreted={row.normalized} mapping={definition.mapping} />
                         {row.problems.length > 0 && (
                           <ul>
                             {row.problems.map((problem, i) => (
@@ -807,6 +806,36 @@ function NormalizationDraft({
                   </button>
                 </div>
                 <h3>Reuse an approved recipe</h3>
+                <p>Check reviewed source profiles against this delivery before copying their rules. A structural match is not a semantic review.</p>
+                <button type="button" disabled={busy} onClick={() => void run(async () => {
+                  const result = await api<Compatibility>(`${base}/recipe-compatibility?expected_attempt=${encodeURIComponent(attemptId)}&offset=0&limit=20`);
+                  if (alive.current) setCompatibility(result);
+                })}>Check reusable source profiles</button>
+                {compatibility && <section aria-label="Source profile compatibility">
+                  <p>{compatibility.notice}</p>
+                  <p className="iw-muted">Showing {compatibility.items.length} of {compatibility.total} reviewed profiles. Manual mapping remains available.</p>
+                  {compatibility.items.length === 0 && <p>No reviewed profile is available for this source and scope. Continue with manual mapping above.</p>}
+                  <ul className="np-profiles">{compatibility.items.map(item => <li key={item.revision_id}>
+                    <strong>{item.name}</strong><span>{item.status.replaceAll("_", " ")}</span>
+                    {item.missing_mapped_columns.length > 0 && <p>Missing mapped columns: {item.missing_mapped_columns.join(", ")}</p>}
+                    {!!item.ambiguous_columns?.length && <p>Ambiguous source columns: {item.ambiguous_columns.join(", ")}. Choose a unique binding manually.</p>}
+                    {item.added_columns.length > 0 && <p>Added columns: {item.added_columns.join(", ")}</p>}
+                    {item.removed_columns.length > 0 && <p>Removed columns: {item.removed_columns.join(", ")}</p>}
+                    <button type="button" disabled={busy || !item.reusable || !actor.trim() || !reason.trim()} onClick={() => void run(async () => {
+                      const proposal = await api<Revision>(`${base}/recipes/${encodeURIComponent(item.revision_id)}/reuse`, { expected_attempt: attemptId, actor, reason });
+                      if (alive.current) {
+                        setDefinition(proposal.definition); setName(proposal.name); setSaved(proposal); setInspectedProposal(proposal);
+                        setPreview(null); setSelected(""); setRevisions([...revisions, proposal]);
+                        setStatus("Reviewed profile copied into a new proposal. Preview this delivery before explicitly approving and applying it.");
+                      }
+                    })}>Copy {item.name} as a proposal</button>
+                  </li>)}</ul>
+                  {compatibility.next_offset !== null && <button type="button" disabled={busy} onClick={() => void run(async () => {
+                    const next = await api<Compatibility>(`${base}/recipe-compatibility?expected_attempt=${encodeURIComponent(attemptId)}&offset=${compatibility.next_offset}&limit=20`);
+                    if (alive.current) setCompatibility({ ...next, items: [...compatibility.items, ...next.items] });
+                  })}>Load more reviewed profiles</button>}
+                  <p className="iw-muted">Enter the recipe reviewer and decision reason above to copy a compatible profile. Copying never accepts rows or approves a dataset.</p>
+                </section>}
                 <p>
                   Only revisions compatible with this source, input profile and
                   dataset scope appear.

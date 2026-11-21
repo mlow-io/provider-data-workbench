@@ -65,7 +65,7 @@ test("imports XLSX and CSV, quarantines, preserves repeats, verifies and reopens
   ).toBeVisible();
   await page.getByText("Clinic roster!3 · Valid", { exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Original evidence", exact: true }),
+    page.getByRole("columnheader", { name: "Original evidence", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".iw-preview").getByText("02108", { exact: false }).first()).toBeVisible();
   await page

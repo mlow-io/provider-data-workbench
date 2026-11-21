@@ -1,0 +1,103 @@
+/* Operator shell: ink navigation, warm neutral work surfaces, blue actions. */
+.wb-app { --wb-ink: #172c3c; --wb-accent: #254f9b; --wb-line: #d6dcdf; --wb-muted: #5b6973; min-height: 100vh; background: #f5f4f0; font-family: "Lucida Sans", "Lucida Grande", Tahoma, sans-serif; font-size: 14px; color: var(--wb-ink); }
+.wb-sidebar { position: fixed; inset: 0 auto 0 0; width: 224px; display: flex; flex-direction: column; padding: 30px 15px 22px; background: #172b3a; color: #f2f4f4; overflow-y: auto; }
+.wb-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 33px; }
+.wb-brand-mark { font: 700 30px/1 Georgia, serif; letter-spacing: -2px; color: #faf5e8; }
+.wb-brand-mark > span { color: #8cadd9; }
+.wb-brand strong { font-size: 12px; font-weight: 600; line-height: 1.6; }
+.wb-brand strong > span { display: block; color: #bac8d1; font-weight: 400; letter-spacing: .05em; font-size: 11px; }
+.wb-nav-heading { margin: 0 10px 10px; color: #aebfc9; font-size: 10px; line-height: 1.6; text-transform: uppercase; letter-spacing: .1em; }
+.wb-nav-group { display: grid; gap: 5px; margin-bottom: 30px; }
+.wb-nav-group a { display: flex; align-items: flex-start; gap: 12px; min-height: 54px; padding: 10px; border: 1px solid transparent; border-radius: 4px; color: #dce5eb; text-decoration: none; }
+.wb-nav-group a:hover { background: #223d50; }
+.wb-nav-group a[aria-current="page"] { color: #fff; background: #2b4558; border-color: #456178; box-shadow: inset 3px 0 #94b7e7; }
+.wb-nav-number { padding-top: 2px; color: #92aaba; font: 10px/1.7 ui-monospace, monospace; }
+.wb-nav-label { display: block; font-size: 12px; font-weight: 600; line-height: 1.7; }
+.wb-nav-group small { display: block; margin-top: 2px; color: #b1c2ce; font-size: 10px; line-height: 1.6; }
+.wb-tools a { min-height: 44px; }
+.wb-tools small { display: none; }
+.wb-local { margin: auto 8px 0; padding-top: 18px; border-top: 1px solid #3b5263; color: #d9e2e9; font-size: 11px; line-height: 1.6; }
+.wb-local > span { color: #9ab5a6; margin-right: 5px; }
+.wb-local small { display: block; color: #acbecb; font-size: 10px; margin-top: 6px; }
+.wb-content { margin-left: 224px; min-width: 0; }
+.wb-context { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 32px; border-bottom: 1px solid var(--wb-line); background: #fdfcf9; font-size: 11px; color: var(--wb-muted); }
+.wb-context strong { color: var(--wb-ink); font-weight: 600; }
+.wb-context span > span { margin: 0 8px; color: #8d979e; }
+.wb-local-label { font-size: 10px; }
+.wb-skip { position: fixed; top: 10px; left: 16px; z-index: 50; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; background: #fff; color: #172b3a; }
+.wb-skip:focus { width: auto; height: auto; padding: 12px; clip-path: none; }
+.wb-app :focus-visible { outline: 3px solid #bb741f; outline-offset: 3px; }
+#workspace-content:focus { outline: none; }
+.wb-app .iw-shell, .wb-app .app-shell { width: 100%; max-width: 1480px; padding: 30px 32px 64px; }
+.wb-app .iw-heading { margin-bottom: 24px; max-width: 900px; }
+.wb-app h1 { font: 600 clamp(25px, 2.5vw, 32px)/1.2 "Lucida Sans", "Lucida Grande", Tahoma, sans-serif; color: var(--wb-ink); letter-spacing: -.045em; }
+.wb-app .iw-heading h1 { margin-bottom: 9px; }
+.wb-app .iw-heading > p:last-child { font-size: 13px; color: var(--wb-muted); line-height: 1.7; max-width: 750px; }
+.wb-app .iw-eyebrow { font-size: 10px; letter-spacing: .1em; color: #5c6d7b; }
+.wb-app h2 { font-family: "Lucida Sans", "Lucida Grande", Tahoma, sans-serif; font-weight: 600; letter-spacing: -.025em; }
+.wb-app .iw-card { padding: 20px; border-radius: 5px; border-color: var(--wb-line); box-shadow: 0 2px 4px #172b3a03; margin-bottom: 18px; }
+.wb-app .iw-card h2 { font-size: 17px; }
+.wb-app .iw-card h3 { font-size: 13px; text-transform: none; letter-spacing: 0; color: #334956; }
+.wb-app .iw-shell a { color: #234d91; text-underline-offset: 3px; }
+.wb-app .iw-shell button { border-radius: 4px; color: #23446d; background: #fafbfc; border-color: #b8c5d2; min-height: 44px; }
+.wb-app .iw-shell button:not(.iw-primary):not(.mf-primary):hover:not(:disabled) { background: #edf2f8; border-color: #819dbb; }
+.wb-app .iw-shell button.iw-primary, .wb-app .mf-shell button.mf-primary { background: #254f9b; border-color: #254f9b; color: #fff; }
+.wb-app .iw-list li button { gap: 5px; padding: 14px; background: #fff; }
+.wb-app .iw-list li button[aria-pressed="true"] { border-color: #537ab0; box-shadow: inset 3px 0 #254f9b; background: #f0f4fb; }
+.wb-app .iw-list small, .wb-app .iw-title p { color: #596b76; }
+.wb-app .iw-title { margin-bottom: 14px; }
+.wb-app .iw-list { gap: 7px; }
+.wb-app .iw-form { gap: 12px; }
+.wb-app .iw-split { grid-template-columns: minmax(260px, .76fr) minmax(0, 1.4fr); gap: 18px; }
+.wb-app .iw-empty { color: #596b76; }
+.wb-app .mf-boundary { background: #eef1f3; border-color: #71899a; padding: 10px 14px; font-size: 12px; }
+.wb-app .mf-context { margin: 14px 0; padding: 12px 14px; background: #f4f6f8; border-left: 3px solid #718baa; }
+.wb-app .mf-context strong, .wb-app .mf-context span { display: block; }
+.wb-app .mf-context span { margin-top: 5px; color: #596b76; font-size: 12px; }
+.wb-app .mf-current a { display: inline-block; margin: 6px 18px 0 0; }
+.wb-app .mf-evidence-table details { margin-top: 8px; padding-top: 8px; }
+.wb-app .mf-evidence-table p { margin-bottom: 8px; }
+.wb-app .mf-counts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.wb-app .mf-counts dd { font-size: 22px; }
+.wb-app .mf-configuration { margin-bottom: 18px; }
+.wb-app .mf-configuration > summary { font-size: 15px; color: #233e57; margin: 0; }
+.wb-app .mf-configuration h3 { margin-top: 22px; }
+.wb-app .mf-evidence-table { overflow: auto; margin: 12px 0 20px; border: 1px solid var(--wb-line); }
+.wb-app .mf-evidence-table table { min-width: 520px; }
+.wb-app .mf-evidence-table th { position: static; font-size: 10px; background: #f1f3f5; text-transform: none; letter-spacing: 0; }
+.wb-app .mf-evidence-table td { font-size: 12px; vertical-align: top; }
+.wb-app .mf-evidence-table tr { cursor: default; }
+.wb-app .mf-change { display: block; margin-top: 5px; }
+.wb-app .mf-change span { display: inline-block; margin: 2px 6px 2px 0; }
+.wb-app .mf-change-before { color: #74533b; }
+.wb-app .mf-change-after { color: #234c7e; }
+.wb-app .mf-summary-counts { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 14px 0; }
+.wb-app .mf-summary-counts div { display: grid; gap: 4px; }
+.wb-app .mf-summary-counts dt { font-size: 11px; color: #596b76; }
+.wb-app .mf-summary-counts dd { margin: 0; font-size: 16px; font-weight: 600; }
+.wb-app .wb-empty-action { display: inline-block; margin-top: 10px; }
+@media (max-width: 1120px) {
+  .wb-sidebar { width: 196px; padding-inline: 10px; }
+  .wb-content { margin-left: 196px; }
+  .wb-app .iw-shell, .wb-app .app-shell { padding-inline: 22px; }
+  .wb-app .iw-split { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .wb-sidebar { position: static; width: 100%; padding: 15px; }
+  .wb-brand { padding: 0 5px 15px; }
+  .wb-brand strong > span { display: inline; margin-left: 6px; }
+  .wb-content { margin-left: 0; }
+  .wb-sidebar nav { display: grid; grid-template-columns: 1fr; }
+  .wb-nav-heading, .wb-local, .wb-nav-number, .wb-nav-group small { display: none; }
+  .wb-nav-group { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin: 0; }
+  .wb-nav-group a { justify-content: center; align-items: center; text-align: center; min-height: 48px; padding: 7px 4px; }
+  .wb-nav-label { font-size: 11px; line-height: 1.4; }
+  .wb-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #3b5263; padding-top: 6px; margin-top: 6px; }
+  .wb-tools a { min-height: 44px; padding: 6px; }
+  .wb-context { padding: 12px 18px; min-height: 44px; }
+  .wb-local-label { display: none; }
+  .wb-app .iw-shell, .wb-app .app-shell { padding: 24px 16px 44px; }
+  .wb-app .iw-card { padding: 16px; }
+  .wb-app .mf-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wb-app .iw-heading h1 { font-size: 26px; }
+}

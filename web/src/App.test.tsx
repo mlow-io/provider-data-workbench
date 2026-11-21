@@ -17,7 +17,7 @@ test("shows bounded-data labeling, filters queue, and opens case evidence", asyn
   vi.stubGlobal("fetch", fetchMock);
   window.history.replaceState(null, "", "/?view=qa");
   renderApp();
-  expect(await screen.findByText("Decide with evidence, not automation.")).toBeInTheDocument();
+  expect(await screen.findByText("Batch exception review")).toBeInTheDocument();
   expect(screen.getByText(/synthetic sample data/i)).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: /missing required field/i }));
   await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("issue_code=missing_required_field"), undefined));

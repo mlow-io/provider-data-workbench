@@ -53,7 +53,7 @@ export function RemediationWorkspace({ onExit }: { onExit: () => void }) {
     </section>
 
     <section className="remediation-heading" aria-labelledby="remediation-heading">
-      <div><p className="eyebrow">Payer directory loop</p><h1 id="remediation-heading">Follow the evidence through verification.</h1><p>Inspect the stored comparison, make a reasoned proposal, and record what the payer actually shows.</p></div>
+      <div><p className="eyebrow">Payer directory loop</p><h1 id="remediation-heading">Correction review and verification</h1><p>Inspect the stored comparison, make a reasoned proposal, and record what the payer actually shows.</p></div>
       <div className="loop-key" aria-label="Workflow stages"><span>Evidence</span><b>→</b><span>Human proposal</span><b>→</b><span>Observed verification</span></div>
     </section>
 

@@ -56,18 +56,12 @@ test("profiles a synthetic clinic file, reviews explicit normalization and separ
     panel.getByText("1 valid · 1 quarantined · 2 total", { exact: true }),
   ).toBeVisible();
   await panel.getByText("Sample row 1 · Valid", { exact: true }).click();
-  await expect(
-    panel
-      .locator("pre")
-      .filter({ hasText: '"phone_extension": "007"' })
-      .first(),
-  ).toBeVisible();
-  await expect(
-    panel
-      .locator("pre")
-      .filter({ hasText: '"source_updated_at": "2026-04-03"' })
-      .first(),
-  ).toBeVisible();
+  const comparison = panel.getByRole("table", { name: "Original evidence and normalized interpretation" });
+  await expect(comparison.getByRole("row", { name: /phone extension/ })).toContainText("007");
+  await expect(comparison.getByRole("row", { name: /source updated at/ })).toContainText("2026-04-03");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await comparison.screenshot({ path: info.outputPath("populated-normalization-fields.png") });
+  await page.screenshot({ path: info.outputPath("populated-normalization-preview.png"), fullPage: true });
   await panel
     .getByLabel("Recipe name", { exact: true })
     .fill("Synthetic clinic phone/date rules");
@@ -151,6 +145,10 @@ test("profiles a synthetic clinic file, reviews explicit normalization and separ
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await panel.getByRole("button", { name: "Check reusable source profiles" }).click();
+  const compatibility = panel.getByRole("region", { name: "Source profile compatibility" });
+  await expect(compatibility.getByText(/Showing/)).toBeVisible();
+  await expect(compatibility.getByRole("button", { name: "Copy Synthetic clinic phone/date rules as a proposal" })).toBeVisible();
   await page.screenshot({
     path: info.outputPath("normalization-accepted.png"),
     fullPage: true,

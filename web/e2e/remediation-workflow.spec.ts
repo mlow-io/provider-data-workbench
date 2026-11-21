@@ -14,7 +14,7 @@ const paths = {
 async function enterRemediation(page: import("@playwright/test").Page, listing: string, field: string) {
   await page.goto("/?view=qa");
   await page.getByRole("button", { name: /open remediation loop/i }).click();
-  await expect(page.getByRole("heading", { name: "Follow the evidence through verification." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Correction review and verification" })).toBeVisible();
   await page.getByRole("row", { name: new RegExp(`Open remediation case ${listing}, ${field}`, "i") }).click();
   await expect(page.getByText("Immutable Phase 1 snapshot")).toBeVisible();
 }

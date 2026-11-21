@@ -26,7 +26,7 @@ test("opens remediation evidence and submits a human triage event through the se
   renderApp();
 
   fireEvent.click(await screen.findByRole("button", { name: /open remediation loop/i }));
-  expect(await screen.findByRole("heading", { name: "Follow the evidence through verification." })).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: "Correction review and verification" })).toBeInTheDocument();
   fireEvent.click(await screen.findByRole("row", { name: /open remediation case payer-00002, state/i }));
   expect(await screen.findByText("Comparison / reference value")).toBeInTheDocument();
   expect(screen.getByText("not certified truth", { exact: false })).toBeInTheDocument();

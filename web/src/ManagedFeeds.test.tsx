@@ -22,7 +22,7 @@ function api(options: { hard?: boolean; stale?: boolean } = {}) {
     }
     if (url.endsWith("/exceptions")) acknowledged = body.disposition === "acknowledged";
     if (url.endsWith("/decide")) approved = true;
-    const version = { id: "candidate-2", state: approved ? "approved" : "candidate", report_hash: reportHash, current_version: "approved-1", report: { counts: { raw: 3, valid: 2, quarantined: 1, unique: 3 }, comparison: { baseline_version: "approved-1", missing: 1 }, findings: options.hard ? [{ code: "headers", severity: "hard", message: "Required phone header is missing" }] : [{ code: "quarantine", severity: "hold", message: "One source row is quarantined" }] }, review: acknowledged ? [{ code: "quarantine", disposition: "acknowledged", actor: "Reviewer", reason: "Reviewed invalid row" }] : [], rows: [{ original: { zip: "02108" } }], delivery: { id: "delivery-2" }, manifest: { period: "2026-11-02" } };
+    const version = { id: "candidate-2", state: approved ? "approved" : "candidate", report_hash: reportHash, current_version: "approved-1", report: { counts: { raw: 3, valid: 2, quarantined: 1, unique: 3 }, comparison: { baseline_version: "approved-1", missing: 1 }, findings: options.hard ? [{ code: "headers", severity: "hard", message: "Required phone header is missing" }] : [{ code: "quarantine", severity: "hold", message: "One source row is quarantined" }] }, review: acknowledged ? [{ code: "quarantine", disposition: "acknowledged", actor: "Reviewer", reason: "Reviewed invalid row" }] : [], rows: [{ original: { zip: "02108" } }], delivery: { id: "delivery-2" }, manifest: { source_delivery: { period: "2026-11-02" }, designation: "synthetic", notice: "Synthetic source assertions, not independently verified provider truth." } };
     const value = url === "/api/feeds" ? (body ? feed : { items: [feed] })
       : url === "/api/feeds/recipes" ? { items: [recipe] }
       : url === "/api/feeds/feed-1/current" ? { version_id: approved ? "candidate-2" : "approved-1", stale: true, notice: "A newer delivery is awaiting review" }
@@ -65,6 +65,9 @@ test("held candidate leaves prior approved version available and requires separa
   expect(screen.getByRole("link", { name: "Download current approved JSON" })).toHaveAttribute("href", "/api/feed-versions/approved-1/export");
   expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeDisabled();
   expect(calls.filter(call => call.body)).toHaveLength(0);
+  expect(screen.getByText(/Period: 2026-11-02/)).toBeVisible();
+  expect(screen.getByText("Evidence designation: synthetic")).toBeVisible();
+  expect(screen.getByText("Synthetic source assertions, not independently verified provider truth.")).toBeVisible();
   fireEvent.click(screen.getByRole("button", { name: "Acknowledge quarantine" }));
   await waitFor(() => expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeEnabled());
   expect(calls.some(call => call.url.endsWith("/decide"))).toBe(false);

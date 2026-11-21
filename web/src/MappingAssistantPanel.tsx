@@ -25,6 +25,7 @@ export function MappingAssistantPanel({ receiptId, attemptId, onProposalReady }:
   const [actor, setActor] = useState("");
   const [reason, setReason] = useState("");
   const [permission, setPermission] = useState(false);
+  const [includeApprovedExamples, setIncludeApprovedExamples] = useState(false);
   const [busy, setBusy] = useState(false);
   const [invoking, setInvoking] = useState(false);
   const [error, setError] = useState("");
@@ -60,7 +61,7 @@ export function MappingAssistantPanel({ receiptId, attemptId, onProposalReady }:
   async function act(action: "create" | "run-once" | "cancel") {
     const origin = guard.capture(); setError("");
     if (action === "run-once") setInvoking(true); else setBusy(true);
-    const body = { expected_attempt: attemptId, actor, reason, external_processing: permission };
+    const body = { expected_attempt: attemptId, actor, reason, external_processing: permission, ...(includeApprovedExamples ? { include_approved_examples: true } : {}) };
     const key = JSON.stringify(body);
     if (action === "create" && intent.current?.key !== key) intent.current = { key, id: crypto.randomUUID() };
     try {
@@ -99,6 +100,8 @@ export function MappingAssistantPanel({ receiptId, attemptId, onProposalReady }:
           <label>Assistance reason<input value={reason} maxLength={2000} disabled={busy} onChange={event => setReason(event.target.value)} /></label>
         </div>
         <label className="np-check"><input type="checkbox" checked={permission} disabled={busy} onChange={event => setPermission(event.target.checked)} />Allow this source sample to be sent to OpenAI for this run</label>
+        <label className="np-check"><input type="checkbox" checked={includeApprovedExamples} disabled={busy || invoking} onChange={event => setIncludeApprovedExamples(event.target.checked)} />Include reviewed mapping definitions from this source and scope as model examples</label>
+        <p className="iw-muted">Optional: send up to three approved definitions (4,000 bytes total). Previous source cells and reviewer names/reasons are excluded. Inspect the exact request before running; model output still requires ordinary recipe review.</p>
         <button type="button" disabled={busy || invoking || !registry.configuration.available || !registry.source_processing_allowed || !permission || !actor.trim() || !reason.trim()} onClick={() => void act("create")}>Queue model mapping</button>
         <label className="iw-capture-picker">Retained assistance run<select value={run?.id ?? ""} disabled={busy || invoking} onChange={event => void select(event.target.value)}>
           <option value="">Choose a retained run</option>

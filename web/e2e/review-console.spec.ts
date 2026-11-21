@@ -46,7 +46,7 @@ test("reviews missing-field, stale-verification, and duplicate candidate cases",
     : { provider: "Jordan Ellis DO", field: "phone" };
 
   await page.goto("/?view=qa");
-  await expect(page.getByRole("heading", { name: "Decide with evidence, not automation." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Batch exception review" })).toBeVisible();
   await expect(page.getByText(/bounded review data/i)).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("queue-overview.png"), fullPage: true });
 

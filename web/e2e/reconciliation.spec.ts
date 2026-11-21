@@ -72,7 +72,7 @@ test("three retained sources show quality, reproducible typed candidates, persis
     );
   }
   await page.goto("/?view=intake");
-  await page.getByRole("link", { name: "Reconcile", exact: true }).click();
+  await page.getByRole("link", { name: "Provider records", exact: true }).click();
   await expect(page).toHaveURL(/view=reconciliation/);
   await expect(
     page.getByRole("button", { name: "Create candidate run" }),

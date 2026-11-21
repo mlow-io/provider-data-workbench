@@ -420,3 +420,18 @@
 .iw-native input { max-width: 100%; }
 .iw-capture-picker { display: grid; gap: .4rem; max-width: 100%; margin-block: 1rem; }
 .iw-capture-picker select { width: 100%; min-width: 0; max-width: 42rem; padding: .6rem; font: inherit; border: 1px solid #b8cbd1; border-radius: .3rem; background: #fff; }
+
+/* Delivery progress reflects intake decisions, separate from dataset approval. */
+.iw-import-context { padding: 16px; margin-block: 18px; background: #f5f7f9; border: 1px solid #d6dcdf; border-radius: 4px; }
+.iw-stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; padding: 0; margin: 0; gap: 8px; }
+.iw-stages li { padding: 8px 0; border-top: 3px solid #ccd5dc; font-size: 11px; color: #5b6e7e; line-height: 1.5; }
+.iw-stages li[aria-current] { border-color: #254f9b; color: #234779; font-weight: 700; }
+.iw-quality-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-block: 14px; margin: 4px 0 0; border-bottom: 1px solid #d6dcdf; gap: 12px; }
+.iw-quality-counts dt { font-size: 11px; color: #5b6e7e; }
+.iw-quality-counts dd { font-size: 23px; font-weight: 600; margin: 4px 0 0; color: #233f56; }
+.iw-import-context > p { font-size: 12px; margin-bottom: 0; }
+.iw-import-context code { overflow-wrap: anywhere; }
+@media (max-width: 700px) { .iw-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.iw-inbox .iw-list { max-height: 72vh; overflow-y: auto; padding: 3px; scrollbar-gutter: stable; }
+@media (max-width: 1120px) { .iw-inbox .iw-list { max-height: 360px; } }

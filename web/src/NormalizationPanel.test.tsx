@@ -508,3 +508,32 @@ test("reopening an applied recipe shows its authority and exact phone/date rules
   expect(screen.getByLabelText("phone format")).toHaveValue("");
   expect(calls.some((call) => call.body)).toBe(false);
 });
+
+test("profile compatibility explains drift and copying still requires a fresh preview", async () => {
+  const calls = mockApi();
+  const original = globalThis.fetch;
+  vi.stubGlobal("fetch", vi.fn((url: string, init?: RequestInit) => {
+    if (url.includes("/recipe-compatibility?")) return Promise.resolve(new Response(JSON.stringify({
+      notice: "Structural compatibility only.", total: 2, next_offset: null,
+      items: [
+        { revision_id: "compatible", name: "Prior office phones", status: "compatible", reusable: true, missing_mapped_columns: [], added_columns: ["Updated"], removed_columns: [] },
+        { revision_id: "drifted", name: "Old workbook", status: "drift", reusable: false, missing_mapped_columns: ["Old phone"], added_columns: [], removed_columns: ["Old phone"] },
+      ],
+    })));
+    if (url.endsWith("/reuse")) return Promise.resolve(new Response(JSON.stringify({ id: "copied", name: "Prior office phones", state: "proposed", receipt_id: "receipt", attempt_id: "attempt", definition })));
+    return original(url, init);
+  }));
+  render(<NormalizationPanel {...props} />);
+  await open();
+  fireEvent.click(screen.getByRole("button", { name: "Check reusable source profiles" }));
+  await screen.findByText("Structural compatibility only.");
+  expect(screen.getByText("Missing mapped columns: Old phone")).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText("Recipe reviewer"), { target: { value: "Reviewer" } });
+  fireEvent.change(screen.getByLabelText("Recipe decision reason"), { target: { value: "Reviewed repeated source" } });
+  expect(screen.getByRole("button", { name: "Copy Old workbook as a proposal" })).toBeDisabled();
+  fireEvent.click(screen.getByRole("button", { name: "Copy Prior office phones as a proposal" }));
+  await screen.findByText(/Reviewed profile copied into a new proposal/);
+  expect(screen.getByRole("button", { name: "Approve recipe" })).toBeDisabled();
+  expect(screen.getByLabelText("Normalize phone source")).toHaveValue("Office tel");
+  expect(calls.some(call => call.url.endsWith("/apply"))).toBe(false);
+});

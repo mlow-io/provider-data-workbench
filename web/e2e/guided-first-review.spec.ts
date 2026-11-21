@@ -4,14 +4,8 @@ import { readFile } from 'node:fs/promises';
 test('first synthetic clinic and reference can reach a resumable comparison and handoff', async ({page, request}, info) => {
   test.setTimeout(120_000);
   await page.goto('/');
-  await expect(page.locator('main.mf-shell')).toHaveAttribute('aria-busy', 'false');
-  const empty = page.getByText(/No managed feeds yet/);
-  if (await empty.isVisible()) {
-    await expect(empty).toContainText('synthetic clinic workbook');
-    await empty.getByRole('link', {name:'Intake'}).click();
-  } else {
-    await page.getByRole('link', {name:'Intake', exact:true}).click();
-  }
+  await expect(page.getByRole('heading', {name:'Provider work queue'})).toBeVisible();
+  await page.getByRole('link', {name:'Receive data', exact:true}).click();
   await expect(page.getByRole('heading', {name:'Start with a clinic roster'})).toBeVisible();
   const clinicReceived = page.waitForResponse(response => response.url().endsWith('/api/demo/samples/clinic-workbook') && response.request().method() === 'POST');
   await page.getByRole('button', {name:'Load synthetic sample'}).click();
@@ -32,12 +26,12 @@ test('first synthetic clinic and reference can reach a resumable comparison and 
   const inbox = await (await request.get('/api/intakes')).json();
   const parsed = inbox.items.filter((item: {attempt_id?:string; state?:string}) =>
     item.attempt_id && !['processing', 'failed', 'interrupted', 'rejected'].includes(item.state ?? ''));
-  await page.getByRole('link', {name:'Reconcile', exact:true}).click();
+  await page.getByRole('link', {name:'Provider records', exact:true}).click();
   if (new Set(parsed.map((item: {source:string}) => item.source)).size < 2) {
     await expect(page.getByText(/Comparison needs at least two retained interpretations/)).toBeVisible();
     await page.getByRole('link', {name:'Open Intake', exact:true}).click();
   } else {
-    await page.getByRole('link', {name:'Intake', exact:true}).click();
+    await page.getByRole('link', {name:'Receive data', exact:true}).click();
   }
   await page.getByRole('combobox', {name:/^Synthetic sample/}).selectOption('nppes');
   const referenceReceived = page.waitForResponse(response => response.url().endsWith('/api/demo/samples/nppes') && response.request().method() === 'POST');
@@ -48,7 +42,7 @@ test('first synthetic clinic and reference can reach a resumable comparison and 
   const before = await (await request.get('/api/work')).json();
   const identityWrites: string[] = [];
   page.on('request', req => { if (req.method() === 'POST' && req.url().endsWith('/api/reconciliation/links')) identityWrites.push(req.url()); });
-  await page.getByRole('link', {name:'Reconcile', exact:true}).click();
+  await page.getByRole('link', {name:'Provider records', exact:true}).click();
   for (const item of [clinic, reference]) {
     const card = page.locator(`[data-receipt-id="${item.id}"]`);
     await expect(card).toContainText(item.id);

@@ -133,7 +133,9 @@ test("one discoverable three-source journey from reviewed normalization through 
   const nativeBytes = await readFile(new URL("nppes.json", fixtures));
   await test.step("Start from the default operator entry", async () => {
     await page.goto('/');
-    await expect(page.getByRole('heading', {name:'Review the delivery. Approve the version.'})).toBeVisible();
+    await expect(page.getByRole('heading', {name:'Provider work queue'})).toBeVisible();
+    await page.getByRole('link', {name:'Deliveries',exact:true}).click();
+    await expect(page.getByRole('heading', {name:'Review deliveries'})).toBeVisible();
     await expect(page.getByRole('heading', {name:'Registered feeds'})).toBeVisible();
   });
   async function catalog(path: string, value: Record<string, unknown>) {
@@ -219,11 +221,8 @@ test("one discoverable three-source journey from reviewed normalization through 
     ).toBeVisible();
     await panel.getByText("Sample row 1 · Valid", { exact: true }).click();
     await expect(
-      panel
-        .locator("pre")
-        .filter({ hasText: '"phone_extension": "004"' })
-        .first(),
-    ).toBeVisible();
+      panel.getByRole("table", { name: "Original evidence and normalized interpretation" }).getByRole("row", { name: /phone extension/ }),
+    ).toContainText("004");
     await panel
       .getByLabel("Recipe name", { exact: true })
       .fill(`${prefix} explicit clinic phones/state/ZIP`);
@@ -325,20 +324,20 @@ test("one discoverable three-source journey from reviewed normalization through 
     await page.getByLabel("Reviewer", { exact: true }).fill(attribution.actor);
     await page.getByLabel("Decision reason", { exact: true }).fill(attribution.reason);
     await page.getByRole("button", { name: "Check deliveries and process one job" }).click();
-    await expect(page.getByText("Delivery check completed. Review the job and candidate results below.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Delivery check completed. Review the processing history and candidate results.", { exact: true })).toBeVisible();
     feed = await body(await page.request.get(`/api/feeds/${feed.id}`));
     const baselineId = feed.versions.at(-1).id;
-    await page.getByRole("button").filter({ has: page.locator("code", { hasText: baselineId }) }).click();
+    await page.locator(`button[data-version-id="${baselineId}"]`).click();
     await page.getByRole("button", { name: "Approve dataset version", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
     const baselineExport = await (await page.request.get(`/api/feed-versions/${baselineId}/export`)).text();
     // NORTH's changed phone arrives without SOUTH. A partial delivery is not a closure.
     await deliver(Buffer.from([lines[0], changedNorth].join("\n") + "\n"), "partial", "2026-10-12");
     await page.getByRole("button", { name: "Check deliveries and process one job" }).click();
-    await expect(page.getByText("Delivery check completed. Review the job and candidate results below.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Delivery check completed. Review the processing history and candidate results.", { exact: true })).toBeVisible();
     feed = await body(await page.request.get(`/api/feeds/${feed.id}`));
     const partialVersionId = feed.versions.at(-1).id;
-    await page.getByRole("button").filter({ has: page.locator("code", { hasText: partialVersionId }) }).click();
+    await page.locator(`button[data-version-id="${partialVersionId}"]`).click();
     await expect(page.getByRole("button", { name: "Approve dataset version", exact: true })).toBeDisabled();
     expect((await body(await page.request.get(`/api/feeds/${feed.id}/current`))).version_id).toBe(baselineId);
     expect(await (await page.request.get(`/api/feed-versions/${baselineId}/export`)).text()).toBe(baselineExport);
@@ -353,10 +352,10 @@ test("one discoverable three-source journey from reviewed normalization through 
     // Corrected full delivery retains the changed NORTH phone and SOUTH source row.
     labels.clinic = await deliver(Buffer.from([lines[0], changedNorth, lines[2]].join("\n") + "\n"), "corrected", "2026-10-19");
     await page.getByRole("button", { name: "Check deliveries and process one job" }).click();
-    await expect(page.getByText("Delivery check completed. Review the job and candidate results below.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Delivery check completed. Review the processing history and candidate results.", { exact: true })).toBeVisible();
     feed = await body(await page.request.get(`/api/feeds/${feed.id}`));
     managedVersionId = feed.versions.at(-1).id;
-    await page.getByRole("button").filter({ has: page.locator("code", { hasText: managedVersionId }) }).click();
+    await page.locator(`button[data-version-id="${managedVersionId}"]`).click();
     await page.getByRole("button", { name: "Approve dataset version", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
     const version = await body(await page.request.get(`/api/feed-versions/${managedVersionId}`));
@@ -366,7 +365,7 @@ test("one discoverable three-source journey from reviewed normalization through 
     await page.getByRole("region", { name: "Dataset review · approved", exact: true }).screenshot({ path: info.outputPath("connected-approved-version.png") });
     await page.goto(`/?view=feeds&feed=${feed.id}&version=${baselineId}`);
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
-    await page.getByRole("button").filter({ has: page.locator("code", { hasText: managedVersionId }) }).click();
+    await page.locator(`button[data-version-id="${managedVersionId}"]`).click();
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
     const bookmark = page.url();
     await page.goBack();

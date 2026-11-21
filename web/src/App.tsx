@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { api } from "./api";
@@ -8,6 +8,7 @@ import { ManagedFeeds } from "./ManagedFeeds";
 import { ReconciliationWorkspace } from "./ReconciliationWorkspace";
 import { RemediationWorkspace } from "./RemediationWorkspace";
 import { IntakeWorkbench, type IntakePage } from "./IntakeWorkbench";
+import { WorkbenchShell } from "./WorkbenchShell";
 
 type Filters = { search: string; severity: string; issueCode: string; status: string; sort: string; direction: "asc" | "desc" };
 const initialFilters: Filters = { search: "", severity: "", issueCode: "", status: "", sort: "priority", direction: "asc" };
@@ -19,35 +20,10 @@ function timestamp(value: string) { return new Intl.DateTimeFormat(undefined, { 
 export function App() {
   const query = useWorkspaceQuery();
   const requestedView = query.get("view");
-  const workspace = requestedView && ["intake", "feeds", "reconciliation", "work", "sources", "qa", "remediation"].includes(requestedView) ? requestedView : "feeds";
+  const workspace = requestedView && ["intake", "feeds", "reconciliation", "work", "sources", "qa", "remediation"].includes(requestedView) ? requestedView : "work";
   const navigate = (view: string) => navigateWorkspace(view);
   return (
-    <>
-      <nav className="iw-nav" aria-label="Workbench navigation">
-        {[
-          ["intake", "Intake"],
-          ["feeds", "Managed feeds"],
-          ["reconciliation", "Reconcile"],
-          ["work", "Work queue"],
-          ["sources", "Sources"],
-          ["qa", "Legacy QA"],
-          ["remediation", "Corrections"],
-        ].map(([view, label]) => (
-          <a
-            key={view}
-            href={`?view=${view}`}
-            aria-current={workspace === view ? "page" : undefined}
-            onClick={(event) => {
-              if (!event.ctrlKey && !event.metaKey && !event.shiftKey) {
-                event.preventDefault();
-                navigate(view);
-              }
-            }}
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
+    <WorkbenchShell workspace={workspace}>
       {["intake", "work", "sources"].includes(workspace) ? (
         <IntakeWorkbench page={workspace as IntakePage} />
       ) : workspace === "feeds" ? (
@@ -59,7 +35,7 @@ export function App() {
       ) : (
         <ReviewConsole onOpenRemediation={() => navigate("remediation")} />
       )}
-    </>
+    </WorkbenchShell>
   );
 }
 
@@ -93,7 +69,7 @@ function ReviewConsole({ onOpenRemediation }: { onOpenRemediation: () => void })
   const sortName = (columnId: string) => ({ provider_name: "provider", review_status: "status", assigned_to: "owner" }[columnId] ?? columnId);
 
   if (batch.isLoading || cases.isLoading) return <main className="loading">Preparing review queue…</main>;
-  if (batch.isError || cases.isError) return <main className="loading error">Unable to load the local review batch. Run <code>make demo</code> and start the API.</main>;
+  if (batch.isError || cases.isError) return <main className="loading error">Unable to load the local review batch. Check the local service connection, then reload. Existing evidence is retained.</main>;
   const currentBatch = batch.data!;
 
   return <main className="app-shell">
@@ -105,10 +81,10 @@ function ReviewConsole({ onOpenRemediation }: { onOpenRemediation: () => void })
     <section className="notice" aria-label="Data limitation"><span aria-hidden="true">ⓘ</span><p><strong>Bounded review data.</strong> {currentBatch.data_notice}</p><span>{currentBatch.limitations}</span></section>
 
     <section className="overview" aria-labelledby="overview-heading">
-      <div className="section-heading"><div><p className="eyebrow">Review overview</p><h1 id="overview-heading">Decide with evidence, not automation.</h1><p>{currentBatch.source_label} <span aria-hidden="true">·</span> {currentBatch.record_count} records reviewed</p></div><a className="button button-secondary" href="/api/exports/batch.csv">↓ Export batch</a></div>
+      <div className="section-heading"><div><p className="eyebrow">Review overview</p><h1 id="overview-heading">Batch exception review</h1><p>{currentBatch.source_label} <span aria-hidden="true">·</span> {currentBatch.record_count} records in this batch</p></div><a className="button button-secondary" href="/api/exports/batch.csv">↓ Export batch</a></div>
       <div className="metric-grid">
-        <Metric label="Exceptions" value={currentBatch.exception_count} hint={`${currentBatch.records_with_issues} records affected`} />
-        <Metric label="Open queue" value={cases.data!.items.filter((item) => item.review_status !== "resolved").length} hint="in the current filter" />
+        <Metric label="Batch exceptions" value={currentBatch.exception_count} hint={`${currentBatch.records_with_issues} records affected`} />
+        <Metric label="Unresolved loaded cases" value={cases.data!.items.filter((item) => item.review_status !== "resolved").length} hint="returned by the current filter" />
         <Metric label="Sources" value={Object.keys(currentBatch.source_summary).length} hint="contributing systems" />
         <div className="metric severity-mix"><p>Severity mix</p><div>{["high", "medium", "low"].map((level) => <span key={level} className={`tag tag-${level}`}>{level} {currentBatch.severity_mix[level] ?? 0}</span>)}</div></div>
       </div>

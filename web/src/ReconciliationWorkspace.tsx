@@ -422,7 +422,7 @@ export function ReconciliationWorkspace() {
     <main className="iw-shell rc-shell">
       <header className="iw-heading">
         <p className="iw-eyebrow">Retained evidence / Reconciliation</p>
-        <h1>Compare sources. Keep the evidence.</h1>
+        <h1>Provider records and reconciliation</h1>
         <p>
           Inspect comparison rules, then propose clinician and practice-location
           candidates separately. A candidate creates no identity or link. Rule
