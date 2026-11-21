@@ -1,35 +1,30 @@
 # Provider Directory Workbench
 
-A local web application for cleaning provider rosters, comparing directory sources, and producing approved datasets with traceable evidence.
+A local application for importing inconsistent provider files, reviewing office discrepancies, and exporting approved datasets with traceable evidence.
 
-An analyst receives a clinic workbook and a later CSV that changes one office while omitting another. The workbench preserves the originals, applies reviewed cleaning rules, holds incomplete deliveries, and keeps the last approved dataset available to downstream users. Conflicting directory evidence can become a scoped investigation with a recorded decision history.
+An operator receives a clinic workbook and a later delivery that changes one office while omitting another. The workbench retains originals, applies reviewed cleaning rules, holds incomplete data and keeps the last approved version usable. A reviewed phone can become a new roster candidate; approval remains a separate action.
 
 **Python · FastAPI · React · TypeScript · shadcn/ui · Tailwind · SQLite**
 
-## Adaptive intake and review
-
-The workbench includes scoped reuse of approved mapping recipes, structural drift and ambiguity reports, optional approved-example context for model proposals, and an approved-directory review workbook with unresolved issues and source references. Licensing-source integration, expanded identity investigation and network analytics follow through explicit spec revisions.
-
-**Contributors start with [NEXT](NEXT.md)**, then the [S1 contract](docs/ADAPTIVE_INGESTION_SPEC.md), [ROADMAP](ROADMAP.md) and [STATUS](STATUS.md). The ingestion-first plan supersedes the earlier immediate recipient-response priority. The application remains one modular system; separate packages/apps are future evidence-driven extraction decisions.
-
-## What works
+## What it does
 
 | Area | Implemented behavior |
 |---|---|
-| Intake | CSV/XLSX, declared JSON formats, NPPES/CMS lookups, saved FHIR R4 Bundles and bounded payer-directory capture |
-| Cleaning | Column profiling, versioned mapping/normalization recipes, duplicate checks, quarantine and explicit acceptance |
-| Data management | Recurring clinic feeds, quality holds, approved versions and an independent version-pinned contact reader |
-| Review | Separate clinician/location links, field-level provenance, conflicting evidence, follow-up and investigation history |
-| Recovery | Repeat/restart handling, stale-write rejection and stopped database-plus-artifact backup/restore |
-| Optional assistance | MCP inspection/proposals and an experimental model-backed mapping client; actual-model evaluation remains open |
+| Intake | CSV/XLSX, declared JSON profiles, bounded NPPES/CMS lookups, saved FHIR directory Bundles and fixed-source capture |
+| Cleaning | Column profiling, reviewed normalization recipes, compatibility/drift reports, quarantine and explicit acceptance |
+| Review | Separate clinician/office links, conflicting source assertions, local field decisions and investigation history |
+| Delivery | Recurring feeds, quality holds, separately approved phone corrections and version-pinned consumer output |
+| Exports | Complete approved JSON/XLSX, extensions, correction/source lineage and separate complete quality evidence for review |
+| Recovery | Retained versions/artifacts, stale-write checks, retry/restart and stopped database-plus-artifact recovery |
+| Optional assistance | MCP/model mapping proposals through normal review; manual operation works without model access |
 
-The FHIR consumer targets a documented **R4 4.0.1 / Plan-Net 1.2.0 subset**. Unsupported resources and ambiguous relationships stay visible. It does not implement a conformant FHIR server or payer writeback.
+The application is single-user and local. FHIR support is a documented **R4 4.0.1 / Plan-Net 1.2.0 subset**, not a conformant server. Licensing-board integration, expanded network analysis, recipient exchange and hosting are future work. Local approval is not independent provider verification or payer writeback.
 
-![Synthetic delivery review](docs/evidence/canonical/workbench-migration-2026-11-21/delivery-wide.png)
+![Synthetic correction review](docs/evidence/canonical/documentation-code-audit-2026-11-21/quality-review-wide.png)
 
-## Run the web workbench
+## Run it
 
-Requires Python 3.10+ and Node 22.12+; the automated environment uses Python 3.13 and Node 22.
+Use Python 3.10+ and Node 22.12+ within 22.x; [web/package.json](web/package.json) lists other allowed Node versions. CI uses Python 3.13 and Node 22.
 
 ```sh
 git clone https://github.com/mlow-io/provider-data-workbench.git
@@ -41,36 +36,32 @@ npm ci --prefix web
 make workbench
 ```
 
-Open the printed local URL. The work queue is the entry point. In Receive data, load the synthetic clinic workbook, review the mapping and quarantine, then explicitly accept eligible rows. The launcher creates a fresh retained runtime; it prints the root to use when resuming.
+Open the printed local URL. The launcher prints an invocation-owned demo root and its `inputs` directory, including the synthetic clinic workbook/CSV. Start in Receive data to inspect a file, map its columns and separately accept valid rows. Storage is retained; resume with `python3 scripts/demo.py --root <existing-demo-root>`. The work queue is the default entry point.
 
-[Demo and export inspection guide](docs/OPERATIONS_DEMO.md#run-and-inspect) · [Engineering case study](docs/CASE_STUDY.md) · [Current synthetic UI](docs/evidence/canonical/workbench-migration-2026-11-21/delivery-wide.png)
-
-## Reproduce the complete workflow
-
-After setup:
+For a headless connected rehearsal after setup:
 
 ```sh
 mkdir -p .runtime
 provider-truth-layer rehearse-operations --root .runtime/operations-demo-NEW
 ```
 
-Use a new suffix for each run. This creates synthetic workbook/CSV/FHIR inputs, exercises controlled loopback HTTP failures, holds an incomplete delivery, reads the pinned approved export, investigates NORTH while preserving SOUTH, and verifies restart/backup/restore. It retains JSON/XLSX exports and a report in the selected root. It makes no public payer or model calls.
+Choose a new root. The rehearsal uses synthetic files and controlled loopback HTTP, preserves the last approved roster while a delivery is held, inspects exports and exercises restart/backup/restore. It makes no public payer or model calls. See [run/export inspection](docs/OPERATIONS_DEMO.md#run-and-inspect) and [portable Python installation](docs/OPERATIONS_DEMO.md#portable-python-installation); the web interface requires the source/Node setup above.
 
-The Python wheel and source distribution also include the headless commands and their immutable default assets. [Portable installation details](docs/OPERATIONS_DEMO.md#portable-python-installation) describe use outside a checkout. The web interface uses the source/Node setup above.
+## Correction and handoff
 
-## Verification and scope
+Review clinician/office links and select a source phone in Reconciliation. Open the current approved delivery, inspect reviewed phone decisions, compare number/extension/source, and create a candidate. Review its complete quality evidence and approve it separately. Then preview/download approved JSON or XLSX. Earlier versions and original bytes remain readable. See [the operator flow](docs/OPERATOR_EXPERIENCE.md#reviewed-correction-to-handoff) and [correction contract](docs/FIELD_MATERIALIZATION_SPEC.md).
 
-The 2026-11-15 checkpoint passed **869 Python tests**, **134 frontend tests**, **72 desktop/phone browser scenarios**, pipeline validation, a production build, and clean wheel/sdist installed journeys. [The verification record](docs/evidence/canonical/integrated-review-2026-11-15/README.md) includes failures/reruns, exact artifacts and limitations. CI repeats the required checks.
+## Verification and limits
 
-The local UI1 update passed 136 frontend tests and a production build; its [separate record](docs/evidence/canonical/operator-ui-2026-11-19/README.md) preserves the 74-scenario full browser pass, follow-up failures and corrected affected reruns. Adaptive response/enrollment/research extensions remain design contracts.
+[STATUS](STATUS.md) is the current implementation/checkpoint summary; [dated receipts](docs/evidence/canonical/README.md) retain exact builds, commands, failures and limits. [CI](https://github.com/mlow-io/provider-data-workbench/actions) runs the required checks. The [UI protocol](docs/UI_QUALIFICATION.md) records production-build measurements at 100/1,000 records; samples do not truncate complete exports.
 
-This is a single-user local application developed with agent-assisted implementation and human direction/review. Synthetic correctness and bounded live-source observations do not establish production accuracy, full standards conformance or measured customer benefit. Actual-model evaluation and uncoached analyst sessions remain open. Actor names, contact events and submissions are local assertions; the application sends no outreach or payer updates.
+[The independent mapping challenge](docs/AI_MAPPING_EVALUATION.md) is one blinded external-agent observation against frozen synthetic expectations. Saved-proposal replay runs without model access. Neither that challenge nor controlled transport tests establish production-model quality, broad injection resistance or human time savings. Owner visual acceptance, uncoached-user outcomes and broader source conformance remain open.
 
-## Engineering documentation
+## Contribute
 
-[Operator workflow](docs/OPERATOR_EXPERIENCE.md) · [Provider operations contract](docs/PROVIDER_OPERATIONS_CONTRACT.md) · [Specification](SPEC.md) · [Architecture](docs/ARCHITECTURE.md) · [Roadmap](ROADMAP.md) · [Current status](STATUS.md) · [Spec-driven delivery](docs/SPEC_DRIVEN_DELIVERY.md)
+Start with [AGENTS](AGENTS.md), [NEXT](NEXT.md) and [STATUS](STATUS.md), then the relevant contract. [SPEC](SPEC.md) owns product behavior, [architecture](docs/ARCHITECTURE.md) service boundaries, and [ROADMAP](ROADMAP.md) future scope.
 
-[API reference](docs/API_REFERENCE.md) · [Data dictionary](docs/DATA_DICTIONARY.md) · [Design decisions](docs/DECISIONS.md) · [Read-only operational SQL](docs/OPERATIONAL_SQL.md) · [Contributor guide](AGENTS.md)
+[API reference](docs/API_REFERENCE.md) · [Data dictionary](docs/DATA_DICTIONARY.md) · [Operator procedures](docs/operations_governance/sop_provider_remediation.md) · [Design decisions](docs/DECISIONS.md)
 
 ```sh
 make validate
@@ -78,18 +69,6 @@ npm test --prefix web
 npm run build --prefix web
 npm run test:e2e --prefix web
 python3 scripts/check_project_docs.py
-python3 scripts/sync_bundled_assets.py
 ```
 
-Tests use owned disposable storage. [Operator procedures](docs/operations_governance/sop_provider_remediation.md) cover stopped backup/restore. Private preparation, credentials and actual-source runtime data stay outside the repository.
-
-The component-system migration adds a responsive sidebar, delivery table/inspector, evidence tabs and shared intake/mapping/reconciliation controls. Major workspaces load on demand. The [migration record](docs/evidence/canonical/workbench-migration-2026-11-21/README.md) retains frontend/build/browser checks, inspected synthetic captures and remaining performance/supporting-surface limits.
-
-The [UI qualification protocol](docs/UI_QUALIFICATION.md) includes a reproducible production-build benchmark at 100 and 1,000 synthetic records, bounded previews and complete workbook inspection. [The results and flows](docs/evidence/canonical/ui-qualification-2026-11-21/README.md) retain raw metrics, captures and limits.
-
-## Reviewed correction workflow
-
-Review exact clinician/office identity links and select a phone assertion in Reconciliation. Open the current approved delivery, inspect reviewed phone decisions, compare the number and extension, and create a complete roster candidate. Approve that candidate separately before preparing its pinned JSON/XLSX handoff. Original source bytes and earlier approved versions remain available; corrected rows include decision/source lineage. See [S1.3](docs/FIELD_MATERIALIZATION_SPEC.md), [the operator flow](docs/OPERATOR_EXPERIENCE.md#reviewed-correction-to-handoff) and [review export format 2](docs/REVIEW_WORKBOOK_CONTRACT.md).
-
-
-[The independent mapping challenge](docs/AI_MAPPING_EVALUATION.md) records a blinded Terra Medium proposal pass against a frozen synthetic key and deterministic aliases. Its replay uses actual proposal/review services and runs in CI without model access. The result is narrow evidence for unfamiliar header mapping; production-model quality and human time savings remain unverified.
+Use invocation-owned synthetic storage and reuse warm dependencies. Credentials, actual-source runtime data and private preparation stay outside Git. [AGENTS](AGENTS.md) defines checks and publication boundaries; a passing link checker does not prove documentation accuracy.

@@ -1,6 +1,6 @@
 # Adaptive ingestion and contact-review specification
 
-Revision **S1.1 — selected implementation boundary, 2026-11-21**. Owner-selected direction; detailed source, UI and durable-interface decisions remain open. The owner authorized implementation on 2026-11-21. The bounded first implementation uses the existing roster authority and services, a Tennessee-filtered NPPES reference sample, reviewed mapping reuse and a pinned workbook. Detailed added interfaces are frozen in their area contracts before code. This is a product contract, not an API/schema migration or completion receipt. [SPEC](../SPEC.md) owns global invariants; [ROADMAP](../ROADMAP.md) owns sequence; [NEXT](../NEXT.md) is the executable brief.
+S1.1 and the S1.3 correction delta define the bounded adaptive intake and contact-review contract selected on 2026-11-21. The implementation uses existing roster authority, a Tennessee-filtered NPPES reference sample, reviewed mapping reuse and a pinned workbook. [STATUS](../STATUS.md) and its receipts identify implemented coverage and limits; [NEXT](../NEXT.md) states current authorization. This contract does not itself establish completion or authorize a new migration.
 
 ## Product objective
 
@@ -12,7 +12,7 @@ The primary user is a provider-data operator. The first working environment is t
 
 Separate transport (upload, retained HTTP response), syntax (CSV, XLSX, JSON, FHIR Bundle), source semantics (roster, registry, directory, license, enrollment), and interpretation recipe. A new column layout is not necessarily a new parser. A readable file is not necessarily a valid provider roster.
 
-S1.1 should freeze this candidate qualification matrix after checking existing support:
+The original S1.1 candidate matrix records the intended breadth, not a claim that every source or case is fully qualified:
 
 | Candidate case | Required exercise | Boundary |
 |---|---|---|
@@ -23,11 +23,11 @@ S1.1 should freeze this candidate qualification matrix after checking existing s
 | One named Tennessee-relevant source | Actual sample, source permission/access note, contact/address purpose, dated coverage and replay | Prefer reuse of a working adapter; no assumed licensing-to-office equivalence |
 | Drift/unsupported challenge | Renamed header, ambiguous binding, missing key, unknown structure and partial capture | Hold or abstain with a reason; never silently force a mapping |
 
-This matrix is a proposed validation breadth, not six new adapters. P0 inventories what already works. Commit synthetic equivalents; keep real samples outside Git. A known inaccessible source remains a named open gate. An explicitly selected accessible alternative requires an updated source decision; synthetic replay must not be represented as live qualification.
+This matrix does not imply six new adapters. See the [adaptive release receipt](evidence/canonical/adaptive-release-2026-11-21/README.md) for actual coverage. Keep real samples outside Git; synthetic replay is not live-source qualification.
 
 ## Bounded source shortlist for P0
 
-These are research leads, not newly qualified integrations. Verify current access, actual response and field meaning before selection. The Tennessee-specific goal can be met by a Tennessee subset of a national registry, but must be labeled accordingly; it is not a state licensing or payer-participation dataset.
+This is the historical P0 shortlist, not a current source selection or a list of newly qualified integrations. Verify access, actual response and field meaning before a new source is selected. The Tennessee-specific goal can be met by a Tennessee subset of a national registry, but must be labeled accordingly; it is not a state licensing or payer-participation dataset.
 
 | Candidate | Starting reference | Decision to establish |
 |---|---|---|
@@ -35,7 +35,7 @@ These are research leads, not newly qualified integrations. Verify current acces
 | BCBST directory evidence | [BCBST developer resources](https://www.bcbst.com/developer-resources) | Can a bounded provider-directory response be obtained through an authorized route, and do its office links/profile semantics fit the existing FHIR subset? |
 | Tennessee licensing report | [Health Professional Licensing Reports](https://internet.health.tn.gov/LicensureReports) | Inspect actual report shape and address purpose. Prefer S2 if it supports licensing evidence but not office-contact comparison. |
 
-Default P0 remote investigation budget: at most three candidates, ten total HTTP requests including redirects/retries, 10 MiB cumulative returned content, and a retained data sample of at most 200 records. Use smaller source limits when required. No bulk national download, automated pagination crawl or model call. If a report requires a larger transfer or unavailable interaction, record the blocker and propose a bounded alternative rather than claiming access or silently expanding the budget.
+The original P0 remote investigation budget was: at most three candidates, ten total HTTP requests including redirects/retries, 10 MiB cumulative returned content, and a retained data sample of at most 200 records. It prohibited bulk national downloads, automated pagination crawls and model calls. Future investigations need their own selected scope and access limits.
 
 ## One complete operator journey
 
@@ -54,7 +54,7 @@ Reuse current receipts, artifacts, attempts, recipes, observations, reviewed lin
 
 A proposed source-profile revision records: stable namespace and version; supported container and source kind; one-record meaning; native key and identifier systems; relationship/cardinality rules; field meaning and address/contact purpose; supported operations; required/optional fields; unknown handling; limits and coverage; parser/configuration version; compatibility findings; origin and approval history. A recipe maps a specific input shape to that declared meaning. A new profile is not an unreviewed relaxation of required fields.
 
-P0 must decide whether the existing registry/recipe relations can represent these concepts or require additive persistence. Freeze exact service shapes and a migration/backfill/recovery decision before P2 coding. Conceptual fields here do not authorize speculative tables.
+The selected S1.1 implementation reuses existing registry/recipe relations; the full conceptual profile above is not a claim that every field is persisted. New semantics require a scoped contract and migration/recovery decision, not speculative tables.
 
 Clinician, organization, office, license, payer, product and network are separate domain concepts. S1 implements only the additions required by its selected sources; preserve the ability to represent later relationships without prematurely building the entire network model. A license or enrollment row may provide reference evidence without establishing an exact practice location.
 
@@ -62,19 +62,19 @@ Clinician, organization, office, license, payer, product and network are separat
 
 Recognize supported input or return unknown/ambiguous; never select a profile solely to obtain a successful parse. Drift produces a new compatibility report and proposed interpretation with pinned input/profile/recipe versions. Retain unknown fields as source evidence without silently making them business fields.
 
-Learning means retrieving approved profile/recipe examples and recorded reviewer corrections. Scope reuse by source family, semantics and compatible version, not merely similar column labels. Rejected, unreviewed or source-injected content cannot become trusted examples. Revoked/superseded examples remain historical and are excluded from new recommendations under an explicit policy.
+Current reuse retrieves compatible approved recipe examples in exact source/profile/scope; it creates a proposal for separate review. Superseded examples remain historical and are excluded from recommendations. Explicit example revocation and broader use of reviewer corrections remain future work. Rejected, unreviewed or source-injected content cannot become trusted examples.
 
 Reuse the existing OnboardingService, MappingAssistant and MCP service boundary. A configured model API and an external agent must return the same validated proposal representation while retaining distinct provenance. Model proposals cannot approve recipes, accept sources, merge identities or promote datasets. Manual and deterministic paths remain usable.
 
 Runtime extension produces declarative bindings and allowlisted transformations. A genuinely new parser is a developer-authored or agent-proposed code change, reviewed and tested through normal development before registration; runtime cannot install or execute generated code. Parser-generation assistance is later work, not an S1 runtime feature.
 
-Before P3, freeze sample permission, redaction, prompt/result schemas, retrieval policy, model/provider config, request/time/token/cost limits, cancellation, stale-input rejection and uncertain-call retry policy. Preserve the prior A1/A3 corpus; new capabilities receive a separate versioned evaluation. Use independent expected mappings, output values, abstentions and invalid-operation cases. Actual-model results, controlled-provider tests and observed human effort are different evidence. Do not tune expected answers after trials.
+The selected model invocation contract specifies sample permission, redaction, prompt/result schemas, retrieval policy, configuration, budgets, cancellation, stale-input rejection and uncertain-call retry policy; see [source onboarding](SOURCE_ONBOARDING.md). Preserve the prior A1/A3 corpus; new capabilities receive a separate versioned evaluation. Use independent expected mappings, output values, abstentions and invalid-operation cases. Actual-model results, controlled-provider tests and observed human effort are different evidence. Do not tune expected answers after trials.
 
 ## Output contract
 
-Primary planned output: a review workbook with **Directory**, **Unresolved issues**, and **Sources and export details** worksheets. The Directory represents a pinned approved version; unresolved issues may refer to records still present with their previously approved value. Cross-sheet clinician/office/issue identifiers and version/scope metadata make that relationship explicit. Preserve text identifiers, unknown values and safe spreadsheet cell serialization.
+The implemented review workbook contains **Directory**, **Unresolved issues**, and **Sources and export details** worksheets, with **Reviewed corrections** when applicable. The Directory represents a pinned approved version; unresolved issues may refer to records still present with their previously approved value. Feed-scoped row/office/issue references and version/scope metadata make that relationship explicit without inferring a clinician identity. Preserve text identifiers, unknown values and safe spreadsheet cell serialization.
 
-Retain existing machine-readable evidence exports. S1.1 must define exact column names/types, row grain, completeness/count rules, selection behavior, snapshot consistency, ordering, timezone representation and source-locator resolution. The workbook is a review deliverable, not an arbitrary payer's upload template. Recipient-specific exports require a named specification/version and their later acceptance gate. A locally approved value is not an externally verified contact or participation claim.
+Retain existing machine-readable evidence exports. The [workbook contract](REVIEW_WORKBOOK_CONTRACT.md) defines columns, row grain, counts, selection, snapshot consistency, ordering, timestamps and source references. The workbook is a review deliverable, not an arbitrary payer's upload template. Recipient-specific exports require a named specification/version and their later acceptance gate. A locally approved value is not an externally verified contact or participation claim.
 
 ## Stable acceptance scenarios
 
@@ -91,37 +91,25 @@ Retain existing machine-readable evidence exports. S1.1 must define exact column
 | AI-09 | A populated import-to-export journey is understandable and operable at desktop/narrow widths | Running screenshots, keyboard/focus/error checks, separately recorded owner review |
 | AI-10 | New processing failure or held candidate leaves the prior approved output usable | Failure/recovery rehearsal and independent downstream reader |
 
-These are target requirements. P0 maps each to existing coverage, a concrete gap and planned verification. Do not label an acceptance ID passed from a design statement or merely from a test count.
+These requirements remain stable. The [adaptive receipt](evidence/canonical/adaptive-release-2026-11-21/README.md) maps the selected release to evidence; STATUS and later receipts identify subsequent changes and open gates. A design statement or test count alone does not close an acceptance ID.
 
 ## Decisions required for S1.1
 
-| Decision | Recommended starting point | How to resolve |
-|---|---|---|
-| Tennessee contact evidence | One accessible registry/payer source with explicit office/contact meaning | Inspect actual sample and existing adapter; licensing only if semantics support the task |
-| Baseline authority | Practice roster is an explicitly chosen working baseline; other sources are competing evidence | Specify first-import and subsequent-approval behavior with the owner |
-| Breadth | Candidate matrix above, reusing existing parsers | Inspect supported limits and qualify multiple layouts; enumerate exclusions |
-| Profile persistence | Extend current versioned recipe/registry model | Identify exact gaps and freeze service/storage contract without duplicate canonical state |
-| UI system | React/TypeScript/Vite, existing TanStack Query/Table, shadcn/ui candidate | Record compatibility and maintenance decision; owner reviews populated visual proposal |
-| Approval/export behavior | Explicit field decisions and pinned dataset/workbook snapshot | Resolve how existing field decisions feed a candidate dataset; never infer propagation |
-| Adaptive invocation | Existing model client and MCP adapter through shared services | Freeze retrieval/proposal interface and limits before P3; credentials never inferred |
+The original S1.1 decisions covered the Tennessee reference source, roster authority, supported breadth, profile reuse, UI system, approval/export behavior and adaptive invocation. The selected decisions below and linked contracts supersede the initial candidate choices; remaining evidence gaps are recorded in STATUS.
 
 ## Revision discipline
 
-S1.0 captured direction. S1.1 freezes the source matrix, user flow, design proposal and planned interfaces after P0 review. S1.2 freezes the adaptive invocation/evaluation contract before P3. S1.3 freezes integrated release/export/demo acceptance before P4. Minor clarifications preserve IDs; changed semantics require a dated delta, affected tests/data assessment and explicit selection before implementation.
-
-Later S2 licensing/identity, S3 networks and S4 research/exchange are roadmap goals. Draft their detailed contracts at the preceding revision gate; do not execute speculative migrations for them now. Record owner decisions in DECISIONS, implementation evidence in STATUS, and exactly one active task in NEXT.
+Keep acceptance IDs stable. Changed semantics need a dated contract change and an assessment of affected tests, data and recovery before implementation. Later licensing, expanded network, research and exchange work require their own selected scope; see [ROADMAP](../ROADMAP.md) and [NEXT](../NEXT.md).
 
 ## Selected S1.1 decisions
 
 - Existing approved clinic dataset remains the working roster; external reference assertions cannot replace it automatically. Field decisions do not implicitly promote a new dataset.
 - First Tennessee evidence is a bounded NPPES API 2.1 Nashville/TN subset. A private three-record actual capture succeeded on 2026-11-21; six addresses included LOCATION and MAILING purposes. This is registry evidence, not state licensure or network acceptance. Synthetic samples remain committed examples.
 - Reuse existing profile/recipe records and their approval history. Compatibility and reuse are bounded shared-service operations; missing mapped columns block reuse. No new database server or duplicate registry.
-- Preserve the existing React/TanStack runtime. Deliver consistent evidence tables and controls with shared CSS/component boundaries for this slice; introducing shadcn is deferred to a separately validated dependency migration if needed. No component library alone establishes visual acceptance.
+- The original S1.1 slice used shared CSS/components and deferred shadcn. The subsequent [workbench migration](UI_WORKBENCH_MIGRATION.md) adopted shadcn and Tailwind; component adoption alone does not establish visual acceptance.
 - Review workbook reads a pinned approved version in a consistent read snapshot. It never applies contact proposals. Existing approval and verification stages remain authoritative.
 - Optional actual-model and participant evidence remain independent open gates. A model transport is not invoked merely to claim completed adaptation quality.
 
 ## S1.3 selected correction-release delta — 2026-11-21
 
-After UI qualification, the owner selected the complete reviewed-office-phone → candidate roster → separate dataset approval → pinned JSON/XLSX journey. [The materialization contract](FIELD_MATERIALIZATION_SPEC.md) freezes scope and failure semantics; [review format 2](REVIEW_WORKBOOK_CONTRACT.md) freezes extension/provenance output. Bulk and address corrections, licensing and network reconciliation remain later revisions. Existing AI-04/08/09 acceptance IDs cover decision preservation, inspected output and connected usability; the dated correction receipt records checks without substituting for participant evidence.
-
-The earlier shadcn deferral above is historical: the component-system migration and 100/1,000-record qualification are implemented; see STATUS. No new framework or dependency is selected by S1.3.
+After UI qualification, the owner selected the complete reviewed-office-phone → candidate roster → separate dataset approval → pinned JSON/XLSX journey. [The materialization contract](FIELD_MATERIALIZATION_SPEC.md) freezes scope and failure semantics; [review format 2](REVIEW_WORKBOOK_CONTRACT.md) freezes extension/provenance output. Bulk and address corrections, licensing and expanded source-specific network reconciliation remain later work. Existing bounded organization/network intake and review are described in the [API reference](API_REFERENCE.md#organizationnetwork-intake-schema-v4). Existing AI-04/08/09 acceptance IDs cover decision preservation, inspected output and connected usability; the dated correction receipt records checks without substituting for participant evidence.

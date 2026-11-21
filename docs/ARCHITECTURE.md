@@ -4,7 +4,7 @@ The application runs locally as one Python/FastAPI backend, a React/TypeScript c
 
 ## Selected separation architecture
 
-Selected 2026-11-21: evolve a **modular monolith**, one application with explicit responsibility boundaries, one SQLite database and one retained artifact store. These are logical ownership rules, not a claim that all existing files already follow new package boundaries. The [S1 draft](ADAPTIVE_INGESTION_SPEC.md) defines the next contract; P0 maps existing code and refactors only where the selected slice requires it.
+Selected 2026-11-21: evolve a **modular monolith**, one application with explicit responsibility boundaries, one SQLite database and one retained artifact store. These are logical ownership rules, not a claim that all existing files already follow new package boundaries. The [S1 contract](ADAPTIVE_INGESTION_SPEC.md) and [correction contract](FIELD_MATERIALIZATION_SPEC.md) describe the delivered bounded workflow; refactor only where selected work needs it.
 
 | Module | Owns | Provides | Must not do |
 |---|---|---|---|
@@ -117,3 +117,10 @@ The selected [UI contract](OPERATOR_EXPERIENCE.md) reuses workspace URL/action g
 ## Workbench presentation system
 
 The React/Vite client composes official shadcn Radix Nova source primitives with Tailwind 4 semantic tokens, Lucide icons and locally served IBM Plex Sans. WorkbenchShell owns responsive navigation; feature modules own query/draft/version guards and domain content. App loads major workspaces on demand. Shared primitives live in web/src/components/ui; supporting legacy styles are layered/scoped so they cannot silently override migrated controls. [The migration contract](UI_WORKBENCH_MIGRATION.md) identifies implemented coverage and measured versus unmeasured performance gates. Backend approval/storage ownership remains unchanged.
+
+
+## Reviewed correction and quality evidence
+
+`FieldMaterialization` uses fresh `FieldReconciliation` views and the existing managed-feed transaction/version model. Discovery can reuse a view inside its single read transaction; creation and approval reconstruct/recheck current evidence. No cache crosses a write boundary. `ManagedFeed` preserves source-to-source comparison separately from incoming assertions against approved local corrections.
+
+`review_workbook` builds pinned approved JSON/XLSX; a separate complete quality-report projection permits candidate investigation without authorizing consumer output. It reads persisted report columns without loading roster rows. The bounded interactive preview remains small; it is never the only available evidence for a required approval decision.

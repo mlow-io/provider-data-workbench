@@ -56,7 +56,7 @@ def main(argv=None):
             print(str(exc), file=sys.stderr)
             return 1
     Path('.runtime').mkdir(exist_ok=True)
-    root = (args.root or Path(tempfile.mkdtemp(prefix='employer-demo-', dir='.runtime'))).resolve()
+    root = (args.root or Path(tempfile.mkdtemp(prefix='workbench-demo-', dir='.runtime'))).resolve()
     root.mkdir(parents=True, exist_ok=True)
     # Never replace a resumed demo's original input files.
     if not (root/'inputs').exists():

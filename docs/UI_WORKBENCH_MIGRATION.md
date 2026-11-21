@@ -1,24 +1,20 @@
 # Workbench UI migration plan
 
-Selected design contract with implementation notes, 2026-11-21. The prior adaptive release improved the existing React/CSS screens; it did not install a component library or complete the workbench redesign. This plan makes that migration a distinct deliverable. [STATUS](../STATUS.md) owns implementation evidence; [NEXT](../NEXT.md) selects the next task. The owner subsequently authorized implementation; current evidence and remaining gates are recorded below.
+Design contract and historical migration reference, selected 2026-11-21. The shared shell and primary delivery/import/mapping/reconciliation controls are implemented; some supporting surfaces remain legacy. [STATUS](../STATUS.md) and the linked receipts describe verification and open limits; [NEXT](../NEXT.md) states the current task boundary.
 
 ## Outcome and proposed stack
 
 A provider-data operator works in one application shell: navigation, contextual toolbar, compact source/record list, selected-record inspector and explicit action area. Import inspection, mapping/quality, discrepancy review and export share the same interaction model. Source/version/office context remains visible while original evidence and configuration are progressively disclosed.
 
-Recommended implementation: existing React/TypeScript/Vite; **shadcn/ui + Tailwind CSS**; existing TanStack Query and Table. Start from an **official @shadcn sidebar block**, with sidebar-07 as the candidate, and compose the domain-specific workbench body. Record the selected block, primitive base, icon library and exact package versions at UI-W0. Template example accounts, teams, sample projects and placeholder cards must be removed or replaced by functioning product controls. No new authentication or backend framework is implied.
+The selected stack retains React/TypeScript/Vite and TanStack Query/Table, with **shadcn/ui + Tailwind CSS**. The shell composes official sidebar primitives after inspecting sidebar-07; see the implementation notes below. Template accounts and placeholder controls do not belong in product navigation. No new authentication or backend framework is implied.
 
-A component library supplies reusable behavior and visual primitives. An application-shell block supplies navigation/layout structure. The workbench's table/inspector/decision flow still needs product design. Do not claim migration complete by adding a sidebar around legacy long-form screens.
+A component library supplies reusable behavior and visual primitives; the table, inspector and decision flow require product-specific design. A sidebar alone does not complete migration of legacy screens.
 
 Official references: [Vite installation](https://ui.shadcn.com/docs/installation/vite), [sidebar blocks](https://ui.shadcn.com/blocks/sidebar), [table composition](https://ui.shadcn.com/docs/components/data-table). These are starting references, not pinned implementation inputs. Inspect current CLI output before generating components and retain generated source for review.
 
 ## Pre-migration baseline and concrete gaps
 
-- React 19/Vite 6, TanStack Query 5 and Table 8 are installed. At the start of migration, no components.json, Tailwind or shadcn dependency/configuration existed.
-- WorkbenchShell.tsx, EvidenceComparison.tsx and ApprovedExportReview.tsx contain reusable behavior, but the visual primitives remain custom.
-- Ten CSS files independently style shell, intake, normalization, managed feeds, evidence, reconciliation and network screens. Broad shell overrides already caused a primary-button hover contrast defect during the last release.
-- Delivery sections still contain substantial explanatory content and configuration/history within the main decision flow. A workbench needs stable selection and a dedicated inspector/action area.
-- Preserve workspaceNavigation deep links, query guards, dirty drafts, source/attempt/version pins, explicit approvals, unknown/null/absent semantics and actual download integrity.
+Before migration, custom control styles and stacked delivery sections made the task harder to scan. The [migration receipt](evidence/canonical/workbench-migration-2026-11-21/README.md) records the selected implementation and remaining supporting surfaces. Preserve navigation, query guards, dirty drafts, source/attempt/version pins, approval boundaries, unknown/null/absent semantics and download integrity.
 
 ## Representative layout and behavior
 
@@ -42,14 +38,14 @@ Import detail uses a short staged flow: inspect file → map/preview → review 
 
 ## Visual direction: precise, calm provider operations
 
-Review recommendation, 2026-11-21: retain the proposed stack and staged migration. Strengthen the contract around a recognizable product identity and measured responsiveness. The component system is a starting vocabulary; the distinguishing feature is a well-composed source comparison and decision inspector. The current approved-export capture shows readable evidence but substantial vertical prose and stacked panels. Review this against the proposed populated workbench, not an empty dashboard.
+The component system is a starting vocabulary; source comparison and the decision inspector must remain understandable in populated states. Assess recognizable product identity and responsiveness alongside actual tasks.
 
 The primary audience spends sustained time comparing office records and source assertions. Use a restrained, contemporary application aesthetic with clear surface separation, compact readable tables and deliberate typography. Technical depth belongs in the inspector; the main workspace answers which dataset is selected, what needs attention and what action is available.
 
 | Element | Proposed U1.0 direction and review rule |
 |---|---|
 | Identity and surfaces | Light neutral canvas, white data/inspector surfaces, deep ink navigation, one restrained blue/teal action accent. Retain a small product mark; use subtle borders, 6–8 px corner radii and shadow mainly for overlays. Contrast-test actual token combinations. Avoid a stack of equally prominent cards. |
-| Typography | Trial one locally served, licensed family such as IBM Plex Sans with a robust fallback; use tabular numerals for counts and monospace only for identifiers/raw evidence. Body/table text starts at 14–16 px; secondary metadata stays readable. Font choice and its transfer cost are part of the spike, not a prerequisite for functionality. |
+| Typography | Use a locally served, licensed family with a robust fallback; use tabular numerals for counts and monospace only for identifiers/raw evidence. Body/table text starts at 14–16 px; secondary metadata stays readable. Account for font transfer cost. |
 | Density and hierarchy | Start with 40–44 px table rows, a compact toolbar and a small title hierarchy. Prefer whitespace between task regions over padding around every field. Make the selected record and the next action obvious; avoid all-caps instructions, giant statistics and repetitive explanatory copy. Preserve full values through keyboard-accessible detail/copy controls. |
 | State vocabulary | Separate selection/action color from warning/error/success. Pair color with text/icon labels. Pending, proposed, approved and verified stay distinct; a green badge must not imply provider truth. Keep source and observation dates visible where they affect a decision. |
 | Interaction and motion | Stable inspector and table geometry; restrained 120–180 ms feedback with reduced-motion support. No entrance choreography, animated counters or a motion dependency for decoration. Loading placeholders reserve space; errors preserve context and provide a specific recovery action. |
@@ -57,13 +53,11 @@ The primary audience spends sustained time comparing office records and source a
 
 At 1440 and 1280 px, review the table beside its inspector with realistic long names, office addresses, missing values and competing evidence. At 1024 px, collapse navigation or switch to a focused detail view when both panes would be cramped. At 390 px and 200% zoom, preserve the complete review/export task with an explicit return to the list. Use content fit, not a device label, to choose the breakpoint. Table overflow stays inside its region; do not hide critical values/actions to make a screenshot fit.
 
-UI-W0 produces one primary direction and, only if needed, a small token/density variant of the same populated screen. Review default, selected, held, empty, loading, failure and stale states. A polished first view must also show where the operator starts; one integrated sample journey should be discoverable without reading project documentation. Dark mode, a command palette, customizable dashboards, bulk approval and a paid grid are deferred until a concrete workflow warrants them.
+Review default, selected, held, empty, loading, failure and stale states. A polished first view must also show where the operator starts; one integrated sample journey should be discoverable without reading project documentation. Dark mode, a command palette, customizable dashboards, bulk approval and a paid grid are deferred until a concrete workflow warrants them.
 
 ## Performance contract and evidence
 
-These are proposed engineering targets, not measured results or promises of dataset capacity. UI-W0 records the baseline and freezes the measurement setup before production migration. A miss requires a diagnosis and a scoped remediation or an explicitly reviewed limit; do not silently relax targets after observing a failure.
-
-Current code inspection identified two risks to measure: App.tsx eagerly imports the major workspace modules, and ApprovedExportReview.tsx fetches the full JSON export before displaying a five-row sample. The latter bounds rendered rows but not transfer, JSON parsing or server snapshot work. The existing chunk-size advisory also warrants inspection; suppressing the warning is not a performance improvement.
+These local engineering targets are not promises of dataset capacity. The [qualification protocol](UI_QUALIFICATION.md) and its receipt report measured 100/1,000-record results and limitations. The original eager workspace imports and full-JSON preview transfer have since been addressed; the bounded preview still constructs the complete server snapshot. A miss needs diagnosis and a scoped remediation or reviewed limit.
 
 | Concern | Proposed budget or decision rule |
 |---|---|
@@ -76,7 +70,7 @@ Current code inspection identified two risks to measure: App.tsx eagerly imports
 
 Use reproducible synthetic populations of 100 and 1,000 records with long strings, repeated offices, missing fields and multiple issues. The 1,000-record workload is the selected upper qualification bound. Do not run a 10,000-record case. Keep fixture generation and data loading outside timed UI actions; test the actual HTTP/service path for release evidence. A mocked spike can establish layout and rendering behavior only. Run at least five cold-load trials, report range and median, and retain interaction traces and failures alongside the exact build/fixture. Measure export preparation separately from download transfer; feedback must remain responsive while it runs.
 
-If current endpoints cannot supply bounded list/preview data, UI-W0 records a prerequisite contract revision before UI-W2 qualification. Such a revision must preserve full-export semantics, source/version scope, exact counts and expected-snapshot rejection; a summary response must not masquerade as the complete dataset. This is a bounded service dependency, not permission for a backend rewrite or silent API change. Do not claim scale qualification from a small fixture or a mocked response.
+Bounded previews must preserve full-export semantics, source/version scope, exact counts and expected-snapshot rejection; a sample is not the complete dataset. Do not infer scale qualification from a small fixture or mocked response.
 
 References: [TanStack Table v8 pagination](https://tanstack.com/table/v8/docs/guide/pagination) distinguishes client/server paging; [interaction responsiveness](https://web.dev/articles/inp) distinguishes next-paint feedback from asynchronous completion; [WCAG target-size guidance](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) explains target size and spacing. The project budgets above are local design choices, not thresholds mandated by those sources.
 
@@ -93,7 +87,7 @@ Do not create an unbounded generic dashboard framework. Extract components when 
 
 ## Compatibility and dependency decisions
 
-- The current official data-table guide uses TanStack Table v9; the repository uses v8. Keep v8 for the initial migration and use compatible APIs. Any major-version upgrade is a separate reviewed dependency change with regression evidence.
+- The repository uses TanStack Table v8. A major-version upgrade is a separate dependency change requiring compatibility and regression review.
 - Verify React/Vite/TypeScript/Node, Tailwind/plugin, registry primitive-base and overlay compatibility in the isolated spike. Pin exact resolved versions in the lockfile; do not run an uncontrolled dependency-upgrade sweep.
 - Follow the existing Vite proxy and Vitest configuration; preserve server settings and test setup when adding Tailwind and import aliases. Alias settings must agree between TypeScript and Vite.
 - Tailwind global styles/preflight can change legacy screens. Compare baseline screenshots and explicitly handle coexistence. Scope legacy selectors to legacy containers, remove migrated selectors and test remaining screens; adding the new theme beneath broad old button/headings rules is not acceptable.
@@ -101,6 +95,8 @@ Do not create an unbounded generic dashboard framework. Extract components when 
 - Retain current form state unless a concrete migrated interaction needs a form library. Additional router/state/grid libraries require a documented need; existing navigation/Query/Table remain the baseline.
 
 ## Ordered migration and specification revisions
+
+The original stage plan is retained below as historical context, not a current task queue. See the implementation notes and receipts for actual scope and open gates.
 
 | Stage | Contract / work | Completion gate |
 |---|---|---|
@@ -111,7 +107,7 @@ Do not create an unbounded generic dashboard framework. Extract components when 
 | **UI-W4 — discrepancy/provider tools and retirement** | U1.4 covers selected case, identities, field decisions and supporting source screens; migrate remaining primary surfaces | Shared table/inspector/action patterns; remove replaced CSS/components; legacy tools isolated without duplicate main journeys |
 | **UI-W5 — release acceptance** | U1.5 records final interaction/visual acceptance and retained limitations | Required frontend/build/browser checks, inspected outputs, keyboard/contrast/responsive checks, consistent screenshots, updated documentation and privacy-reviewed publication |
 
-UI stages reuse the prior UX1–5 and AI-09 acceptance boundaries; stable new IDs below express migration-specific outcomes. Field-candidate materialization remains a separate domain slice after UI-W2 unless a concrete dependency requires rescheduling. Licensing/network and backend roadmap work remain intact.
+UI stages reuse UX1–5 and AI-09; the stable IDs below express migration-specific outcomes. Field-candidate materialization was implemented separately in [S1.3](FIELD_MATERIALIZATION_SPEC.md).
 
 ## Acceptance and review boundaries
 
@@ -130,7 +126,7 @@ UI stages reuse the prior UX1–5 and AI-09 acceptance boundaries; stable new ID
 | WM-11 | Populated states share the selected type/color/density system at desktop, intermediate and narrow widths, with keyboard/contrast/reduced-motion/zoom checks |
 | WM-12 | One complete operator task is discoverable from the entry screen; record observed confusion separately from visual approval and automated correctness |
 
-Run AGENTS-required frontend tests, build and full browser gates for completed production slices; inspect real downloads. For UI-W0, run docs checks and the isolated spike's relevant checks, label synthetic outputs and keep user storage untouched. Preserve baseline and failed-run evidence. A rollback restores the previous frontend commit while retaining unchanged API/data storage; do not clear runtime state to recover a UI deployment.
+Run AGENTS-required frontend tests, build and full browser gates for completed production slices; inspect real downloads. Preserve baseline and failed-run evidence. Before rollback, check frontend/backend compatibility and preserve data and artifacts; do not clear runtime state to recover a UI deployment.
 
 ## Current implementation and remaining gates
 
@@ -140,4 +136,4 @@ Delivery review now uses a compact version table, selected inspector, evidence/o
 
 Major workspace modules load on demand. An isolated build of the prior revision produced a 519.08 kB initial JS chunk (145.90 kB gzip); the integrated migration build produced 365.86 kB (118.26 kB gzip), plus route chunks. Initial CSS grows from 10.74 to 16.73 kB gzip, and three local font weights add transfer. These are build measurements, not loading-time or field-performance results. The bounded review-preview endpoint now supplies the small workbook sample, retaining complete counts and the full export token. The [100/1,000-record qualification](UI_QUALIFICATION.md) records actual service/browser measurements and exact limits; server snapshot construction remains proportional to the full data. No beyond-1,000 scale claim is asserted.
 
-See [migration receipt](evidence/canonical/workbench-migration-2026-11-21/README.md) for exact checks and captures. Owner visual acceptance, uncoached usability, stress/interaction/memory budgets and exhaustive retirement of supporting legacy surfaces remain open. The implementation authorization supersedes the earlier prototype-only stop, but does not establish these evidence outcomes.
+See the [migration receipt](evidence/canonical/workbench-migration-2026-11-21/README.md), [UI qualification receipt](evidence/canonical/ui-qualification-2026-11-21/README.md) and [correction receipt](evidence/canonical/correction-export-2026-11-21/README.md) for checks and captures. The selected 100/1,000-record engineering measurements include interaction, one slowed-condition diagnostic and a finite heap observation; they do not establish broader capacity or leak freedom. Owner visual acceptance, uncoached usability, exhaustive accessibility/zoom qualification and retirement of supporting legacy surfaces remain open.

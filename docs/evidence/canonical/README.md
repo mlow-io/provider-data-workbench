@@ -1,6 +1,17 @@
 # Verification records
 
-The latest implementation qualification is [the 2026-11-15 integrated review](integrated-review-2026-11-15/README.md): 869 Python tests/pipeline, 134 frontend tests/build, 72 browser scenarios, inspected exports and both installed distribution journeys. [STATUS](../../../STATUS.md) owns the current summary. Dated records retain their exact revisions, failures, reruns and scope; earlier counts below describe the earlier candidate.
+[STATUS](../../../STATUS.md) owns the current summary. These records identify exact checkpoints, failures and limits; an older successful run is not automatically evidence for later code.
+
+| Current area | Record |
+|---|---|
+| Current documentation/code audit | [Findings, changes and checks](documentation-code-audit-2026-11-21/README.md) |
+| Adaptive intake and recipe reuse | [Adaptive release](adaptive-release-2026-11-21/README.md) |
+| Primary workbench migration | [Migration](workbench-migration-2026-11-21/README.md) |
+| 100/1,000-record UI/export qualification | [Initial UI qualification](ui-qualification-2026-11-21/README.md), [corrected-roster qualification](correction-export-2026-11-21/README.md) |
+| Reviewed phone → approved export | [Correction/export and loading guard](correction-export-2026-11-21/README.md) |
+| Independent external-agent observation | [Mapping challenge](independent-mapping-2026-11-21/README.md) |
+
+## Earlier engineering records
 
 | Area | Record |
 |---|---|
@@ -14,7 +25,7 @@ The latest implementation qualification is [the 2026-11-15 integrated review](in
 
 Application integration: 396aaf0. Canonical contracts: 0a295f8. The connected second-delivery rehearsal is in 409fbd8. This candidate descends from public main 572f891; private ancestry and runtime records are excluded.
 
-## Completed local checks
+### Completed local checks
 - Fresh virtual-environment setup with editable dev/MCP installation and npm ci.
 - Initial assembled application: 579 Python tests and pipeline validation passed; 114 frontend tests and production build passed; full desktop/phone browser suite passed 54 scenarios.
 - Focused outreach API/export regressions passed. An initial two-viewport test attempt used an incorrect exact label locator; the corrected role locator passed both widths. The application did not record an action during that failed test setup.
@@ -22,7 +33,7 @@ Application integration: 396aaf0. Canonical contracts: 0a295f8. The connected se
 - Existing challenge/held-out/generated matching metrics remain unchanged. The supplemental authored fixture has 11 address records and eight candidates: all three authored clinician pairs are retrieved, two satisfy strict eligibility; one known nonlink and one unresolved clinician pair remain suggestions for review. Partial labels do not support overall precision.
 - Matching and impact summaries, the investigation receipt and inspected synthetic [desktop](investigation-wide.png)/[phone](investigation-mobile.png) screenshots are retained alongside this file.
 
-## Final candidate qualification
+### Final candidate qualification
 
 [GitHub CI run 41723418456](https://github.com/mlow-io/provider-directory-workbench/actions/runs/41723418456), head 5848d6e, passed 580 Python tests, pipeline validation, documentation checks, 114 frontend tests, production build and all 54 desktop/phone browser scenarios. This includes the connected second-delivery investigation. Application/rehearsal code is unchanged in the follow-up evidence/status commit.
 

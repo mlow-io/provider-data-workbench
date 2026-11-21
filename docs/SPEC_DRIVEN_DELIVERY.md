@@ -1,49 +1,22 @@
 # Spec-driven delivery plan
 
-Updated 2026-11-21. The active work is P0 planning for [S1](ADAPTIVE_INGESTION_SPEC.md); P0–P8 scheduling lives in [ROADMAP](../ROADMAP.md). The D/R work packages below are retained historical delivery contracts, not the current task queue.
-
-Historical baseline updated 2026-11-14. The work packages below define the delivery sequence; linked receipts identify implemented and verified slices. This plan decomposes [ROADMAP](../ROADMAP.md); [STATUS](../STATUS.md) remains the sole summary of verified completion, and [NEXT](../NEXT.md) selects one active slice.
+This is a reference for the delivery contracts and stable acceptance IDs. P0 planning and the D/R packages below are historical, not the current task queue. [NEXT](../NEXT.md) states the current selection and authorization, [STATUS](../STATUS.md) records implementation and evidence, and [ROADMAP](../ROADMAP.md) describes future direction.
 
 ## Documentation authority
 
-| Document | Owns | Update rule |
-|---|---|---|
-| [SPEC](../SPEC.md) | User, problem, behavior, non-goals and end-to-end acceptance | Change when product behavior or boundaries change; do not put task logs here |
-| [ARCHITECTURE](ARCHITECTURE.md) | Components, shared contracts C1–C6 and integration risks | Change when a boundary or responsibility changes |
-| Area contracts below | Detailed semantics, input/output expectations and failure cases | Mark planned versus implemented explicitly; resolve contract changes before dependent code |
-| This delivery plan | Ordered work packages, dependencies, requirement-to-check mapping | Keep work IDs stable; link completed evidence instead of repeating logs |
-| [ROADMAP](../ROADMAP.md) | Milestone outcomes and exit gates | Do not treat subtask completion as whole-milestone qualification |
-| [NEXT](../NEXT.md) | One executable brief, current blockers and next action | Replace after a slice closes; link contracts and acceptance IDs |
-| [STATUS](../STATUS.md) and `docs/evidence/` | Actual implementation/verification and dated receipts | Record revision, command, fixture, result and limits; preserve failed attempts |
-| [DECISIONS](DECISIONS.md) | Why a consequential design was chosen | Add a short dated decision; explicitly supersede old choices |
-| [API_REFERENCE](API_REFERENCE.md), [DATA_DICTIONARY](DATA_DICTIONARY.md) | Implemented HTTP and persistence contracts | Update with code; proposed interfaces belong in a labeled area contract first |
-
-The README is the entrypoint, not another roadmap. Older intake proposals and execution/progress files are historical context, not competing task queues. Do not copy private chats into public design documents.
+[AGENTS](../AGENTS.md) defines the working agreement and document authority. [SPEC](../SPEC.md) and the relevant area contract describe behavior; [API_REFERENCE](API_REFERENCE.md) and [DATA_DICTIONARY](DATA_DICTIONARY.md) describe implemented interfaces and persistence. [DECISIONS](DECISIONS.md) records consequential choices, while dated evidence preserves observed outcomes and limitations. Older intake proposals and progress files are historical context.
 
 ## Active specification revision protocol
 
-S1.0 records the selected product direction. P0 must turn it into S1.1 with inspected source examples, a code/test gap map, populated user-flow/UI proposal, explicit planned service/storage/export contracts and an owner review. The roadmap assigns S1.2 before assisted adaptation, S1.3 before integrated release, then S2–S5 for licensing, networks, research/exchange and consumer/deployment architecture.
+The S1 planning and implementation history is retained in [the adaptive contract](ADAPTIVE_INGESTION_SPEC.md) and its linked receipts. Before a new selected slice changes durable meaning, specify its source and record grain, input/output and failure behavior, compatibility and recovery effects, acceptance checks, and unresolved decisions. Reuse existing implementations and keep requirement IDs stable. A roadmap item is not authorization to implement it.
 
-For each revision, record: previous revision; reason and changed behavior; affected requirement IDs; source/record grain; input/output examples; state transitions and error behavior; compatibility/migration/backfill/recovery impact; fixture expectations; chosen UI flow; budget/access limits; unresolved decisions; and selection/approval status. Do not invent an approval date or overwrite earlier decisions. Add a dated decision entry for consequential changes.
-
-Each milestone brief must identify:
-
-1. User-visible outcome and non-goals.
-2. Required spec revision, dependencies and verified baseline.
-3. Existing code to reuse and narrow implementation ownership.
-4. Acceptance IDs mapped to meaningful tests/observations and actual exports.
-5. Invocation-owned storage, source/model request limits and restart behavior.
-6. Stop conditions, evidence to retain and exact continuation instructions.
-
-A long run may complete the explicitly authorized milestones within their frozen contracts. It may choose internal implementation details. It must stop dependent work for unresolved durable semantics, insufficient source rights/access, an unapproved external cost/action or a required owner design decision; continue unrelated authorized work when useful. Record the blocking fact and proposed resolution rather than silently changing the goal. No passage of time grants approval.
-
-Before implementation, maintain this row shape in the active area spec: **requirement ID → existing implementation/test → remaining gap → planned check → observed receipt/limit**. Unrun checks remain planned. A passing parser test does not close the UI/export requirement. Existing D/R/F/N/A/E/PX/UX identifiers remain stable; S1 uses AI-01–10.
-
-After completion, STATUS records evidence, ROADMAP records the closed gate, NEXT selects one continuation, and implemented API/data docs change with code. Do not create another status dashboard or duplicate roadmap. Documentation-only revisions require link/whitespace checks and content consistency review, not full application requalification.
+For a completed slice, record actual checks and limits in STATUS or its linked receipt, and update implemented API/data references when applicable. [AGENTS](../AGENTS.md) owns the working and verification rules.
 
 ## Work areas and scope
 
-| Area | What must change | Authoritative detail |
+The following responsibilities retain the original D-series framing; see STATUS for their present implementation and limits.
+
+| Area | Original scope | Authoritative detail |
 |---|---|---|
 | Source acquisition | One bounded payer FHIR source; explicit query scope, page/error/retry evidence and replay | [Public sources](PUBLIC_DATA_SOURCES.md), C1, D2 |
 | Parsing and healthcare semantics | Typed resource interpretation, references, profile findings and conservative comparison projections | [FHIR intake](FHIR_INTAKE_CONTRACT.md), C2/C3, D1 |
@@ -56,6 +29,8 @@ After completion, STATUS records evidence, ROADMAP records the closed gate, NEXT
 These areas are responsibilities, not seven independent builds. Implement one complete slice through the affected backend, UI, export and tests before starting the next.
 
 ## Ordered work packages
+
+These are historical D-series work packages and acceptance boundaries, not instructions to repeat completed work.
 
 | ID | Deliverable | Depends on | Acceptance / completion evidence |
 |---|---|---|---|
@@ -91,21 +66,12 @@ Each implementation PR/receipt maps affected IDs to actual test names or observe
 
 ## Working loop
 
-1. Read NEXT and its linked contracts; verify checkout, branch, dirty state and owned test storage. Preserve unrelated work. Use a focused branch from public ancestry for implementation.
-2. Freeze the slice's user-visible behavior, data grain, service input/output, state changes, failure behavior and migration/recovery consequences. Mark open decisions. Resolve any that affect durable data or consumer meaning before dependent coding.
-3. Author representative fixtures and independent expected outcomes. Add meaningful failing boundary tests; use a temporary characterization check where current behavior is unclear. Avoid tests that merely mirror helper implementations.
-4. Implement the smallest connected path through producer, shared service, consumer/UI and export. Keep intermediate parser changes clearly incomplete until connected acceptance passes.
-5. Run affected checks and AGENTS-required full gates for the completed slice. Inspect outputs and failure/recovery behavior. Record implementation versus automated verification versus human observation separately.
-6. Review the diff against the contract, append a short receipt, update implemented API/data docs, STATUS and NEXT in the same change. Revise the area contract first if evidence requires a semantic change. Publication follows the repository's separate rules.
-
-Use one active slice and a short ordered backlog. Small commits may isolate parser, persistence and UI changes, but merge/claim the feature only when its complete acceptance boundary passes. Do not add a new goal/tooling system, generated status dashboard or duplicated task tracker for this plan.
+Follow the selected brief and the working agreement in [AGENTS](../AGENTS.md). Inspect existing behavior, implement a connected slice, verify meaningful outputs and preserve any failed or partial evidence. Do not treat a planned check as an observed result.
 
 ## Receipt and handoff minimum
 
-A dated receipt records work ID, baseline/candidate revision, acceptance IDs, invocation-owned fixtures/root designation, commands and exit results, inspected output values, failed attempts/reruns, unresolved limits and the next action. Keep private runtime paths, credentials, real provider records and participant details outside public receipts. STATUS links the receipt and states what remains open.
-
-H1 can run independently with [the existing walkthrough](INVESTIGATION_DEMO.md). H2 observes the expanded journey after D4. Engineering does not wait indefinitely for a participant, and automated success never substitutes for human usefulness evidence.
+A dated receipt identifies the revision, fixtures, checks, inspected outputs, failures and limitations; STATUS links it. Keep private runtime data and credentials out of public receipts. H1 and H2 require actual participants; automated checks cannot establish human usefulness.
 
 ## Independent completion slices R1–R4
 
-The renewed 2026-11-14 continuation is ordered in [ROADMAP](../ROADMAP.md#independent-headless-continuation): filtered-response integrity, coherent relationship qualification, portable distribution, then reviewable integrated delivery. These strengthen C1–C5 and packaging of the existing local product; actual-model access is not their dependency. R1 Q1–Q4 are frozen in [the source contract](PUBLIC_DATA_SOURCES.md#filtered-response-integrity-r1) and their retained brief/receipt. R2 G1–G4 are frozen in the FHIR contract, R3 P1–P4 in the operations distribution contract, and R4 V1–V4 in its retained review receipt/source contract. Each slice freezes acceptance before implementation. Preserve the original challenge corpus and historical receipts; qualify changed producer, consumer, UI and exports together before advancing.
+The 2026-11-14 continuation is recorded in [ROADMAP](../ROADMAP.md#independent-headless-continuation): filtered-response integrity, coherent relationship qualification, portable distribution, then reviewable integrated delivery. These strengthen C1–C5 and packaging of the existing local product; actual-model access is not their dependency. R1 Q1–Q4 are frozen in [the source contract](PUBLIC_DATA_SOURCES.md#filtered-response-integrity-r1) and their retained brief/receipt. R2 G1–G4 are frozen in the FHIR contract, R3 P1–P4 in the operations distribution contract, and R4 V1–V4 in its retained review receipt/source contract. These are historical completed slices; preserve their challenge corpus and receipts. See STATUS for their verified boundaries.
