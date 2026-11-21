@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import copy
+from collections import Counter
 import json
 
 from .intake_store import Conflict, now, packed, uid
@@ -137,6 +138,100 @@ class OnboardingService:
                 if run:
                     item['assistant_run'] = {'id': run['id'], 'receipt_id': run['receipt_id'], 'model': json.loads(run['config'])['model']}
         return {'items': items}
+
+    @staticmethod
+    def _example_query():
+        # Approval is a separate child of a proposal. Only approved corrections
+        # supersede their parent example; a pending proposal is not authority.
+        return """FROM recipe_revision r WHERE r.state='approved'
+            AND r.source=? AND r.profile=? AND r.scope=?
+            AND NOT EXISTS (SELECT 1 FROM recipe_revision p
+                JOIN recipe_revision a ON a.parent_id=p.id AND a.state='approved'
+                WHERE p.parent_id=r.id AND p.state='proposed')"""
+
+    def _compatibility(self, revision, headers):
+        original = self.store.detail(revision['receipt_id'], revision['attempt_id'])
+        spec = next(a['spec'] for a in original['attempts'] if a['id'] == revision['attempt_id'])
+        rows, prior_headers, _sheets, native = self.store.rows(original, spec)
+        if native:
+            prior_headers = sorted({key for row in rows for key in row['original']})
+        current, prior = set(headers), set(prior_headers)
+        missing = sorted(set(revision['definition']['mapping'].values()) - current)
+        ambiguous = sorted({key for columns in (headers, prior_headers)
+                            for key, count in Counter(columns).items() if count > 1})
+        added, removed = sorted(current - prior), sorted(prior - current)
+        return {'revision_id': revision['id'], 'receipt_id': revision['receipt_id'],
+                'attempt_id': revision['attempt_id'], 'artifact_sha': original['artifact_sha'],
+                'name': revision['name'], 'actor': revision['actor'], 'reason': revision['reason'],
+                'definition': revision['definition'],
+                'status': 'incompatible' if missing or ambiguous else 'drift' if added or removed else 'compatible',
+                'reusable': not missing and not ambiguous, 'missing_mapped_columns': missing,
+                'ambiguous_columns': ambiguous,
+                'added_columns': added, 'removed_columns': removed}
+
+    def recipe_compatibility(self, receipt_id, expected_attempt, offset=0, limit=20):
+        """Read-only, scoped approved examples and structural drift, never inferred meaning."""
+        if not expected_attempt:
+            raise ValueError('expected_attempt is required')
+        if type(offset) is not int or type(limit) is not int or offset < 0 or not 1 <= limit <= 100:
+            raise ValueError('Use offset >= 0 and limit between 1 and 100')
+        detail, settings, _rows, headers, _sheets, _native = self._input(receipt_id, expected_attempt)
+        if detail['profile'] != 'flat' or settings.get('roster_kind') == 'network':
+            raise ValueError('Recipe reuse supports clinic CSV/XLSX/flat JSON only')
+        params = (detail['source'], detail['profile'], packed(detail['metadata'].get('scope')))
+        query = self._example_query()
+        with self.store.db() as conn:
+            conn.execute('BEGIN')
+            self._check_attempt(conn, receipt_id, expected_attempt)
+            total = conn.execute('SELECT count(*) ' + query, params).fetchone()[0]
+            revisions = [decode(row) for row in conn.execute(
+                'SELECT r.* ' + query + ' ORDER BY r.created_at DESC,r.id DESC LIMIT ? OFFSET ?',
+                (*params, limit, offset))]
+        return {'receipt_id': receipt_id, 'attempt_id': expected_attempt,
+                'artifact_sha': detail['artifact_sha'], 'source': detail['source'],
+                'profile': detail['profile'], 'scope': detail['metadata'].get('scope'),
+                'items': [self._compatibility(revision, headers) for revision in revisions],
+                'total': total, 'next_offset': offset + limit if offset + limit < total else None,
+                'manual_fallback': True,
+                'notice': 'Header compatibility is not semantic verification. Preview and review every proposal; manual mapping remains available.'}
+
+    def check_example_pins(self, conn, receipt_id, pins):
+        """Fence selected examples under the caller's invocation/publication transaction."""
+        receipt = self.store._receipt(conn, receipt_id)
+        metadata = json.loads(receipt['metadata'])
+        params = (receipt['source'], receipt['profile'], packed(metadata.get('scope')))
+        for pin in pins:
+            row = conn.execute('SELECT r.* ' + self._example_query() + ' AND r.id=?',
+                               (*params, pin['revision_id'])).fetchone()
+            if (row is None or (row['receipt_id'], row['attempt_id']) != (pin['receipt_id'], pin['attempt_id'])
+                    or self.store._receipt(conn, pin['receipt_id'])['artifact_sha'] != pin['artifact_sha']):
+                raise Conflict('Approved recipe example changed; create a new reviewed assistant run')
+
+    def reuse_recipe(self, receipt_id, revision_id, payload):
+        """Copy a current approved example into a new proposal, without approving/applying it."""
+        if set(payload) != {'expected_attempt', 'actor', 'reason'}:
+            raise ValueError('Supply only expected_attempt, actor and reason')
+        expected = self.store.required(payload, 'expected_attempt')
+        detail, settings, _rows, headers, _sheets, _native = self._input(receipt_id, expected)
+        if detail['profile'] != 'flat' or settings.get('roster_kind') == 'network':
+            raise ValueError('Recipe reuse supports clinic CSV/XLSX/flat JSON only')
+        params = (detail['source'], detail['profile'], packed(detail['metadata'].get('scope')), revision_id)
+        with self.store.db() as conn:
+            row = conn.execute('SELECT r.* ' + self._example_query() + ' AND r.id=?', params).fetchone()
+        if row is None:
+            raise ValueError('Choose a current approved recipe example in this source/profile/dataset scope')
+        revision = decode(row)
+        if self._compatibility(revision, headers)['ambiguous_columns']:
+            raise ValueError('Ambiguous duplicate source columns block recipe reuse')
+        # Shared preview rejects missing bindings and validates every operation.
+        preview = self.preview(receipt_id, revision['definition'], expected, limit=1)
+        with self.store.db() as conn:
+            conn.execute('BEGIN IMMEDIATE')
+            if conn.execute('SELECT r.id ' + self._example_query() + ' AND r.id=?', params).fetchone() is None:
+                raise Conflict('Recipe example changed; inspect compatibility again')
+            return self._save_proposal(conn, receipt_id, {
+                **payload, 'name': revision['name'], 'parent_id': revision_id,
+            }, preview['definition'])
 
     def propose(self, receipt_id, payload):
         expected = self.store.required(payload, 'expected_attempt')

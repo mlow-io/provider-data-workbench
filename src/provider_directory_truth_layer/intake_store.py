@@ -584,6 +584,8 @@ class IntakeStore:
                             'sample_policy': context['sample_policy'], 'usage': result.get('usage'),
                             'conservative_estimated_usd': result.get('conservative_estimated_usd'),
                             'notice': 'Model proposal; approval and source acceptance are separate decisions.'}
+                        if 'approved_examples' in context:
+                            observation['normalization']['assistant']['approved_examples'] = context['approved_examples']
                 comparison = conn.execute('SELECT rule_version,evidence FROM observation_comparison WHERE observation_id=?', (observation['id'],)).fetchone()
                 if comparison:
                     observation['comparison_values'] = {'rule_version': comparison['rule_version'], 'records': json.loads(comparison['evidence'])}
@@ -704,7 +706,36 @@ class IntakeStore:
         norm = observation['normalized']
         provider, location = observation['provider_id'], observation['location_id']
         # Only source-native record + explicit source location provides stable operational scope.
-        stable = [receipt['source'], provider, location, norm.get('listing_id') or observation['native_id']] if provider and location and (norm.get('listing_id') or observation['native_id']) else None
+        legacy_stable = [receipt['source'], provider, location, norm.get('listing_id') or observation['native_id']] if provider and location and (norm.get('listing_id') or observation['native_id']) else None
+        scope = json.loads(receipt['metadata']).get('scope')
+        scope_json = packed(scope)
+        scoped_stable = [*legacy_stable, {'dataset_scope': scope}] if legacy_stable else None
+        stable = scoped_stable if scope is not None else legacy_stable
+
+        def existing_case(kind, field):
+            if stable is None:
+                return None, None
+            primary = digest([stable, kind, field])
+            legacy = digest([legacy_stable, kind, field])
+            # Preserve matching historical cases without rewriting their keys.
+            # Null-scope normally retains the original key, but an old scoped
+            # case can already occupy it; use an explicit null-scope key then.
+            fallback = digest([scoped_stable, kind, field])
+            keys = list(dict.fromkeys([primary, legacy, fallback]))
+            occupied_primary = False
+            for key in keys:
+                row = conn.execute('''select c.id,r.metadata from work_case c
+                    left join receipt r on r.id=json_extract(c.evidence,'$.receipt_id')
+                    where c.identity_key=?''', (key,)).fetchone()
+                if row is None:
+                    continue
+                if row['metadata'] is not None and packed(json.loads(row['metadata']).get('scope')) == scope_json:
+                    return row, key
+                occupied_primary |= key == primary
+            if occupied_primary and scope is not None:
+                raise Conflict('Scoped work identity conflicts with initial evidence scope')
+            return None, fallback if occupied_primary else primary
+
         findings = []
         existing_fields = set()
         if stable:
@@ -712,7 +743,7 @@ class IntakeStore:
             # Evidence alone must never verify or close an operator's correction.
             for field in ['phone', 'record', 'location_id', 'record_id']:
                 for kind in ['qa', 'correction']:
-                    prior = conn.execute('select id from work_case where identity_key=?', (digest([stable, kind, field]),)).fetchone()
+                    prior, _key = existing_case(kind, field)
                     if prior:
                         conn.execute('insert or ignore into work_evidence values (?,?)', (prior[0], observation['id']))
                         existing_fields.add(field)
@@ -725,8 +756,7 @@ class IntakeStore:
         if not findings and not existing_fields:
             findings.append(('qa', 'record', 'Review accepted source observation', 'low', 'Human source-evidence review'))
         for kind, field, issue, risk, risk_reason in findings:
-            key = digest([stable, kind, field]) if stable else None
-            case = conn.execute('select id from work_case where identity_key=?', (key,)).fetchone() if key else None
+            case, key = existing_case(kind, field)
             case_id = case[0] if case else uid()
             evidence = {'original': observation['original'], 'normalized': norm, 'locator': observation['locator'], 'receipt_id': receipt['id'], 'observation_id': observation['id'], 'listing_value': norm.get(field), 'reference_value': norm.get('reference_' + field), 'source': receipt['source'], 'designation': receipt['designation'], 'provider_id': provider, 'location_id': location}
             if not case:

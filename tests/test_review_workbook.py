@@ -233,15 +233,23 @@ def test_record_grain_and_office_namespaces_do_not_invent_clinician_identity(tmp
     assert first_north['record_id'] == second_north['record_id']
     assert first_north['source_record_key'] != second_north['source_record_key']
     assert first_north['office_key'] != second_north['office_key']
-    # Existing work keys predate dataset scoping. The second feed can inherit
-    # links to organization A's case, but its proposal must not cross exports.
+    # Preserve the export guard for historical polluted links from before the
+    # source-work scope fix. New cases are now isolated; reproduce only the old
+    # extra links in this owned synthetic database, without changing case keys.
     north_case = next(issue for issue in first['unresolved_issues'] if issue['office_key'] == first_north['office_key'])
+    assert len(first['unresolved_issues']) == len(second['unresolved_issues']) == 2
+    assert {issue['issue_id'] for issue in first['unresolved_issues']}.isdisjoint({issue['issue_id'] for issue in second['unresolved_issues']})
     with store.db() as conn:
+        for issue in first['unresolved_issues']:
+            source_record = next(row['record_id'] for row in first['directory'] if row['directory_row_id'] == issue['directory_row_id'])
+            observation = conn.execute('SELECT id FROM observation WHERE attempt_id=? AND native_id=?', (second['manifest']['attempt_id'], source_record)).fetchone()
+            conn.execute('INSERT INTO work_evidence VALUES (?,?)', (issue['issue_id'], observation['id']))
         conn.execute("UPDATE work_case SET proposal='6175550199',version=version+1 WHERE id=?", (north_case['issue_id'],))
     first_current = snapshot(store.path, first['version_id'])
     second_current = snapshot(store.path, second['version_id'])
     assert any(issue['proposed_value'] == '6175550199' for issue in first_current['unresolved_issues'])
-    assert second_current['unresolved_issues'] == []
+    assert len(second_current['unresolved_issues']) == 2
+    assert all(issue['proposed_value'] != '6175550199' for issue in second_current['unresolved_issues'])
     assert second_current['counts']['excluded_cross_scope_cases'] == 2
     assert second_current['scope_notice']
     guarded_book = load_workbook(io.BytesIO(workbook(second_current)))

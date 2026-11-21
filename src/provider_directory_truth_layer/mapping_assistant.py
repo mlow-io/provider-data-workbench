@@ -92,8 +92,11 @@ class MappingAssistant:
             raise ValueError('This source namespace has no server-configured external-processing permission')
 
     def create(self, receipt_id, payload):
-        if set(payload) != {'request_id', 'expected_attempt', 'actor', 'reason', 'external_processing'}:
-            raise ValueError('Supply only request_id, expected_attempt, actor, reason and external_processing')
+        required = {'request_id', 'expected_attempt', 'actor', 'reason', 'external_processing'}
+        if not required <= set(payload) or set(payload) - required - {'include_approved_examples'}:
+            raise ValueError('Supply request_id, expected_attempt, actor, reason, external_processing and optional include_approved_examples')
+        if 'include_approved_examples' in payload and type(payload['include_approved_examples']) is not bool:
+            raise ValueError('include_approved_examples must be an explicit boolean')
         for key in ('request_id', 'expected_attempt', 'actor', 'reason'):
             if not isinstance(payload[key], str) or not payload[key].strip() or len(payload[key]) > 2000:
                 raise ValueError(key + ' requires nonblank bounded text')
@@ -108,12 +111,15 @@ class MappingAssistant:
             return self.detail(receipt_id, prior['id'])
         detail = self.store.detail(receipt_id)
         self._eligible(detail)
-        raw, context = mapping_model.build_request(self.onboarding, receipt_id, payload['expected_attempt'])
+        raw, context = mapping_model.build_request(self.onboarding, receipt_id, payload['expected_attempt'],
+                                                   include_approved_examples=payload.get('include_approved_examples', False))
         context['external_processing_policy'] = {
             'basis': 'synthetic-designation' if detail['designation'] == 'synthetic' else 'configured-source-namespace',
             'source': detail['source'], 'explicit_run_permission': True}
         sha = self.store.retain(raw)
         configuration = self.configuration.public()
+        if payload.get('include_approved_examples'):
+            configuration['prompt_version'] = mapping_model.EXAMPLE_PROMPT_VERSION
         state = 'queued' if configuration['available'] else 'unavailable'
         result = {} if state == 'queued' else {'error': configuration['reason']}
         with self.store.db() as conn:
@@ -125,6 +131,7 @@ class MappingAssistant:
                 run_id = prior['id']
             else:
                 self.onboarding._check_attempt(conn, receipt_id, payload['expected_attempt'])
+                self.onboarding.check_example_pins(conn, receipt_id, context.get('approved_examples', {}).get('pins', []))
                 run_id = uid()
                 conn.execute('''INSERT INTO assistant_run
                     (id,request_id,intent_hash,receipt_id,attempt_id,config,context,request_sha,state,revision,result,created_at)
@@ -182,6 +189,10 @@ class MappingAssistant:
                 try:
                     self._eligible(self.store.detail(receipt_id))
                     current_config = self.configuration.public()
+                    if 'approved_examples' in row['context']:
+                        if row['context']['approved_examples']['policy'] != mapping_model.EXAMPLE_POLICY:
+                            raise ValueError('Approved example policy changed; create a new reviewed run')
+                        current_config['prompt_version'] = mapping_model.EXAMPLE_PROMPT_VERSION
                     if any(row['config'].get(key) != current_config[key] for key in ('provider', 'model', 'prompt_version', 'schema_version', 'limits', 'rates')):
                         raise ValueError('Assistant configuration changed; create a new reviewed run')
                     raw = self._read(row['request_sha'])
@@ -190,6 +201,7 @@ class MappingAssistant:
                     with self.store.db() as conn:
                         conn.execute('BEGIN IMMEDIATE')
                         self.onboarding._check_attempt(conn, receipt_id, row['attempt_id'])
+                        self.onboarding.check_example_pins(conn, receipt_id, row['context'].get('approved_examples', {}).get('pins', []))
                         reserved = conn.execute('SELECT coalesce(sum(reserved_microusd),0) FROM assistant_run').fetchone()[0]
                         if reserved + RESERVATION > LIFETIME:
                             raise ValueError('Local lifetime assistant budget exhausted; no request sent')
@@ -239,6 +251,7 @@ class MappingAssistant:
                     current = conn.execute('SELECT revision FROM assistant_run WHERE id=?', (run_id,)).fetchone()
                     if current['revision'] != row['revision']:
                         return self.detail(receipt_id, run_id)
+                    self.onboarding.check_example_pins(conn, receipt_id, row['context'].get('approved_examples', {}).get('pins', []))
                     proposal = self.onboarding._save_proposal(conn, receipt_id, {
                         'name': 'Model mapping proposal', 'actor': 'OpenAI model proposal: ' + mapping_model.MODEL,
                         'reason': f"Assistant run {run_id}; review required. " + result['explanation'],

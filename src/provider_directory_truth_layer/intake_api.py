@@ -288,6 +288,14 @@ def create_workbench(path: Path | None = None, root: Path | None = None, *, demo
     def recipes(receipt_id: str):
         return onboarding.recipes(receipt_id)
 
+    @app.get('/api/intakes/{receipt_id}/recipe-compatibility')
+    def recipe_compatibility(receipt_id: str, expected_attempt: str, offset: int = 0, limit: int = 20):
+        return onboarding.recipe_compatibility(receipt_id, expected_attempt, offset, limit)
+
+    @app.post('/api/intakes/{receipt_id}/recipes/{revision_id}/reuse')
+    def reuse_recipe(receipt_id: str, revision_id: str, payload: dict):
+        return onboarding.reuse_recipe(receipt_id, revision_id, payload)
+
     @app.post('/api/intakes/{receipt_id}/recipes')
     def propose_recipe(receipt_id: str, payload: dict):
         return onboarding.propose(receipt_id, payload)

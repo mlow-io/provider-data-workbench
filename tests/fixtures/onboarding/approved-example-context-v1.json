@@ -1,0 +1,17 @@
+{
+  "version": "approved-recipe-examples-1",
+  "prompt_version": "clinic-mapping-approved-examples-1",
+  "evidence_class": "synthetic-controlled-transport-only",
+  "limits": {"examples": 3, "bytes": 4000, "candidates": 20},
+  "expected_mapping": {
+    "record_id": "record_id", "npi": "npi", "provider_name": "provider_name",
+    "address": "address", "city": "city", "state": "state", "zip": "zip",
+    "phone": "phone", "location_id": "location_id"
+  },
+  "expected_current_values": {"phone": "6175550100", "zip": "02108"},
+  "private_prior_cell": "SYNTHETIC-PRIOR-CELL-DO-NOT-SEND",
+  "private_actor": "SYNTHETIC-REVIEWER-DO-NOT-SEND",
+  "private_reason": "SYNTHETIC-REASON-DO-NOT-SEND",
+  "negative_operation": "__import__",
+  "cases": ["default-preserved", "approved-only", "namespace-isolation", "superseded-before-call", "superseded-during-call", "bounded-examples", "invalid-operation", "explicit-abstention"]
+}

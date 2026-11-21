@@ -97,3 +97,58 @@ Schema 13 adds `assistant_run` (idempotent intent, receipt/attempt, configuratio
 Implemented HTTP surface: GET receipt-scoped `/assistant-runs` lists configuration/availability and runs; POST creates a run with the fields above; GET `/assistant-runs/{id}` returns its retained packet; POST `/{id}/run-once` explicitly invokes/resumes; POST `/{id}/cancel` requires revision/actor/reason. A completed proposal appears in the existing recipe selector, with run attribution and unresolved fields. Loading the editor or refreshing history does not invoke a model. Approval, application and dataset acceptance remain distinct existing decisions; runs have none of that authority.
 
 Freeze `tests/fixtures/onboarding/mapping-assistant-v1.json` and its manifest before any actual model trials. Compare exact field bindings, abstentions and cleaned values with independent authored expectations and the current alias-only baseline. Include reordered/messy headers, ZIP/extension preservation, dates, ambiguous contact numbers and instruction-like cells. Record raw per-case outputs, validation failures, missing/incorrect bindings, corrections needed, latency and available usage/cost, with denominators. Do not label correction counts as measured human effort. Gates are zero invalid operations reaching acceptance and zero incorrect automatic state changes. Keep the feature experimental/disabled while benefit is unproven. Missing API access leaves actual-model A1/A3 open; controlled transport tests are separate evidence.
+## Reviewed recipe reuse and drift contract (2026-11-21)
+
+This bounded P2 slice reuses schema 5 and its exact source namespace, profile and
+dataset scope. No new profile registry, migration or backfill is required. Recipe
+version 1 remains the declarative contract; native/network adapters are excluded.
+Approved recipe leaves are examples. A leaf is superseded only when a proposal
+descending directly from it receives an approval; an unapproved correction does
+not displace the earlier example. This is a recommendation policy, not revocation:
+existing pinned interpretations and direct approved-recipe application remain valid.
+
+Compatibility compares current headers with the headers parsed using the example's
+pinned original attempt settings. Missing mapped columns or duplicate ambiguous headings block reuse. Added or
+removed unmapped columns produce visible drift; they never acquire business meaning.
+Header compatibility cannot prove unchanged field semantics. Counts/values still
+require preview and review. Reports pin the current attempt/artifact and return
+at most 100 examples per page, with explicit pagination and deterministic ordering.
+They read retained evidence only and do not invoke a model or change an attempt.
+
+An explicit reuse action copies a compatible approved leaf into an immutable
+proposal on the current receipt, linking its parent to the example. It requires
+the current attempt, actor and reason; normal approval, application and source
+acceptance remain separate actions. A stale attempt, superseded example, incompatible
+scope, native/network input or missing mapped header changes no approved state.
+Manual mapping/preview/proposal remains the fallback for absent or incompatible
+examples. HTTP and external MCP agents share these services. Existing configured
+model proposals continue through the same declarative validator and review boundary;
+this slice does not change the frozen model prompt, external-processing permissions,
+budgets or evaluation corpus, and claims no actual-model qualification.
+
+## Opt-in approved-example context contract (S1.2 bounded slice)
+
+The assistant creation request optionally accepts `include_approved_examples: true`.
+Omitting it (or false) preserves the original `clinic-mapping-1` prompt and frozen
+A1/A3 corpus. True is explicit permission to include previously approved mapping
+**definitions**, in addition to the existing consented current-input sample.
+Existing namespace external-processing permission, request identity, cancellation,
+time/cost/byte limits, no-retry policy and human review are unchanged.
+
+The separate prompt version is `clinic-mapping-approved-examples-1`; context policy
+is `approved-recipe-examples-1`. Inspect at most 20 current approved leaves, select
+at most three structurally reusable examples in deterministic newest-first order,
+and include at most 4,000 UTF-8 JSON bytes of examples. Skip examples that do not
+fit; retain selected revision/receipt/attempt/artifact pins and omitted counts in
+run context. No prior source cells, reviewer actor/reason, recipe name or historical
+model explanation enter the provider request. Prior reviewed mappings are examples,
+not authority over source instructions or proof of unchanged semantics.
+
+Check selected examples still belong to the exact source/profile/scope and are
+current approved leaves before invocation and atomically before proposal publication.
+A superseded example fails the run without publication; after an invoked call its
+response and reserved budget remain historical evidence. A current-attempt fence
+continues to apply. Both routes produce only validated recipe proposals. No schema
+migration, training, generated-code execution or actual-provider trial is introduced.
+A separate synthetic controlled-transport fixture validates this context policy;
+its results are not model-quality or human-effort evidence.

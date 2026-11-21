@@ -309,3 +309,137 @@ def test_schema12_upgrade_and_api_packet_keep_source_and_run_ownership(setup, mo
     packet = client.get(f"/api/intakes/{receipt['id']}/packet").json()
     assert packet['assistant_runs'][0]['proposal_id'] == result['proposal_id']
     assert 'synthetic-provider-key' not in packed(packet)
+
+
+def example_fixture():
+    from pathlib import Path
+    return json.loads((Path(__file__).parent / 'fixtures/onboarding/approved-example-context-v1.json').read_text())
+
+
+def approve_example(service, receipt, *, parent_id=None, definition=None):
+    fixture = example_fixture()
+    body = {'expected_attempt': receipt['attempt_id'], 'actor': fixture['private_actor'],
+            'reason': fixture['private_reason']}
+    draft = service.onboarding.propose(receipt['id'], {**body, 'name': 'SYNTHETIC-NAME-DO-NOT-SEND',
+        'definition': definition or {'version': 1, 'mapping': fixture['expected_mapping'],
+                                     'transforms': {}, 'required': ['phone']}, 'parent_id': parent_id})
+    return service.onboarding.approve(receipt['id'], draft['id'], body)
+
+
+def test_opt_in_context_is_versioned_definition_only_and_proposal_only(setup):
+    store, receipt, service, calls = setup
+    fixture = example_fixture()
+    prior = store.receive(DATA.replace(b'Synthetic Clinician', fixture['private_prior_cell'].encode()),
+                          'prior.csv', source=receipt['source'], designation='synthetic')
+    approved = approve_example(service, prior)
+    # Unapproved and foreign-namespace history must not be exported as examples.
+    service.onboarding.propose(prior['id'], {'expected_attempt': prior['attempt_id'], 'actor': 'Unapproved',
+        'reason': 'Unreviewed', 'name': 'Draft', 'definition': approved['definition']})
+    other = store.receive(DATA, 'other.csv', source='other-source', designation='synthetic')
+    foreign = approve_example(service, other)
+    default = create(service, receipt, request_id='legacy')
+    expected_raw, _ = mapping_model.build_request(service.onboarding, receipt['id'], receipt['attempt_id'])
+    assert service._read(default['request_sha']) == expected_raw
+    assert 'approved_examples' not in default['context']
+    assert default['config']['prompt_version'] == mapping_model.PROMPT_VERSION
+    run = create(service, receipt, request_id='opt-in', include_approved_examples=True)
+    assert run['config']['prompt_version'] == fixture['prompt_version']
+    raw = service._read(run['request_sha'])
+    data = json.loads(json.loads(raw)['input'][0]['content'])
+    assert data['approved_examples'] == [{'revision_id': approved['id'], 'definition': approved['definition']}]
+    assert foreign['id'] not in raw.decode()
+    for private in ('private_prior_cell', 'private_actor', 'private_reason'):
+        assert fixture[private] not in raw.decode()
+    assert 'SYNTHETIC-NAME-DO-NOT-SEND' not in raw.decode()
+    context = run['context']['approved_examples']
+    assert context['policy']['version'] == fixture['version']
+    assert context['pins'] == [{'revision_id': approved['id'], 'receipt_id': prior['id'],
+                                'attempt_id': prior['attempt_id'], 'artifact_sha': prior['artifact_sha']}]
+    before = counts(store)
+    result = service.run_once(receipt['id'], run['id'])
+    assert result['state'] == 'succeeded' and len(calls) == 1
+    assert counts(store) == {**before, 'recipe_revision': before['recipe_revision'] + 1}
+    proposal_row = next(r for r in service.onboarding.recipes(receipt['id'])['items'] if r['id'] == result['proposal_id'])
+    assert proposal_row['state'] == 'proposed'
+    assert proposal_row['definition']['mapping'] == fixture['expected_mapping']
+    assert store.detail(receipt['id'])['observations'] == []
+    # Optional example provenance follows separately approved/accepted observations.
+    reviewed = service.onboarding.approve(receipt['id'], result['proposal_id'], {
+        'expected_attempt': receipt['attempt_id'], 'actor': 'Separate reviewer', 'reason': 'Review output'})
+    mapped = service.onboarding.apply(receipt['id'], reviewed['id'], receipt['attempt_id'])
+    store.commit(receipt['id'], {'expected_attempt': mapped['attempt_id'], 'actor': 'Acceptance reviewer',
+        'reason': 'Accept current source', 'policy': 'valid_rows'})
+    record = service.onboarding.dataset(receipt['id'])['records'][0]
+    assert record['normalization']['assistant']['approved_examples'] == context
+    assert {key: record['normalized'][key] for key in fixture['expected_current_values']} == fixture['expected_current_values']
+
+
+@pytest.mark.parametrize('during_call', [False, True])
+def test_superseded_selected_example_fences_invocation_or_publication(setup, during_call):
+    store, receipt, service, calls = setup
+    prior = store.receive(DATA, 'prior.csv', source=receipt['source'], designation='synthetic')
+    approved = approve_example(service, prior)
+    run = create(service, receipt, include_approved_examples=True)
+    def supersede():
+        return approve_example(service, prior, parent_id=approved['id'])
+    if during_call:
+        def transport(raw, key):
+            calls.append((raw, key))
+            supersede()
+            return reply()
+        service.transport = transport
+    else:
+        supersede()
+    before = counts(store)
+    result = service.run_once(receipt['id'], run['id'])
+    assert result['state'] == 'failed' and result['proposal_id'] is None
+    assert 'example changed' in result['result']['error']
+    assert len(calls) == int(during_call)
+    assert result['reserved_microusd'] == (80000 if during_call else 0)
+    assert bool(result['response_sha']) is during_call
+    assert counts(store)['observation'] == before['observation'] == 0
+    assert counts(store)['recipe_revision'] == before['recipe_revision'] + (2 if during_call else 0)
+
+
+def test_example_context_bounds_skip_large_definitions_and_reject_nonboolean_permission(setup):
+    store, receipt, service, calls = setup
+    fixture = example_fixture()
+    for _ in range(5):
+        approve_example(service, receipt)
+    oversized = approve_example(service, receipt, definition={'version': 1, 'mapping': fixture['expected_mapping'],
+        'transforms': {key: ['trim'] * 32 for key in fixture['expected_mapping']}, 'required': ['phone']})
+    run = create(service, receipt, include_approved_examples=True)
+    context = run['context']['approved_examples']
+    assert context['policy'] == {'version': fixture['version'], **fixture['limits']}
+    assert len(context['pins']) == 3
+    assert context['bytes'] <= fixture['limits']['bytes']
+    assert context['omitted_count'] == 3
+    assert oversized['id'] not in [item['revision_id'] for item in context['pins']]
+    for bad in ('true', 1, None, {}):
+        with pytest.raises(ValueError, match='boolean'):
+            create(service, receipt, request_id='invalid', include_approved_examples=bad)
+    with pytest.raises(Conflict):
+        create(service, receipt, include_approved_examples=False)
+    assert calls == []
+
+
+@pytest.mark.parametrize('abstain', [False, True])
+def test_example_route_still_validates_operations_and_supports_abstention(setup, abstain):
+    store, receipt, service, calls = setup
+    approve_example(service, receipt)
+    output = proposal()
+    if abstain:
+        output['bindings'] = []
+        output['unresolved'] = [{'field': field, 'reason': 'Current meaning is uncertain'} for field in REQUIRED]
+    else:
+        output['bindings'][0]['operations'] = [{'op': example_fixture()['negative_operation'], 'format': None}]
+    service.transport = lambda raw, key: reply(response(output))
+    run = create(service, receipt, include_approved_examples=True)
+    result = service.run_once(receipt['id'], run['id'])
+    assert result['state'] == ('succeeded' if abstain else 'failed')
+    if abstain:
+        assert result['result']['definition']['mapping'] == {}
+        assert len(result['result']['unresolved']) == len(REQUIRED)
+    else:
+        assert result['proposal_id'] is None
+    assert store.detail(receipt['id'])['observations'] == []

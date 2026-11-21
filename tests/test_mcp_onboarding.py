@@ -18,6 +18,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 from provider_directory_truth_layer.intake_store import IntakeStore
+from provider_directory_truth_layer.onboarding_service import OnboardingService
 
 
 def test_real_stdio_profile_preview_proposal_and_no_acceptance(tmp_path):
@@ -44,7 +45,8 @@ def test_real_stdio_profile_preview_proposal_and_no_acceptance(tmp_path):
                 await session.initialize()
                 tools = (await session.list_tools()).tools
                 names = {tool.name for tool in tools}
-                assert len(names) == 12
+                assert len(names) == 14
+                assert {'provider_recipe_compatibility', 'provider_reuse_recipe'} <= names
                 assert not any('accept' in name or 'approve' in name or 'apply' in name for name in names)
                 listed = await session.call_tool('provider_list_receipts', {})
                 assert not listed.isError
@@ -70,13 +72,27 @@ def test_real_stdio_profile_preview_proposal_and_no_acceptance(tmp_path):
                 assert not proposed.isError
                 assert proposed.structuredContent['state'] == 'proposed'
                 assert proposed.structuredContent['actor'] == 'MCP agent proposal'
+                # Approval is an independent operator action, absent from MCP capabilities.
+                approved = OnboardingService(store).approve(receipt['id'], proposed.structuredContent['id'], {
+                    'expected_attempt': receipt['attempt_id'], 'actor': 'Synthetic human reviewer', 'reason': 'Reviewed source'})
+                compatibility = await session.call_tool('provider_recipe_compatibility', {
+                    'receipt_id': receipt['id'], 'expected_attempt': receipt['attempt_id']})
+                assert not compatibility.isError
+                assert compatibility.structuredContent['items'][0]['revision_id'] == approved['id']
+                reused = await session.call_tool('provider_reuse_recipe', {
+                    'receipt_id': receipt['id'], 'revision_id': approved['id'],
+                    'expected_attempt': receipt['attempt_id'], 'reason': 'Reuse reviewed bindings'})
+                assert not reused.isError
+                assert reused.structuredContent['state'] == 'proposed'
+                assert reused.structuredContent['parent_id'] == approved['id']
+                assert reused.structuredContent['actor'] == 'MCP agent proposal'
                 bad = await session.call_tool('provider_inspect_input', {'receipt_id': receipt['id'], 'limit': 101})
                 assert bad.isError
     asyncio.run(journey())
     assert store.detail(receipt['id'])['attempt_id'] == receipt['attempt_id']
     assert store.detail(receipt['id'])['observations'] == []
     with store.db() as conn:
-        assert conn.execute('SELECT count(*) FROM recipe_revision').fetchone()[0] == 1
+        assert conn.execute('SELECT count(*) FROM recipe_revision').fetchone()[0] == 3
         assert conn.execute('SELECT count(*) FROM observation').fetchone()[0] == 0
 
 
