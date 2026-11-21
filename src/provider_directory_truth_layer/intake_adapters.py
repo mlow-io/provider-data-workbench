@@ -113,6 +113,13 @@ def parse_json(payload: bytes, profile: str) -> list[dict]:
                     " ".join(_text(basic.get(k)) for k in ("first_name", "middle_name", "last_name", "credential") if basic.get(k)),
                 "specialty": _text(taxonomy.get("desc")), **primary,
                 "locations": locations, "taxonomies": copy.deepcopy(taxonomies),
+                # Registry-reported qualifications are evidence, never board verification.
+                "reported_licenses": [
+                    {"number": _text(t.get("license")), "state": _text(t.get("state")),
+                     "taxonomy_code": _text(t.get("code")),
+                     "source_path": f"taxonomies[{j}]", "verification_status": "unverified"}
+                    for j, t in enumerate(taxonomies) if _text(t.get("license"))
+                ],
                 "status": {"A": "active", "I": "inactive"}.get(_text(basic.get("status")).upper(), "unknown"),
                 "source": "NPPES Registry API", "accepting_new_patients": "unknown",
             }
@@ -232,6 +239,18 @@ def fetch_public(source: str, query: dict) -> dict:
         if len(rows) > limit:
             raise ValueError("Public source returned more records than the requested cap")
         decoded = _decode(payload)
+        if source == "nppes":
+            purposes = {}
+            for row in rows:
+                for location in row["normalized"]["locations"]:
+                    purpose = location["purpose"] or "unknown"
+                    purposes[purpose] = purposes.get(purpose, 0) + 1
+            metadata["contact_evidence"] = {
+                "address_counts_by_purpose": purposes,
+                "reported_license_count": sum(len(row["normalized"]["reported_licenses"]) for row in rows),
+                "qualification_basis": "registry-reported; not licensing-board verification",
+                "location_basis": "source address purpose; no reviewed office association implied",
+            }
         total = decoded.get("count") if source == "cms" else None
         try:
             total = int(total) if total is not None else None

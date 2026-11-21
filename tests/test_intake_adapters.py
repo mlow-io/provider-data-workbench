@@ -215,3 +215,32 @@ def test_cms_datastore_failure_does_not_mislabel_metadata_as_error_body(monkeypa
     assert caught.value.payload is None
     assert '/datastore/' in caught.value.metadata['request_url']
     assert caught.value.metadata['dataset_metadata']['identifier'] == 'mj5m-pzi6'
+
+
+def test_nppes_reported_licenses_preserve_native_scope_without_verification():
+    source = {"result_count": 1, "results": [{"number": "1000000001", "taxonomies": [
+        {"license": "00123", "state": "TN", "code": "207Q00000X", "primary": True},
+        {"license": "00045", "state": "KY", "code": "207Q00000X"},
+        {"license": "", "state": "TN"}], "addresses": [
+        {"address_purpose": "MAILING", "state": "KY"},
+        {"address_purpose": "LOCATION", "state": "TN"}]}]}
+    row = adapters.parse_json(json.dumps(source).encode(), 'nppes')[0]
+    licenses = row['normalized']['reported_licenses']
+    assert [(x['number'], x['state'], x['source_path']) for x in licenses] == [
+        ('00123', 'TN', 'taxonomies[0]'), ('00045', 'KY', 'taxonomies[1]')]
+    assert all(x['verification_status'] == 'unverified' for x in licenses)
+    assert row['original'] == source['results'][0]
+    assert row['normalized']['state'] == 'TN'
+
+
+def test_nppes_capture_summarizes_contact_purpose_and_reported_license_scope(monkeypatch):
+    payload = json.dumps({"result_count": 1, "results": [{"number": "1000000001",
+        "addresses": [{"address_purpose": "LOCATION"}, {"address_purpose": "MAILING"}],
+        "taxonomies": [{"license": "00123", "state": "TN"}]}]}).encode()
+    monkeypatch.setattr(adapters, '_read_url', lambda _: payload)
+    captured = adapters.fetch_public('nppes', {'state': 'TN', 'limit': 1})
+    evidence = captured['metadata']['contact_evidence']
+    assert evidence['address_counts_by_purpose'] == {'LOCATION': 1, 'MAILING': 1}
+    assert evidence['reported_license_count'] == 1
+    assert 'not licensing-board verification' in evidence['qualification_basis']
+    assert captured['payload'] == payload
