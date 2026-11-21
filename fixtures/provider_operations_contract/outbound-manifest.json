@@ -1,0 +1,13 @@
+{
+  "contract": "provider-operations-v1",
+  "designation": "synthetic",
+  "fixture_note": "Symbolic IDs describe records a test seed must create; these are not live provider or storage facts.",
+  "exchange_id": "SYN-EX-001",
+  "recipient_id": "SYN-PAYER-A",
+  "recipient_profile": "synthetic-recipient-roster/1",
+  "source_pins": {"receipt_id": "SYN-CLINIC-RECEIPT", "attempt_id": "SYN-CLINIC-ATTEMPT", "approved_version_id": "SYN-APPROVED-V1", "context_revision": "SYN-CONTEXT-V1"},
+  "items": [
+    {"item_key": "SYN-ROW-NORTH", "record_id": "SYN-CLINIC-ROW-NORTH", "clinician_id": "SYN-CLINICIAN-ONE", "location_id": "SYN-OFFICE-NORTH", "clinician_link_revision": "SYN-CLINICIAN-LINK-V1", "location_link_revision": "SYN-NORTH-LINK-V1", "provider_name": "Fixture Clinician", "npi": "1234567890", "requested_phone": "6155550101"},
+    {"item_key": "SYN-ROW-SOUTH", "record_id": "SYN-CLINIC-ROW-SOUTH", "clinician_id": "SYN-CLINICIAN-ONE", "location_id": "SYN-OFFICE-SOUTH", "clinician_link_revision": "SYN-CLINICIAN-LINK-V1", "location_link_revision": "SYN-SOUTH-LINK-V1", "provider_name": "Fixture Clinician", "npi": "1234567890", "requested_phone": "6155550202"}
+  ]
+}

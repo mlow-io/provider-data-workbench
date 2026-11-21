@@ -1,0 +1,17 @@
+
+> directory-review-console@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 <checkout>/web
+
+
+ Test Files  19 passed (19)
+      Tests  136 passed (136)
+   Start at  12:01:11
+   Duration  3.47s (tests 59%, environment 27%, import 7%, setup 5%, transform 2%, worker 1%)
+
+Environment  jsdom was created 19 times · 7.18s total, 27% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

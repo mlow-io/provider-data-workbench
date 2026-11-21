@@ -1,0 +1,4 @@
+response_id,exchange_id,recipient_id,response_scope,item_key,disposition,reason_code,source_effective_at
+SYN-RESP-001,SYN-EX-001,SYN-PAYER-A,file,,received,,2026-11-01T09:00:00-06:00
+SYN-RESP-001,SYN-EX-001,SYN-PAYER-A,item,SYN-ROW-NORTH,accepted,,2026-11-01T09:01:00-06:00
+SYN-RESP-001,SYN-EX-001,SYN-PAYER-A,item,SYN-ROW-SOUTH,rejected,OFFICE_PHONE_REVIEW,2026-11-01T09:01:00-06:00

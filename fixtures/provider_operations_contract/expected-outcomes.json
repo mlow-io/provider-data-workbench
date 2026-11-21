@@ -1,0 +1,113 @@
+{
+  "designation": "synthetic",
+  "baseline": {
+    "input": "response-baseline.csv",
+    "before_review": {
+      "retained_rows": 3,
+      "proposed_item_links": 2,
+      "confirmed_item_links": 0,
+      "selected_item_dispositions": 0
+    },
+    "actions": [
+      "confirm both exact item correlations at SYN-CONTEXT-V1",
+      "select each source item as its working disposition"
+    ],
+    "after_review": {
+      "file_receipt": "received",
+      "SYN-ROW-NORTH": "accepted",
+      "SYN-ROW-SOUTH": "rejected",
+      "accepted_items": 1,
+      "rejected_items": 1,
+      "established_disposition_denominator": 2,
+      "disputed_items": 0,
+      "observed_directory_corrections": 0,
+      "approved_version_id": "SYN-APPROVED-V1",
+      "rejection_rate_numerator": 1,
+      "rejection_rate_denominator": 2,
+      "response_item_coverage_numerator": 2,
+      "response_item_coverage_denominator": 2,
+      "established_disposition_coverage_numerator": 2,
+      "established_disposition_coverage_denominator": 2
+    },
+    "selected_rejection_packet": {
+      "item_keys": [
+        "SYN-ROW-SOUTH"
+      ],
+      "location_ids": [
+        "SYN-OFFICE-SOUTH"
+      ],
+      "reason_codes": [
+        "OFFICE_PHONE_REVIEW"
+      ],
+      "shared_original_context_includes_other_office": true
+    }
+  },
+  "same_request_retry": {
+    "new_decisions": 0,
+    "same_result_ids": true
+  },
+  "reordered_equivalent_response": {
+    "new_business_outcomes": 0,
+    "retain_new_physical_delivery_if_uploaded": true
+  },
+  "same_response_id_changed_disposition": {
+    "state": "response_identity_conflict",
+    "overwrite_prior_evidence": false,
+    "new_current_dispositions": 0
+  },
+  "new_contradictory_response": {
+    "input": "response-contradictory.csv",
+    "after_confirming_correlation": {
+      "SYN-ROW-NORTH": "accepted",
+      "SYN-ROW-SOUTH": "disputed",
+      "accepted_items": 1,
+      "rejected_items": 0,
+      "disputed_items": 1,
+      "established_disposition_denominator": 1,
+      "previous_selection_retained": true,
+      "observed_directory_corrections": 0,
+      "rejection_rate_numerator": 0,
+      "rejection_rate_denominator": 1,
+      "response_item_coverage_numerator": 2,
+      "response_item_coverage_denominator": 2,
+      "established_disposition_coverage_numerator": 1,
+      "established_disposition_coverage_denominator": 2
+    }
+  },
+  "unknown_item": {
+    "input": "response-unknown-item.csv",
+    "reason": "item_unknown",
+    "confirmed_item_links": 0,
+    "new_exchange_items": 0
+  },
+  "conflicting_duplicate": {
+    "input": "response-conflicting-duplicate.csv",
+    "retained_rows": 2,
+    "affected_item_correlation": "blocked",
+    "reason": "item_ambiguous",
+    "new_selected_dispositions": 0
+  },
+  "wrong_recipient": {
+    "mutation": "change recipient_id to SYN-PAYER-B",
+    "reason": "recipient_mismatch",
+    "confirmed_item_links": 0
+  },
+  "missing_exchange": {
+    "mutation": "blank exchange_id",
+    "reason": "exchange_unknown",
+    "infer_by_npi_or_latest_exchange": false
+  },
+  "stale_review": {
+    "mutation": "change current office link revision after preview",
+    "confirm_selection_result": "context_stale",
+    "partial_decisions_written": 0,
+    "historical_response_retained": true
+  },
+  "invariants": {
+    "dataset_promotions": 0,
+    "identity_changes": 0,
+    "source_record_updates": 0,
+    "outbound_network_requests": 0,
+    "model_calls": 0
+  }
+}

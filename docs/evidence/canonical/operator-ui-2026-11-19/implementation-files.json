@@ -1,0 +1,89 @@
+{
+  "baseline": "52a6f4f7168115719674c19b0b2182abf4cd943c",
+  "files": [
+    {
+      "path": "web/e2e/guided-first-review.spec.ts",
+      "sha256": "ee362ea6b22fe0c81309892f0353db5b9aace2ea3193eddb4b54ca8f2a8c8eae"
+    },
+    {
+      "path": "web/e2e/ingestion-platform.spec.ts",
+      "sha256": "ca68d27a89c3233d40e4c01e7738d015429627d9d3326e66fc8ca853d1c0f16c"
+    },
+    {
+      "path": "web/e2e/managed-feed.spec.ts",
+      "sha256": "7a2d593febc8d9e8bc59f5267f32c0537b9f1b8a7c197b86c2c400d00dec86a5"
+    },
+    {
+      "path": "web/e2e/operator-workspace.spec.ts",
+      "sha256": "13a872dc8c99adee44391ac640c96397fd0e32af95ff288ec9e0aa1efea119b6"
+    },
+    {
+      "path": "web/e2e/reconciliation.spec.ts",
+      "sha256": "c99426688e29800cc8f84f7371abcb7d4cda719e9a68f87002890266b5866edf"
+    },
+    {
+      "path": "web/e2e/remediation-workflow.spec.ts",
+      "sha256": "df0c1d1c46aa7cbd3cfc44ee22b1ebcceb83132498bfb23b2b10b6ad4b525c9b"
+    },
+    {
+      "path": "web/e2e/review-console.spec.ts",
+      "sha256": "8d7cd105f6979b8e8d64a5abff3af2c86cec028224c7dab7c2934c8d0c537a46"
+    },
+    {
+      "path": "web/index.html",
+      "sha256": "cdb26b071b00ae2bf355fbb8e22503f9400f2d4a329c3c4605735f1c60e9155f"
+    },
+    {
+      "path": "web/src/App.test.tsx",
+      "sha256": "71ac2ee5fb9095bd7e8dc6b7b8542a02089f2a3787bfd861762f5716a26dfddd"
+    },
+    {
+      "path": "web/src/App.tsx",
+      "sha256": "24602bbca6e26cc89e2677c4ac79d96bb3d65a8fc0696598453ec426191f24ea"
+    },
+    {
+      "path": "web/src/DeliveryReviewSummary.test.tsx",
+      "sha256": "64651accfd8d1227e5c4862cac80ea64616ea71a8ec037b1c1bb4b8b1b743154"
+    },
+    {
+      "path": "web/src/DeliveryReviewSummary.tsx",
+      "sha256": "d77b374db116fa88d0375d12adaf2045e6588e60c967f7d40d1c733aeb7e403b"
+    },
+    {
+      "path": "web/src/IntakeWorkbench.tsx",
+      "sha256": "3991ea81adfde698caef6477e51dde3f8bf8128120797417acc2f14a6fb6d94d"
+    },
+    {
+      "path": "web/src/ManagedFeeds.test.tsx",
+      "sha256": "aa8ae3ad470247698a6251bf4cbb9c262ddecdc82b599dcfde8f3b18e562f4cf"
+    },
+    {
+      "path": "web/src/ManagedFeeds.tsx",
+      "sha256": "0246e6a1732d891900d200b4e53bfe8eb466a5a2e2303acf66c4965d05817f52"
+    },
+    {
+      "path": "web/src/ReconciliationWorkspace.tsx",
+      "sha256": "b4ece975aeac680373a3f9b9afc17b589865ac930e946df8fde37336cfb2d449"
+    },
+    {
+      "path": "web/src/RecurringImport.tsx",
+      "sha256": "450146c027274f7c21818304206a02d0c73e41f941a1e5df47d54ea56d75e2c6"
+    },
+    {
+      "path": "web/src/RemediationWorkspace.test.tsx",
+      "sha256": "41d1ba54fc9e611a744fb554af196a0182b5db4c271f6258bdc0573861a0b699"
+    },
+    {
+      "path": "web/src/RemediationWorkspace.tsx",
+      "sha256": "6394f83f22c344bbdb9715c0240f7e9c8a902163fbae8000777b667eba55efaf"
+    },
+    {
+      "path": "web/src/WorkbenchShell.tsx",
+      "sha256": "3fb47f56c9a2a02afb9c0f644ef26970daae9ec18e8f0be5936582e1f4b04350"
+    },
+    {
+      "path": "web/src/workbench-shell.css",
+      "sha256": "89c212a1fc6fc400c92a95a36a62f6910aea4146dba42aad531d0281f636554a"
+    }
+  ]
+}

@@ -1,0 +1,1276 @@
+
+> directory-review-console@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.5 <checkout>/web
+
+ ❯ src/RemediationWorkspace.test.tsx (1 test | 1 failed) 1664ms
+   × opens remediation evidence and submits a human triage event through the separate API 1662ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/RemediationWorkspace.test.tsx > opens remediation evidence and submits a human triage event through the separate API
+TestingLibraryElementError: Unable to find role="heading" and name "Follow the evidence through verification."
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="wb-app"
+    >
+      <a
+        class="wb-skip"
+        href="#workspace-content"
+      >
+        Skip to workspace
+      </a>
+      <aside
+        class="wb-sidebar"
+      >
+        <div
+          class="wb-brand"
+        >
+          <span
+            aria-hidden="true"
+            class="wb-brand-mark"
+          >
+            pd
+            <span>
+               / 
+            </span>
+          </span>
+          <strong>
+            Provider Directory
+            <span>
+              Workbench
+            </span>
+          </strong>
+        </div>
+        <nav
+          aria-label="Workbench navigation"
+        >
+          <p
+            class="wb-nav-heading"
+          >
+            Daily work
+          </p>
+          <div
+            class="wb-nav-group"
+          >
+            <a
+              href="?view=work"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                01
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Work queue
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Investigate and follow up
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=intake"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                02
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Receive data
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Upload, map and review
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=feeds"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                03
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Deliveries
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Review recurring datasets
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=reconciliation"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                04
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Provider records
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Link identities and compare
+                </small>
+              </span>
+            </a>
+          </div>
+          <p
+            class="wb-nav-heading"
+          >
+            Sources & supporting tools
+          </p>
+          <div
+            class="wb-nav-group wb-tools"
+          >
+            <a
+              href="?view=sources"
+            >
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Sources
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Capture and source history
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=qa"
+            >
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Legacy QA
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Original batch review
+                </small>
+              </span>
+            </a>
+            <a
+              aria-current="page"
+              href="?view=remediation"
+            >
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Corrections
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Original correction loop
+                </small>
+              </span>
+            </a>
+          </div>
+        </nav>
+        <div
+          class="wb-local"
+        >
+          <span
+            aria-hidden="true"
+          >
+            ●
+          </span>
+           Local workspace
+          <small>
+            Decisions and evidence are retained here.
+          </small>
+        </div>
+      </aside>
+      <div
+        class="wb-content"
+      >
+        <header
+          class="wb-context"
+        >
+          <span>
+            Provider operations 
+            <span
+              aria-hidden="true"
+            >
+              /
+            </span>
+             
+            <strong>
+              Corrections
+            </strong>
+          </span>
+          <span
+            class="wb-local-label"
+          >
+            Single-user workspace
+          </span>
+        </header>
+        <div
+          id="workspace-content"
+          tabindex="-1"
+        >
+          <main
+            class="app-shell remediation-shell"
+          >
+            <header
+              class="topbar"
+            >
+              <div
+                class="brand"
+              >
+                <span
+                  aria-hidden="true"
+                  class="brand-mark"
+                >
+                  ⇄
+                </span>
+                <div>
+                  <p>
+                    Directory Remediation
+                  </p>
+                  <span>
+                    Human-controlled payer verification
+                  </span>
+                </div>
+              </div>
+              <button
+                class="button button-secondary workspace-switch"
+              >
+                ← QA exception review
+              </button>
+            </header>
+            <section
+              aria-label="Remediation scope"
+              class="remediation-notice"
+            >
+              <strong>
+                Human judgment, recorded.
+              </strong>
+              <span>
+                These are synthetic payer-directory discrepancies. Approval records a proposed correction; it never changes provider truth or sends a payer update.
+              </span>
+            </section>
+            <section
+              aria-labelledby="remediation-heading"
+              class="remediation-heading"
+            >
+              <div>
+                <p
+                  class="eyebrow"
+                >
+                  Payer directory loop
+                </p>
+                <h1
+                  id="remediation-heading"
+                >
+                  Correction review and verification
+                </h1>
+                <p>
+                  Inspect the stored comparison, make a reasoned proposal, and record what the payer actually shows.
+                </p>
+              </div>
+              <div
+                aria-label="Workflow stages"
+                class="loop-key"
+              >
+                <span>
+                  Evidence
+                </span>
+                <b>
+                  →
+                </b>
+                <span>
+                  Human proposal
+                </span>
+                <b>
+                  →
+                </b>
+                <span>
+                  Observed verification
+                </span>
+              </div>
+            </section>
+            <section
+              aria-label="Remediation workspace"
+              class="remediation-workspace"
+            >
+              <section
+                class="remediation-queue"
+              >
+                <div
+                  class="queue-top"
+                >
+                  <div>
+                    <p
+                      class="eyebrow"
+                    >
+                      Field discrepancy queue
+                    </p>
+                    <h2>
+                      1
+                       case
+                       
+                      <span>
+                        available for human action
+                      </span>
+                    </h2>
+                  </div>
+                  <button
+                    class="text-button"
+                  >
+                    Reset filters
+                  </button>
+                </div>
+                <div
+                  class="filters remediation-filters"
+                >
+                  <label>
+                    Status
+                    <select
+                      aria-label="Remediation status filter"
+                    >
+                      <option
+                        value=""
+                      >
+                        All statuses
+                      </option>
+                      <option
+                        value="new"
+                      >
+                        new
+                      </option>
+                      <option
+                        value="triaged"
+                      >
+                        triaged
+                      </option>
+                      <option
+                        value="approved"
+                      >
+                        approved
+                      </option>
+                      <option
+                        value="pending_verification"
+                      >
+                        pending verification
+                      </option>
+                      <option
+                        value="reopened"
+                      >
+                        reopened
+                      </option>
+                      <option
+                        value="verified"
+                      >
+                        verified
+                      </option>
+                      <option
+                        value="deferred"
+                      >
+                        deferred
+                      </option>
+                    </select>
+                  </label>
+                  <label>
+                    Risk
+                    <select
+                      aria-label="Remediation risk filter"
+                    >
+                      <option
+                        value=""
+                      >
+                        All risks
+                      </option>
+                      <option
+                        value="high"
+                      >
+                        high
+                      </option>
+                      <option
+                        value="medium"
+                      >
+                        medium
+                      </option>
+                      <option
+                        value="low"
+                      >
+                        low
+                      </option>
+                    </select>
+                  </label>
+                  <label>
+                    Field
+                    <select
+                      aria-label="Remediation field filter"
+                    >
+                      <option
+                        value=""
+                      >
+                        All fields
+                      </option>
+                      <option
+                        value="npi"
+                      >
+                        npi
+                      </option>
+                      <option
+                        value="provider_name"
+                      >
+                        provider name
+                      </option>
+                      <option
+                        value="specialty"
+                      >
+                        specialty
+                      </option>
+                      <option
+                        value="address"
+                      >
+                        address
+                      </option>
+                      <option
+                        value="city"
+                      >
+                        city
+                      </option>
+                      <option
+                        value="state"
+                      >
+                        state
+                      </option>
+                      <option
+                        value="zip"
+                      >
+                        zip
+                      </option>
+                      <option
+                        value="phone"
+                      >
+                        phone
+                      </option>
+                      <option
+                        value="accepting_new_patients"
+                      >
+                        accepting new patients
+                      </option>
+                      <option
+                        value="status"
+                      >
+                        status
+                      </option>
+                    </select>
+                  </label>
+                </div>
+                <div
+                  class="table-wrap remediation-table-wrap"
+                >
+                  <table>
+                    <thead>
+                      <tr>
+                        <th
+                          scope="col"
+                        >
+                          Listing / reference
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Field
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Risk
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Workflow
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Active proposal
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Updated
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        aria-label="Open remediation case PAYER-00002, state"
+                        class=" "
+                        tabindex="0"
+                      >
+                        <td>
+                          <strong>
+                            PAYER-00002
+                          </strong>
+                          <span
+                            class="muted mono"
+                          >
+                            npi:1234567890
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            class="rule"
+                          >
+                            state
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            class="tag tag-high"
+                          >
+                            <span
+                              aria-hidden="true"
+                            >
+                              ! 
+                            </span>
+                            high
+                             risk
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            class="status remediation-status status-new"
+                          >
+                            <span
+                              aria-hidden="true"
+                            />
+                            new
+                          </span>
+                        </td>
+                        <td
+                          class="proposal-cell"
+                        >
+                          <span
+                            class="muted"
+                          >
+                            Not approved
+                          </span>
+                        </td>
+                        <td>
+                          <time
+                            class="muted"
+                          >
+                            Jun 25, 2026, 7:00 PM
+                          </time>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+              <aside
+                aria-live="polite"
+                class="detail-card remediation-detail"
+              >
+                <div
+                  class="empty remediation-empty"
+                >
+                  <span
+                    aria-hidden="true"
+                  >
+                    ⇄
+                  </span>
+                  <h2>
+                    Open a discrepancy
+                  </h2>
+                  <p>
+                    Start with the payer-listed value, then record the human decision and the observed verification result.
+                  </p>
+                </div>
+              </aside>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="wb-app"
+    >
+      <a
+        class="wb-skip"
+        href="#workspace-content"
+      >
+        Skip to workspace
+      </a>
+      <aside
+        class="wb-sidebar"
+      >
+        <div
+          class="wb-brand"
+        >
+          <span
+            aria-hidden="true"
+            class="wb-brand-mark"
+          >
+            pd
+            <span>
+               / 
+            </span>
+          </span>
+          <strong>
+            Provider Directory
+            <span>
+              Workbench
+            </span>
+          </strong>
+        </div>
+        <nav
+          aria-label="Workbench navigation"
+        >
+          <p
+            class="wb-nav-heading"
+          >
+            Daily work
+          </p>
+          <div
+            class="wb-nav-group"
+          >
+            <a
+              href="?view=work"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                01
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Work queue
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Investigate and follow up
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=intake"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                02
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Receive data
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Upload, map and review
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=feeds"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                03
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Deliveries
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Review recurring datasets
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=reconciliation"
+            >
+              <span
+                aria-hidden="true"
+                class="wb-nav-number"
+              >
+                04
+              </span>
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Provider records
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Link identities and compare
+                </small>
+              </span>
+            </a>
+          </div>
+          <p
+            class="wb-nav-heading"
+          >
+            Sources & supporting tools
+          </p>
+          <div
+            class="wb-nav-group wb-tools"
+          >
+            <a
+              href="?view=sources"
+            >
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Sources
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Capture and source history
+                </small>
+              </span>
+            </a>
+            <a
+              href="?view=qa"
+            >
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Legacy QA
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Original batch review
+                </small>
+              </span>
+            </a>
+            <a
+              aria-current="page"
+              href="?view=remediation"
+            >
+              <span>
+                <span
+                  class="wb-nav-label"
+                >
+                  Corrections
+                </span>
+                <small
+                  aria-hidden="true"
+                >
+                  Original correction loop
+                </small>
+              </span>
+            </a>
+          </div>
+        </nav>
+        <div
+          class="wb-local"
+        >
+          <span
+            aria-hidden="true"
+          >
+            ●
+          </span>
+           Local workspace
+          <small>
+            Decisions and evidence are retained here.
+          </small>
+        </div>
+      </aside>
+      <div
+        class="wb-content"
+      >
+        <header
+          class="wb-context"
+        >
+          <span>
+            Provider operations 
+            <span
+              aria-hidden="true"
+            >
+              /
+            </span>
+             
+            <strong>
+              Corrections
+            </strong>
+          </span>
+          <span
+            class="wb-local-label"
+          >
+            Single-user workspace
+          </span>
+        </header>
+        <div
+          id="workspace-content"
+          tabindex="-1"
+        >
+          <main
+            class="app-shell remediation-shell"
+          >
+            <header
+              class="topbar"
+            >
+              <div
+                class="brand"
+              >
+                <span
+                  aria-hidden="true"
+                  class="brand-mark"
+                >
+                  ⇄
+                </span>
+                <div>
+                  <p>
+                    Directory Remediation
+                  </p>
+                  <span>
+                    Human-controlled payer verification
+                  </span>
+                </div>
+              </div>
+              <button
+                class="button button-secondary workspace-switch"
+              >
+                ← QA exception review
+              </button>
+            </header>
+            <section
+              aria-label="Remediation scope"
+              class="remediation-notice"
+            >
+              <strong>
+                Human judgment, recorded.
+              </strong>
+              <span>
+                These are synthetic payer-directory discrepancies. Approval records a proposed correction; it never changes provider truth or sends a payer update.
+              </span>
+            </section>
+            <section
+              aria-labelledby="remediation-heading"
+              class="remediation-heading"
+            >
+              <div>
+                <p
+                  class="eyebrow"
+                >
+                  Payer directory loop
+                </p>
+                <h1
+                  id="remediation-heading"
+                >
+                  Correction review and verification
+                </h1>
+                <p>
+                  Inspect the stored comparison, make a reasoned proposal, and record what the payer actually shows.
+                </p>
+              </div>
+              <div
+                aria-label="Workflow stages"
+                class="loop-key"
+              >
+                <span>
+                  Evidence
+                </span>
+                <b>
+                  →
+                </b>
+                <span>
+                  Human proposal
+                </span>
+                <b>
+                  →
+                </b>
+                <span>
+                  Observed verification
+                </span>
+              </div>
+            </section>
+            <section
+              aria-label="Remediation workspace"
+              class="remediation-workspace"
+            >
+              <section
+                class="remediation-queue"
+              >
+                <div
+                  class="queue-top"
+                >
+                  <div>
+                    <p
+                      class="eyebrow"
+                    >
+                      Field discrepancy queue
+                    </p>
+                    <h2>
+                      1
+                       case
+                       
+                      <span>
+                        available for human action
+                      </span>
+                    </h2>
+                  </div>
+                  <button
+                    class="text-button"
+                  >
+                    Reset filters
+                  </button>
+                </div>
+                <div
+                  class="filters remediation-filters"
+                >
+                  <label>
+                    Status
+                    <select
+                      aria-label="Remediation status filter"
+                    >
+                      <option
+                        value=""
+                      >
+                        All statuses
+                      </option>
+                      <option
+                        value="new"
+                      >
+                        new
+                      </option>
+                      <option
+                        value="triaged"
+                      >
+                        triaged
+                      </option>
+                      <option
+                        value="approved"
+                      >
+                        approved
+                      </option>
+                      <option
+                        value="pending_verification"
+                      >
+                        pending verification
+                      </option>
+                      <option
+                        value="reopened"
+                      >
+                        reopened
+                      </option>
+                      <option
+                        value="verified"
+                      >
+                        verified
+                      </option>
+                      <option
+                        value="deferred"
+                      >
+                        deferred
+                      </option>
+                    </select>
+                  </label>
+                  <label>
+                    Risk
+                    <select
+                      aria-label="Remediation risk filter"
+                    >
+                      <option
+                        value=""
+                      >
+                        All risks
+                      </option>
+                      <option
+                        value="high"
+                      >
+                        high
+                      </option>
+                      <option
+                        value="medium"
+                      >
+                        medium
+                      </option>
+                      <option
+                        value="low"
+                      >
+                        low
+                      </option>
+                    </select>
+                  </label>
+                  <label>
+                    Field
+                    <select
+                      aria-label="Remediation field filter"
+                    >
+                      <option
+                        value=""
+                      >
+                        All fields
+                      </option>
+                      <option
+                        value="npi"
+                      >
+                        npi
+                      </option>
+                      <option
+                        value="provider_name"
+                      >
+                        provider name
+                      </option>
+                      <option
+                        value="specialty"
+                      >
+                        specialty
+                      </option>
+                      <option
+                        value="address"
+                      >
+                        address
+                      </option>
+                      <option
+                        value="city"
+                      >
+                        city
+                      </option>
+                      <option
+                        value="state"
+                      >
+                        state
+                      </option>
+                      <option
+                        value="zip"
+                      >
+                        zip
+                      </option>
+                      <option
+                        value="phone"
+                      >
+                        phone
+                      </option>
+                      <option
+                        value="accepting_new_patients"
+                      >
+                        accepting new patients
+                      </option>
+                      <option
+                        value="status"
+                      >
+                        status
+                      </option>
+                    </select>
+                  </label>
+                </div>
+                <div
+                  class="table-wrap remediation-table-wrap"
+                >
+                  <table>
+                    <thead>
+                      <tr>
+                        <th
+                          scope="col"
+                        >
+                          Listing / reference
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Field
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Risk
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Workflow
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Active proposal
+                        </th>
+                        <th
+                          scope="col"
+                        >
+                          Updated
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        aria-label="Open remediation case PAYER-00002, state"
+                        class=" "
+                        tabindex="0"
+                      >
+                        <td>
+                          <strong>
+                            PAYER-00002
+                          </strong>
+                          <span
+                            class="muted mono"
+                          >
+                            npi:1234567890
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            class="rule"
+                          >
+                            state
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            class="tag tag-high"
+                          >
+                            <span
+                              aria-hidden="true"
+                            >
+                              ! 
+                            </span>
+                            high
+                             risk
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            class="status remediation-status status-new"
+                          >
+                            <span
+                              aria-hidden="true"
+                            />
+                            new
+                          </span>
+                        </td>
+                        <td
+                          class="proposal-cell"
+                        >
+                          <span
+                            class="muted"
+                          >
+                            Not approved
+                          </span>
+                        </td>
+                        <td>
+                          <time
+                            class="muted"
+                          >
+                            Jun 25, 2026, 7:00 PM
+                          </time>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+              <aside
+                aria-live="polite"
+                class="detail-card remediation-detail"
+              >
+                <div
+                  class="empty remediation-empty"
+                >
+                  <span
+                    aria-hidden="true"
+                  >
+                    ⇄
+                  </span>
+                  <h2>
+                    Open a discrepancy
+                  </h2>
+                  <p>
+                    Start with the payer-listed value, then record the human decision and the observed verification result.
+                  </p>
+                </div>
+              </aside>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/RemediationWorkspace.test.tsx:29:23
+     27|
+     28|   fireEvent.click(await screen.findByRole("button", { name: /open reme…
+     29|   expect(await screen.findByRole("heading", { name: "Follow the eviden…
+       |                       ^
+     30|   fireEvent.click(await screen.findByRole("row", { name: /open remedia…
+     31|   expect(await screen.findByText("Comparison / reference value")).toBe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 18 passed (19)
+      Tests  1 failed | 135 passed (136)
+   Start at  12:06:17
+   Duration  12.57s (tests 56%, environment 30%, import 7%, setup 5%, transform 2%)
+
+Environment  jsdom was created 19 times · 29.82s total, 30% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
