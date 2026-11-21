@@ -70,3 +70,10 @@ Reference cold-load and event-to-second-frame measures are local lab results, no
 - Corrected 1,000-row measured handoff: [desktop](delivery-1000-desktop.png), [narrow preview](export-1000-narrow.png). The independently downloaded workbook contains every row even though the preview is sampled.
 
 All captures use synthetic fixtures. Page overflow, keyboard table scrolling, touch targets and list/detail focus have engineering checks; screenshot inspection is distinct from owner visual acceptance.
+
+
+## Follow-up: attribution loading guard
+
+A prior Linux CI trace showed an empty Reviewer after an attempted fill while a selected delivery was loading. Inspection found an editable attribution placeholder that was replaced when the selected version arrived. A deterministic delayed-response regression reproduced that exposed editing window. The placeholder now shows progress without editable attribution; review fields become available with the actual selected evidence. This closes the unstable input lifecycle rather than increasing a timeout or weakening review requirements.
+
+The regression failed before the fix and passes after it. The full frontend suite now has **155 passing tests**, the production build passes, and **10 affected desktop/mobile delivery/correction browser scenarios pass** after the guard. The earlier full local run passed 76 scenarios. No backend/contract/dependency change was made. Population timing/screenshots above identify the preceding populated-workbench build by asset hashes; the small loading-state follow-up was not presented as a new performance measurement.

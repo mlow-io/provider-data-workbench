@@ -253,7 +253,7 @@ export function ManagedFeeds() {
 
     </aside>
     <div className="mf-inspector-column">
-    {!version && <section className="mf-panel"><h2>{pending ? "Loading selected evidence…" : "Select a dataset version"}</h2><p>Choose a delivery to inspect its report, review holds and prepare an approved handoff.</p>{attributionForm}</section>}
+    {!version && <section className="mf-panel"><h2>{pending ? "Loading selected evidence…" : "Select a dataset version"}</h2><p>Choose a delivery to inspect its report, review holds and prepare an approved handoff.</p>{!pending && attributionForm}</section>}
 
     {version && version.id === versionId && <section ref={inspectorRef} tabIndex={-1} className="mf-panel mf-version-detail" aria-labelledby="feed-version-heading"><Button variant="ghost" className="mf-detail-return" onClick={returnToDeliveries}>← Back to deliveries</Button><p className="iw-eyebrow">Delivery decision</p><h2 id="feed-version-heading">Dataset review · {version.state}</h2><div className="mf-context"><strong>{feed?.name || "Selected delivery"}</strong><span>Source: {feed?.source || "Unavailable"} · Period: {String(version.manifest.source_delivery?.period ?? "Not supplied")}</span><details><summary>Dataset version identity</summary><code>{version.id}</code></details><span>Evidence designation: {version.manifest.designation || "Not supplied"}</span>{version.kind === "derived_field_candidate" && <p><strong>Reviewed phone candidate.</strong> {version.report_notice}</p>}{version.manifest.notice && <p>{version.manifest.notice}</p>}</div>
       <aside className="iw-notice" aria-label="Delivery next step">

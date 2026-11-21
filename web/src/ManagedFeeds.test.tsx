@@ -36,7 +36,7 @@ function api(options: { hard?: boolean; stale?: boolean; corrections?: boolean; 
 }
 async function openCandidate() {
   fireEvent.click(await screen.findByRole("button", { name: /Synthetic clinic weekly/ }));
-  fireEvent.change(screen.getByLabelText("Reviewer"), { target: { value: "Reviewer" } });
+  fireEvent.change(await screen.findByLabelText("Reviewer"), { target: { value: "Reviewer" } });
   fireEvent.change(screen.getByLabelText("Decision reason"), { target: { value: "Reviewed invalid row" } });
   fireEvent.click(await screen.findByRole("button", { name: /candidate · 2026-11-02/ }));
   await screen.findByRole("heading", { name: "Dataset review · candidate" });
@@ -118,7 +118,7 @@ test("registration is disabled without reviewer and reason and preserves the cho
   fireEvent.change(screen.getByLabelText("Approved source recipe"), { target: { value: "recipe-1" } });
   fireEvent.change(screen.getByLabelText("Local inbox directory"), { target: { value: "/synthetic/new-inbox" } });
   fireEvent.change(screen.getByLabelText("Feed owner"), { target: { value: "Coordinator" } });
-  fireEvent.change(screen.getByLabelText("Reviewer"), { target: { value: "Reviewer" } });
+  fireEvent.change(await screen.findByLabelText("Reviewer"), { target: { value: "Reviewer" } });
   fireEvent.change(screen.getByLabelText("Decision reason"), { target: { value: "Register reviewed scope" } });
   fireEvent.submit(form);
   await waitFor(() => expect(calls.find(call => call.url === "/api/feeds" && call.body)?.body).toMatchObject({ name: "New clinic", source: "synthetic-clinic", scope: "weekly-clinic", inbox: "/synthetic/new-inbox", owner: "Coordinator", actor: "Reviewer", reason: "Register reviewed scope" }));
@@ -212,4 +212,28 @@ test("derived approved handoff identifies reconciliation as original source evid
   expect(screen.getByRole("link", { name: "Inspect original source evidence" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Prepare reconciliation from original source evidence" })).toHaveAttribute("href", expect.stringContaining("receipt=receipt-1"));
   expect(screen.queryByRole("link", { name: "Prepare reconciliation from this approved version" })).not.toBeInTheDocument();
+});
+
+test("attribution waits for selected evidence instead of accepting edits in a loading placeholder", async () => {
+  api();
+  const original = globalThis.fetch;
+  let finish: (value: Response) => void = () => {};
+  let requested = false;
+  vi.stubGlobal("fetch", vi.fn(async (input: string, init?: RequestInit) => {
+    if (String(input) === "/api/feed-versions/candidate-2") {
+      requested = true;
+      return new Promise<Response>(resolve => { finish = resolve; });
+    }
+    return original(input, init);
+  }));
+  window.history.replaceState({}, "", "/?view=feeds&feed=feed-1&version=candidate-2");
+  render(<ManagedFeeds />);
+  await waitFor(() => expect(requested).toBe(true));
+  expect(screen.getByRole("heading", { name: "Loading selected evidence…" })).toBeVisible();
+  expect(screen.queryByLabelText("Reviewer")).not.toBeInTheDocument();
+  await act(async () => { finish(await original("/api/feed-versions/candidate-2")); });
+  await screen.findByRole("heading", { name: "Dataset review · candidate" });
+  fireEvent.change(await screen.findByLabelText("Reviewer"), { target: { value: "Reviewer" } });
+  fireEvent.change(screen.getByLabelText("Decision reason"), { target: { value: "Reviewed ready evidence" } });
+  expect(screen.getByRole("button", { name: "Acknowledge quarantine" })).toBeEnabled();
 });
