@@ -78,6 +78,10 @@ test('combined retained workflow exposes held data, native findings, scoped NORT
     expect((await readFile(workbookPath)).subarray(0,2).toString()).toBe('PK');
     await expect(exportReview.getByRole('button',{name:'Download reviewed workbook XLSX',exact:true})).toBeEnabled();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await page.evaluate(()=>scrollTo(0,0));
+    await page.screenshot({path:info.outputPath('compact-delivery-overview.png')});
+    await exportReview.scrollIntoViewIfNeeded();
+    await page.screenshot({path:info.outputPath('approved-export-workspace.png')});
     await exportReview.screenshot({path:info.outputPath('approved-export-task.png')});
     await page.screenshot({path:info.outputPath('operations-approved-export-review.png'),fullPage:true});
     await page.goto(`${frontendBase}/?view=intake&receipt=${report.acquired_receipt_id}`);

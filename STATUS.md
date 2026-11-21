@@ -2,11 +2,15 @@
 
 Updated 2026-11-21. Provider Directory Workbench implements the bounded local workflow in [SPEC](SPEC.md). The historical core implementation checkpoint is `d09b664`; [its integrated record](docs/evidence/canonical/integrated-review-2026-11-15/README.md) identifies the older backend/distribution qualification. UI1 is a local change set on feat/provider-operations-ui based on 52a6f4f; [the UI receipt and file hashes](docs/evidence/canonical/operator-ui-2026-11-19/README.md) identify this slice. No source push or deployment accompanied the local UI work.
 
-## Current planning state
+## Adaptive release implementation
 
-The 2026-11-21 documentation revision selects ingestion-first evolution, modular application boundaries, draft spec S1.0 and milestones P0–P8. [NEXT](NEXT.md) now selects P0 source/workflow/design readiness. The [planning receipt](docs/evidence/canonical/planning-2026-11-21/README.md) records documentation validation only. P0's actual-source selection, code/test gap matrix, detailed interface/export contracts, populated UI proposal and owner review remain **open**. No new adapter, profile-learning feature, licensing/network capability or redesigned release was implemented by this revision.
+The owner authorized implementation and privacy-reviewed public delivery on 2026-11-21, superseding the P0-only boundary. The [adaptive release receipt](docs/evidence/canonical/adaptive-release-2026-11-21/README.md) records new verification separately from UI1 and older results.
 
-Existing UI1 and application edits remain local in this worktree. Historical test totals below were not rerun for documentation work. Future capabilities in S1 are targets, not a restatement of the implementation table.
+Implemented additions: approved-recipe compatibility/drift and proposal-only reuse through HTTP/MCP; duplicate-header abstention; opt-in bounded approved-example context for model proposals; scoped work identity with matching legacy-history reuse; registry-reported license/contact-purpose metadata; pinned approved-directory workbook preview/download; readable original/interpreted evidence tables and connected import/export controls.
+
+No new database server, queue, runtime code plugin or schema migration was introduced. Model-context transport is controlled-provider tested; actual-model usefulness is still unverified. Registry license entries are not licensing-board verification. New licensing-source profiles, expanded network analytics, case research and recipient exchange remain roadmap work. The workbook does not materialize field proposals into an approved roster.
+
+Existing private history is preserved separately from the clean-history public release candidate. Public delivery is source-code delivery, not a hosted production application or a claim that all long-term milestones are complete.
 
 ## Completed software
 
@@ -20,6 +24,16 @@ Existing UI1 and application edits remain local in this worktree. Historical tes
 | AI/MCP assistance | Client and review integration implemented; actual-model evaluation incomplete | Controlled-provider tests and deterministic/manual fallback; experimental and disabled by default |
 
 The core non-AI operations demonstration and all R1–R4 engineering follow-ups are complete. This describes implemented and automatically verified behavior; the project remains a local prototype.
+
+## Latest adaptive release verification
+
+- Python: 906 passed with propagated checkout source path.
+- Frontend: 142 passed; production build passed.
+- Browser: full 74 passed; final affected 18 passed after layout/interaction updates.
+- Synthetic pipeline and installed wheel/sdist journeys passed.
+- Privacy-reviewed clean-history candidate has only noreply commit emails and no findings in the release scanner.
+
+See the [release receipt](docs/evidence/canonical/adaptive-release-2026-11-21/README.md) for initial failures, corrected runs and remaining boundaries. Historical counts below remain dated baseline evidence.
 
 ## Verification
 
@@ -47,4 +61,4 @@ The older backend/distribution/source results come from [the integrated record](
 
 PX0's [v1 contract](docs/PROVIDER_OPERATIONS_CONTRACT.md) and independent two-office response fixtures define adaptive profiles, exact recipient-response correlation, CMS enrollment/NPPES relationships, finite case research and recipient packets. They introduce no runtime adapters, endpoints, migrations or new model/source trials. The [operator contract](docs/OPERATOR_EXPERIENCE.md) governs UI1; [operational measures](docs/OPERATIONAL_MEASURES.md) remain a separate planned read-only surface.
 
-[ROADMAP](ROADMAP.md) explicitly reschedules PX1/PX3/PX4 into later exchange/research work and maps PX2 evidence to licensing/network milestones. [S1.0](docs/ADAPTIVE_INGESTION_SPEC.md) owns the immediate ingestion/contact target. Existing model/human evidence gates remain open; no recipient compatibility follows from the implemented shell or planned workbook.
+[ROADMAP](ROADMAP.md) explicitly reschedules PX1/PX3/PX4 into later exchange/research work and maps PX2 evidence to licensing/network milestones. [S1.1](docs/ADAPTIVE_INGESTION_SPEC.md) owns the immediate ingestion/contact target. Existing model/human evidence gates remain open; no recipient compatibility follows from the implemented shell or planned workbook.

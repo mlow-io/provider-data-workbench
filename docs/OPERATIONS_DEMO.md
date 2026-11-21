@@ -44,7 +44,7 @@ From a source checkout with Node dependencies, inspect the prepared state in the
 PYTHONPATH=src python3 scripts/demo.py --root .runtime/operations-demo-NEW/storage
 ```
 
-Use the report's feed/version IDs in Managed feeds to inspect the approved baseline and held candidate. In Intake inspect the acquired receipt's invalid/unsupported findings and original page links; in Reconcile select the report's reviewed clinician/location; in Work open its NORTH case. The CLI prepares and verifies the workflow; it does not claim an unassisted person completed it. Follow [the original human walkthrough](INVESTIGATION_DEMO.md) for H1 and retain observed errors/assistance separately for the expanded H2 task.
+Use the report's feed/version IDs in Deliveries to inspect the approved baseline and held candidate. In Receive data inspect the acquired receipt's invalid/unsupported findings and original page links; in Provider records select the report's reviewed clinician/location; in Work queue open its NORTH case. The CLI prepares and verifies the workflow; it does not claim an unassisted person completed it. Follow [the original human walkthrough](INVESTIGATION_DEMO.md) for H1 and retain observed errors/assistance separately for the expanded H2 task.
 
 To use the independent reader on a supplied export:
 

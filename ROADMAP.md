@@ -4,7 +4,7 @@ Updated 2026-11-21. **Ingestion-first product evolution supersedes the November 
 
 ## Active planning and first release
 
-Only **P0** is active, as specified in [NEXT](NEXT.md). Later rows are planned outcomes, not authorization for an unattended run through the entire roadmap. P0 must identify existing implementations before proposing new work. Preserve existing D/R/PX/UX acceptance identifiers; AI identifiers belong to S1.
+The owner authorized implementation on 2026-11-21. The first integrated S1.1 release implements bounded ingestion reuse, assisted context and reviewed export; [STATUS](STATUS.md) and its receipt identify exact coverage and remaining gaps. [NEXT](NEXT.md) selects the current continuation. The table below retains milestone goals and contract gates; authorization does not turn unimplemented rows into completed work. P0 must identify existing implementations before proposing new work. Preserve existing D/R/PX/UX acceptance identifiers; AI identifiers belong to S1.
 
 | Milestone | Spec goal and deliverable | Exit gate and next revision |
 |---|---|---|
@@ -80,3 +80,7 @@ The earlier M0–M4 investigation/consolidation milestones remain documented in 
 | R4 | Strict reference JSON, isolated builds, integrated verification, content review and local commit organization | [Integrated review](docs/evidence/canonical/integrated-review-2026-11-15/README.md) |
 
 R1–R4 are complete. Their verification does not close actual-model, human or broader conformance gates.
+
+## Integrated-release continuation
+
+The bounded S1.1 release does not close every goal in the table. Next qualify and implement explicit field-decision-to-candidate-roster materialization with a separate approval, then source-specific licensing and network milestones. Continue under the owner's implementation authorization while freezing each new semantic contract before code. Actual-model calls require approved configured access; human outcomes require real participants. Do not relabel those external evidence gaps as completed engineering.

@@ -6,11 +6,11 @@ An analyst receives a clinic workbook and a later CSV that changes one office wh
 
 **Python · FastAPI · React · TypeScript · SQLite**
 
-## Current development direction
+## Adaptive intake and review
 
-The next planned release emphasizes adaptable ingestion: declared source profiles, reusable reviewed mappings, schema-change detection, and a complete Tennessee-focused contact-review workflow. Licensing, expanded identity investigation and provider/network operations follow through explicit spec revisions. These are planned outcomes; the implementation table below remains the current baseline.
+The workbench includes scoped reuse of approved mapping recipes, structural drift and ambiguity reports, optional approved-example context for model proposals, and an approved-directory review workbook with unresolved issues and source references. Licensing-source integration, expanded identity investigation and network analytics follow through explicit spec revisions.
 
-**Contributors start with [NEXT](NEXT.md)** for P0 planning, then [S1 draft](docs/ADAPTIVE_INGESTION_SPEC.md), [ROADMAP](ROADMAP.md) and [STATUS](STATUS.md). The ingestion-first plan supersedes the earlier immediate recipient-response priority. The application remains one modular system; separate packages/apps are future evidence-driven extraction decisions.
+**Contributors start with [NEXT](NEXT.md)**, then the [S1 contract](docs/ADAPTIVE_INGESTION_SPEC.md), [ROADMAP](ROADMAP.md) and [STATUS](STATUS.md). The ingestion-first plan supersedes the earlier immediate recipient-response priority. The application remains one modular system; separate packages/apps are future evidence-driven extraction decisions.
 
 ## What works
 
@@ -24,6 +24,8 @@ The next planned release emphasizes adaptable ingestion: declared source profile
 | Optional assistance | MCP inspection/proposals and an experimental model-backed mapping client; actual-model evaluation remains open |
 
 The FHIR consumer targets a documented **R4 4.0.1 / Plan-Net 1.2.0 subset**. Unsupported resources and ambiguous relationships stay visible. It does not implement a conformant FHIR server or payer writeback.
+
+![Synthetic delivery review](docs/evidence/canonical/adaptive-release-2026-11-21/delivery-overview.png)
 
 ## Run the web workbench
 
@@ -41,7 +43,7 @@ make workbench
 
 Open the printed local URL. The work queue is the entry point. In Receive data, load the synthetic clinic workbook, review the mapping and quarantine, then explicitly accept eligible rows. The launcher creates a fresh retained runtime; it prints the root to use when resuming.
 
-[Demo and export inspection guide](docs/OPERATIONS_DEMO.md#run-and-inspect) · [Engineering case study](docs/CASE_STUDY.md) · [Current synthetic UI](docs/evidence/canonical/operator-ui-2026-11-19/work-wide.png)
+[Demo and export inspection guide](docs/OPERATIONS_DEMO.md#run-and-inspect) · [Engineering case study](docs/CASE_STUDY.md) · [Current synthetic UI](docs/evidence/canonical/adaptive-release-2026-11-21/delivery-overview.png)
 
 ## Reproduce the complete workflow
 
