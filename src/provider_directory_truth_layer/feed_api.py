@@ -1,5 +1,5 @@
 """Managed-feed HTTP adapter; application state transitions live in ManagedFeed."""
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from .managed_feed import ManagedFeed
 
 
@@ -58,6 +58,18 @@ def mount(app, store):
     @app.get('/api/feed-versions/{version_id}/export')
     def export(version_id: str):
         return JSONResponse(feeds.export(version_id), headers={'Content-Disposition': f'attachment; filename=approved-dataset-{version_id}.json'})
+
+    @app.get('/api/feed-versions/{version_id}/review-export')
+    def review_export(version_id: str, format: str = 'json', location_id: str | None = None, expected_snapshot: str | None = None):
+        from .review_workbook import snapshot, workbook
+        if format not in {'json', 'xlsx'}:
+            raise ValueError('Choose json or xlsx')
+        if format == 'xlsx' and expected_snapshot is None:
+            raise ValueError('Preview export and provide expected_snapshot before downloading')
+        data = snapshot(store.path, version_id, location_id, expected_snapshot)
+        if format == 'json':
+            return data
+        return Response(workbook(data), media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', headers={'Content-Disposition': f'attachment; filename=reviewed-directory-{version_id}.xlsx'})
 
     @app.post('/api/feed-jobs/{job_id}/{action}')
     def job_action(job_id: str, action: str, payload: dict):
