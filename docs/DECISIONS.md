@@ -222,3 +222,7 @@ The proposed first output is a pinned review workbook with Directory, Unresolved
 ## 2026-11-21 — Authorized integrated implementation and private-history preservation
 
 The owner authorized implementation, bounded GPT-6.1 Sol delegation, Git commits and public results, superseding P0's earlier planning-only stop. Current scope is implemented in connected slices under S1.1 with existing approval boundaries. Keep product documentation technical and exclude private preparation. Existing Git history includes personal author metadata; preserve that repository privately and publish a sanitized clean-history release with noreply metadata. Public release status does not imply completion of later roadmap or actual-model/human gates.
+
+## 2026-11-21 — Explicit component-system migration after incremental release
+
+The current release improved custom React/CSS screens but did not adopt the proposed UI library. Prioritize UI-W0 planning for a workbench migration using React/Vite, shadcn/ui/Tailwind and existing TanStack libraries, with an official sidebar block as a proposed starting point. Select base/theme/versions in the isolated populated spike, then migrate complete tasks and retire replaced CSS. Retain Table v8 initially because the current official table guide targets v9. No dependency or backend change is made by this planning revision. The prior field-materialization task is preserved for continuation after UI-W2.

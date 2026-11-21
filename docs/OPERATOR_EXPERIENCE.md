@@ -37,6 +37,10 @@ These are task destinations, not a requirement for five top-level pages. P0 choo
 
 Exchanges, network analysis and case research enter navigation only when implemented in their scheduled milestones. Research stays attached to a selected question/case. Keep compatibility/history access without two competing primary workflows.
 
+## Workbench migration priority
+
+The prior release delivered incremental CSS/component improvements; shadcn/Tailwind adoption remains unimplemented. The [UI migration plan](UI_WORKBENCH_MIGRATION.md) now owns UI-W0–W5, the official sidebar-block proposal, table/inspector layout, dependency/CSS strategy and WM acceptance. Prototype a populated workbench before installing production dependencies. This explicitly supersedes the earlier decision to defer component-system migration indefinitely.
+
 ## P0 visual design packet
 
 Retain React/TypeScript/Vite and existing TanStack Query/Table. shadcn/ui is the recommended component-system candidate, not an installed or approved migration. Verify compatibility, dependency impact and component ownership; record the decision. Use one coherent system for controls and tokens; retire conflicting CSS as touched screens migrate instead of indefinitely stacking overrides. Keep domain behavior independent of library choice.

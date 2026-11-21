@@ -2,6 +2,10 @@
 
 Updated 2026-11-21. **Ingestion-first product evolution supersedes the November 19 PX1-first order.** Build one adaptable provider-data workbench with explicit module boundaries. Import breadth, reviewed cleaning/mapping and preserved decisions are the foundation; contact review proves the first complete workflow, followed by licensing, identity and network operations. [SPEC](SPEC.md) defines global behavior; [S1](docs/ADAPTIVE_INGESTION_SPEC.md) is the draft next-release contract; [STATUS](STATUS.md) reports actual outcomes.
 
+## Selected workbench migration
+
+The incremental S1.1 UI does not complete component-system adoption. [UI-W0–W5](docs/UI_WORKBENCH_MIGRATION.md) now sequences a populated design spike, shadcn/Tailwind foundation, one complete delivery workbench, import/mapping migration, remaining discrepancy/provider tools and retirement/qualification. Each stage has a U1 spec revision and WM acceptance gates. NEXT selects UI-W0. Resume field-candidate materialization after UI-W2; preserve all later domain milestones and separate actual-model/human gates.
+
 ## Active planning and first release
 
 The owner authorized implementation on 2026-11-21. The first integrated S1.1 release implements bounded ingestion reuse, assisted context and reviewed export; [STATUS](STATUS.md) and its receipt identify exact coverage and remaining gaps. [NEXT](NEXT.md) selects the current continuation. The table below retains milestone goals and contract gates; authorization does not turn unimplemented rows into completed work. P0 must identify existing implementations before proposing new work. Preserve existing D/R/PX/UX acceptance identifiers; AI identifiers belong to S1.

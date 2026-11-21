@@ -25,6 +25,10 @@ Existing private history is preserved separately from the clean-history public r
 
 The core non-AI operations demonstration and all R1–R4 engineering follow-ups are complete. This describes implemented and automatically verified behavior; the project remains a local prototype.
 
+## Workbench migration planning
+
+A separate [UI migration plan](docs/UI_WORKBENCH_MIGRATION.md) now proposes shadcn/ui + Tailwind and an official application-shell block. NEXT selects UI-W0. No library, dependency configuration or new workbench shell was installed by this documentation revision. Prior frontend/browser results below describe the incremental interface, not completed migration. Prototype/compatibility/visual-review gates remain open.
+
 ## Latest adaptive release verification
 
 - Python: 906 passed with propagated checkout source path.

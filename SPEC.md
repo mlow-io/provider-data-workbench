@@ -97,6 +97,10 @@ AI cannot approve a recipe, accept a dataset, merge identities, invent missing v
 
 Evaluate against current deterministic suggestions on a frozen, held-out set of messy and ambiguous inputs. Report correct mappings, invalid proposals, abstentions, reviewer corrections, latency and actual available usage/cost with model/configuration and denominators. Compare accepted cleaned values with hand-authored expectations. Predeclare an engineering gate of zero invalid operations reaching acceptance and zero incorrect automatic state changes; do not invent a quality improvement threshold after seeing results. If assistance does not improve reviewed mapping outcomes or measured effort, keep it experimental/disabled. Human time savings require observed comparable tasks.
 
+## Selected UI migration target
+
+The prior release is an incremental React/CSS interface. The [workbench migration plan](docs/UI_WORKBENCH_MIGRATION.md) defines the proposed React/Vite + shadcn/ui/Tailwind migration with an official shell block, table/inspector layout and staged U1 revisions. WM-01–08 are additional acceptance targets. NEXT selects UI-W0 design/compatibility planning before production dependency changes; this is not an installed capability.
+
 ## Web interface and data-management requirements
 Source setup, received delivery, interpretation preview, quality findings, reviewed links, dataset approval, investigation and exports must be reachable through the existing navigation with selected source/version context intact. Each screen states the current scope, next useful action and blocked/partial/stale state. A reviewer can trace an exported value to its original resource/row, applied rule and decision without using SQL.
 

@@ -17,6 +17,10 @@ NEXT owns the single active milestone and its authorization boundary. ROADMAP ow
 - After a slice, update implemented API/data references when applicable, append a verification receipt, update STATUS, and replace NEXT with exactly one authorized continuation or a clearly marked proposed brief awaiting review.
 - Explain consequential engineering choices and a small learning exercise in chat. Repository docs remain technical and operational; keep personal career preparation and conversations outside Git.
 
+## UI migration discipline
+
+When NEXT selects UI-W work, follow docs/UI_WORKBENCH_MIGRATION.md. A custom-CSS refresh does not close component-library migration. Inspect the selected registry/base and version compatibility before generation; preserve TanStack Table v8 unless upgrading is a separate chosen change. Prototype the populated table/inspector journey, use one token/component system, and retire replaced legacy styles as each screen migrates. Preserve routing/query/draft/approval guards. Separate backend domain changes from visual migration. Do not claim visual acceptance from passing tests alone.
+
 ## Architecture and data integrity
 
 Develop a modular monolith: ingestion/adaptation, provider-domain reconciliation, and operator/application services with explicit contracts. Reuse shared validation across HTTP, CLI and MCP. One database and artifact store remain the baseline. Do not introduce microservices, a second canonical entity store, a generic plugin runtime or a new queue without a reviewed need.

@@ -1,17 +1,17 @@
-# Next implementation: explicit reviewed-field candidate materialization
+# Next task: UI-W0 workbench design and migration readiness
 
-The owner authorized implementation, technical Git commits and privacy-reviewed public results on 2026-11-21. The bounded adaptive ingestion/workbook release is implemented and qualified; see STATUS and the adaptive-release receipt. The long-term roadmap remains active, with no claim that its future rows are already built.
+Selected 2026-11-21 following the request for an explicit component-library/template migration. Planning and an isolated synthetic spike come first. The earlier reviewed-field candidate task is [retained](docs/archive/next-2026-11-21-field-materialization.md) and scheduled after the first complete UI workbench slice.
 
-## Immediate contract and implementation work
+## Read and deliver
 
-1. Inspect FieldReconciliation, managed-feed approval and the new workbook. Identify the exact gap between a reviewed contact decision and a new consumer-eligible roster candidate.
-2. Freeze a narrow S1.3 contract: selected office/field decisions, pinned base dataset/link/decision versions, explicit candidate creation, retained original and proposed values, completeness, conflicting/stale decisions, repeat/restart and separate dataset approval. No implicit promotion or external verification.
-3. Implement one two-office phone-change journey through the existing services and UI. Pending/unresolved values remain excluded; the prior approved dataset remains readable until a separate explicit approval. Avoid a second canonical store or unrestricted grid edits.
-4. Independently inspect output workbook/JSON values and lineage before/after approval; qualify no-op/repeat/stale/restart/conflict behavior. Run AGENTS-required affected checks; preserve failures and update STATUS/SPEC/API/data docs with code.
-5. Continue P5 source-specific licensing and P6 network milestones through their named spec revisions. Use bounded named source access; absent credentials or source samples remain explicit gates, never synthetic success claims.
+Read AGENTS, STATUS, SPEC, ROADMAP, [UI migration plan](docs/UI_WORKBENCH_MIGRATION.md) and OPERATOR_EXPERIENCE. Preserve the current qualified application and all user data.
 
-## Preserved boundaries
+1. Inventory current shell/controls/CSS and map them to proposed shadcn primitives and workbench components. Identify CSS rules that must retire, state/query guards that must remain and package-version risks.
+2. Propose official @shadcn sidebar-07 as the shell starting point; inspect the registry component/block and select one consistent primitive base, icon library and token theme. Verify exact dependency compatibility in an isolated scratch checkout. Keep TanStack Table v8 unless a separate upgrade is justified.
+3. Build a populated synthetic design spike: delivery table plus selected office/evidence inspector and export action. Include a held candidate, unresolved discrepancy, loading/failure/stale states and narrow-width detail navigation. Preserve exact original/interpreted-value semantics.
+4. Record U1.0 dependency delta, layout/state map, component ownership, CSS coexistence/removal and rollback plan. Capture working desktop/narrow views and present the concrete proposal for visual review.
+5. After the chosen direction is reviewed, freeze U1.1 and execute UI-W1/W2 under the existing implementation authorization. Follow the migration plan and AGENTS checks; no backend/schema changes are required by this planning task.
 
-Model-context plumbing is controlled-provider tested; actual-model quality requires configured approved access and separate evaluation. Licensing entries from NPPES are registry assertions, not board verification. A supported FHIR subset is not a conformant server, payer writeback or recipient-template compatibility. Existing original histories and real data remain outside public release inputs.
+## Planning boundary
 
-Use the current local implementation worktree for continuation. The clean-history public candidate is a release surface, not a reason to merge private history. Inspect actual refs/status before publication. Keep commit messages and product documentation technical; ignore private preparation and chat exports.
+This turn selects and documents the migration plan; it does not claim an installed library or redesigned release. UI-W0 can prototype in disposable storage. Defer production dependency changes until the compatibility and visual proposal are concrete. Keep technical docs/commits free of personal preparation and publish only through the clean-history release process.
