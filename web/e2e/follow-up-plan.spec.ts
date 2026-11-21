@@ -267,6 +267,7 @@ test("confirmed plan creates one QA review, reuses owned work, and records separ
       await expect(saved.getByText("Saved follow-up receipt", { exact: true })).toBeVisible();
       return saved;
     }
+    await expect(page.getByRole("heading", { name: "Reconciled field evidence", exact: true })).toBeVisible();
     const openFields = page.getByRole("button", { name: "Open reconciled field evidence", exact: true });
     if (await openFields.count()) await openFields.click();
     const fields = page.getByRole("region", {

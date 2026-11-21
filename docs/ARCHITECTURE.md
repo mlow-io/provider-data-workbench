@@ -113,3 +113,7 @@ The proposed [provider research/exchange contract](PROVIDER_RESEARCH_EXCHANGE.md
 The initial slice uses a minimal exchange manifest generated from a pinned approved export before response parsing. A later recipient-template exporter consumes that same manifest and source/decision versions. Additive SQL relations, indexes, constraints and migration numbers are frozen per slice rather than executing a speculative schema up front.
 
 The selected [UI contract](OPERATOR_EXPERIENCE.md) reuses workspace URL/action guards and shared services. Primary navigation exposes delivered tasks only; typed comparisons precede original JSON disclosure. Read-only operational measures use the same SQLite snapshot and defined populations under [their own contract](OPERATIONAL_MEASURES.md), rather than mutable UI counters or a separate reporting store.
+
+## Workbench presentation system
+
+The React/Vite client composes official shadcn Radix Nova source primitives with Tailwind 4 semantic tokens, Lucide icons and locally served IBM Plex Sans. WorkbenchShell owns responsive navigation; feature modules own query/draft/version guards and domain content. App loads major workspaces on demand. Shared primitives live in web/src/components/ui; supporting legacy styles are layered/scoped so they cannot silently override migrated controls. [The migration contract](UI_WORKBENCH_MIGRATION.md) identifies implemented coverage and measured versus unmeasured performance gates. Backend approval/storage ownership remains unchanged.

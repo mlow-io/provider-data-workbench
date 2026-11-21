@@ -15,7 +15,7 @@ NEXT owns the single active milestone and its authorization boundary. ROADMAP ow
 - Use a requirement-to-check map. Reuse existing modules and tests; distinguish implemented behavior, proposed work and evidence gaps. Finish one connected producer/service/UI/export path before claiming a feature complete.
 - Ordinary internal naming, component extraction and algorithm choices within frozen contracts are agent decisions. Return consequential changes to source scope, authority, record grain, dependencies, security, cost or acceptance semantics to the owner; do not quietly weaken gates.
 - After a slice, update implemented API/data references when applicable, append a verification receipt, update STATUS, and replace NEXT with exactly one authorized continuation or a clearly marked proposed brief awaiting review.
-- Explain consequential engineering choices and a small learning exercise in chat. Repository docs remain technical and operational; keep personal career preparation and conversations outside Git.
+- Explain consequential engineering choices and a small learning exercise in chat. Repository docs remain technical and operational; keep private preparation and conversations outside Git.
 
 ## UI migration discipline
 
@@ -38,3 +38,9 @@ For documentation-only work run `python3 scripts/check_project_docs.py` and `git
 Python changes require `pytest -q`; pipeline changes also require `make validate` under the documented isolated fixture setup. Frontend changes require `npm test --prefix web` and `npm run build --prefix web`; review-console/responsive changes also require `npm run test:e2e --prefix web`. Inspect actual export values, populations and scope. UI acceptance includes populated screenshots and keyboard/responsive checks; passing tests alone is not visual approval or human usability evidence.
 
 Keep public ancestry and verified GitHub noreply metadata for outgoing commits. Never commit credentials, databases, private preparation, local paths or nonsynthetic records. The repository's historical public ancestry does not authorize changing its current visibility. Push, hosted deployment, outreach and external submissions follow explicit session authorization; none follows from this roadmap. Do not spawn agents unless the user or a task-specific instruction authorizes delegation.
+
+## Skills and bounded delegation
+
+For workbench changes use the frontend-design skill for composition and the shadcn skill for registry inspection, generated primitives and correct component APIs. Read available skill instructions before applying them; if unavailable, report the missing guidance and follow the recorded component contracts. Use engineering-documentation for substantial documentation work and engineering-debug for reproduced defects. Skills do not override explicit session authorization.
+
+For this authorized migration, the lead may use at most two concurrent bounded workers, using GPT-6.1 Terra at medium effort by default and high effort for a bounded task with substantial interaction, accessibility or integration complexity. Give each worker an exact checkout, disjoint file ownership, acceptance checks and stop boundary. No recursive delegation. The lead owns dependency selection, integration, data semantics, visual inspection and final qualification/publication. Prefer Terra whenever it can handle the bounded task. Use another model only when explicitly selected or the task demonstrably needs capabilities Terra cannot supply; do not rotate models to avoid investigating failures. Do small coupled edits locally. Workers must report changed files, verification and remaining gaps, and must not publish independently.

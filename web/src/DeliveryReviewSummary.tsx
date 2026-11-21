@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { DeliveryComparison } from "./RecurringImport";
 
 const counts = [
@@ -30,7 +34,9 @@ function ComparisonEvidence({ entry }: { entry: Entry }) {
 }
 
 export function DeliveryReviewSummary({ comparison, baselineVersion }: { comparison: DeliveryComparison | null; baselineVersion?: string | null }) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const entries = comparison?.entries ?? [];
+  const selected = entries[selectedIndex] ?? entries[0];
   const total = typeof comparison?.entry_count === "number" ? comparison.entry_count : entries.length;
   return <section aria-label="Delivery comparison">
     <h3>What changed in this delivery</h3>
@@ -41,14 +47,16 @@ export function DeliveryReviewSummary({ comparison, baselineVersion }: { compari
       <p className="iw-muted">Keys belong to the source delivery; they are not counts of reviewed clinicians or offices.</p>
       {entries.length > 0 ? <>
         <p>Showing {Math.min(entries.length, 20)} of {total} comparison entries. This is a bounded evidence preview.</p>
-        <div className="mf-evidence-table"><table>
-          <thead><tr><th scope="col">Source key</th><th scope="col">Comparison</th><th scope="col">Field evidence</th></tr></thead>
-          <tbody>{entries.slice(0, 20).map((entry, index) => <tr key={index}>
-            <td><code>{entry.key ?? "Unresolved key"}</code></td>
-            <td>{entry.status.replaceAll("_", " ")}</td>
-            <td><ComparisonEvidence entry={entry} /></td>
-          </tr>)}</tbody>
-        </table></div>
+        <div className="mf-evidence-table"><Table aria-label="Delivery comparison entries">
+          <TableHeader><TableRow><TableHead>Source key</TableHead><TableHead>Comparison</TableHead><TableHead>Fields</TableHead></TableRow></TableHeader>
+          <TableBody>{entries.slice(0, 20).map((entry, index) => <TableRow key={index} data-state={entry === selected ? "selected" : undefined}>
+            <TableCell><Button variant="ghost" aria-pressed={entry === selected} onClick={() => setSelectedIndex(index)}>{entry.key ?? "Unresolved key"}</Button></TableCell>
+            <TableCell><Badge variant="secondary">{entry.status.replaceAll("_", " ")}</Badge></TableCell>
+            <TableCell>{entry.fields.length}</TableCell>
+          </TableRow>)}</TableBody>
+        </Table></div>
+        {selected && <section className="mf-selected-evidence" aria-label="Selected source key evidence"><h4>Source key · {selected.key ?? "Unresolved key"}</h4><p>These values belong to the selected source key. An identity or office match is a separate review.</p><ComparisonEvidence entry={selected} /></section>}
+
       </> : <p>No row-level comparison entries were supplied in this report.</p>}
     </>}
   </section>;

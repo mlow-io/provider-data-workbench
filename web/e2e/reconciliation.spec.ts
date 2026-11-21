@@ -1,3 +1,4 @@
+import { navigateViaSidebar } from './support/navigation';
 import { expect, test, type Page } from "@playwright/test";
 
 async function upload(
@@ -72,7 +73,7 @@ test("three retained sources show quality, reproducible typed candidates, persis
     );
   }
   await page.goto("/?view=intake");
-  await page.getByRole("link", { name: "Provider records", exact: true }).click();
+  await navigateViaSidebar(page, 'Provider records');
   await expect(page).toHaveURL(/view=reconciliation/);
   await expect(
     page.getByRole("button", { name: "Create candidate run" }),

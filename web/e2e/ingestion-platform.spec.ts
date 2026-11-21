@@ -1,3 +1,4 @@
+import { navigateViaSidebar } from './support/navigation';
 import { expect, test, type Page, type APIResponse } from "@playwright/test";
 import { readFile, writeFile, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -134,7 +135,7 @@ test("one discoverable three-source journey from reviewed normalization through 
   await test.step("Start from the default operator entry", async () => {
     await page.goto('/');
     await expect(page.getByRole('heading', {name:'Provider work queue'})).toBeVisible();
-    await page.getByRole('link', {name:'Deliveries',exact:true}).click();
+    await navigateViaSidebar(page, 'Deliveries');
     await expect(page.getByRole('heading', {name:'Review deliveries'})).toBeVisible();
     await expect(page.getByRole('heading', {name:'Registered feeds'})).toBeVisible();
   });
@@ -323,20 +324,24 @@ test("one discoverable three-source journey from reviewed normalization through 
     await page.goto(`/?view=feeds&feed=${feed.id}`);
     await page.getByLabel("Reviewer", { exact: true }).fill(attribution.actor);
     await page.getByLabel("Decision reason", { exact: true }).fill(attribution.reason);
+    if (!await page.getByRole('button', { name: 'Check deliveries and process one job' }).isVisible()) await page.getByText('Processing and delivery history', { exact: true }).click();
     await page.getByRole("button", { name: "Check deliveries and process one job" }).click();
     await expect(page.getByText("Delivery check completed. Review the processing history and candidate results.", { exact: true })).toBeVisible();
     feed = await body(await page.request.get(`/api/feeds/${feed.id}`));
     const baselineId = feed.versions.at(-1).id;
+    if (await page.getByRole('button', {name:'← Back to deliveries',exact:true}).isVisible()) await page.getByRole('button', {name:'← Back to deliveries',exact:true}).click();
     await page.locator(`button[data-version-id="${baselineId}"]`).click();
     await page.getByRole("button", { name: "Approve dataset version", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
     const baselineExport = await (await page.request.get(`/api/feed-versions/${baselineId}/export`)).text();
     // NORTH's changed phone arrives without SOUTH. A partial delivery is not a closure.
     await deliver(Buffer.from([lines[0], changedNorth].join("\n") + "\n"), "partial", "2026-10-12");
+    if (!await page.getByRole('button', { name: 'Check deliveries and process one job' }).isVisible()) await page.getByText('Processing and delivery history', { exact: true }).click();
     await page.getByRole("button", { name: "Check deliveries and process one job" }).click();
     await expect(page.getByText("Delivery check completed. Review the processing history and candidate results.", { exact: true })).toBeVisible();
     feed = await body(await page.request.get(`/api/feeds/${feed.id}`));
     const partialVersionId = feed.versions.at(-1).id;
+    if (await page.getByRole('button', {name:'← Back to deliveries',exact:true}).isVisible()) await page.getByRole('button', {name:'← Back to deliveries',exact:true}).click();
     await page.locator(`button[data-version-id="${partialVersionId}"]`).click();
     await expect(page.getByRole("button", { name: "Approve dataset version", exact: true })).toBeDisabled();
     expect((await body(await page.request.get(`/api/feeds/${feed.id}/current`))).version_id).toBe(baselineId);
@@ -351,10 +356,12 @@ test("one discoverable three-source journey from reviewed normalization through 
     expect((await body(await page.request.get(`/api/feeds/${feed.id}/current`))).version_id).toBe(baselineId);
     // Corrected full delivery retains the changed NORTH phone and SOUTH source row.
     labels.clinic = await deliver(Buffer.from([lines[0], changedNorth, lines[2]].join("\n") + "\n"), "corrected", "2026-10-19");
+    if (!await page.getByRole('button', { name: 'Check deliveries and process one job' }).isVisible()) await page.getByText('Processing and delivery history', { exact: true }).click();
     await page.getByRole("button", { name: "Check deliveries and process one job" }).click();
     await expect(page.getByText("Delivery check completed. Review the processing history and candidate results.", { exact: true })).toBeVisible();
     feed = await body(await page.request.get(`/api/feeds/${feed.id}`));
     managedVersionId = feed.versions.at(-1).id;
+    if (await page.getByRole('button', {name:'← Back to deliveries',exact:true}).isVisible()) await page.getByRole('button', {name:'← Back to deliveries',exact:true}).click();
     await page.locator(`button[data-version-id="${managedVersionId}"]`).click();
     await page.getByRole("button", { name: "Approve dataset version", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
@@ -365,6 +372,7 @@ test("one discoverable three-source journey from reviewed normalization through 
     await page.getByRole("region", { name: "Dataset review · approved", exact: true }).screenshot({ path: info.outputPath("connected-approved-version.png") });
     await page.goto(`/?view=feeds&feed=${feed.id}&version=${baselineId}`);
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
+    if (await page.getByRole('button', {name:'← Back to deliveries',exact:true}).isVisible()) await page.getByRole('button', {name:'← Back to deliveries',exact:true}).click();
     await page.locator(`button[data-version-id="${managedVersionId}"]`).click();
     await expect(page.getByRole("heading", { name: "Dataset review · approved" })).toBeVisible();
     const bookmark = page.url();
@@ -671,6 +679,7 @@ test("one discoverable three-source journey from reviewed normalization through 
     ).toBeVisible();
   });
   async function openFieldScope() {
+    await expect(page.getByRole("heading", { name: "Reconciled field evidence", exact: true })).toBeVisible();
     const openFields = page.getByRole("button", { name: "Open reconciled field evidence", exact: true });
     if (await openFields.count()) await openFields.click();
     const panel = page.getByRole("region", {

@@ -1,3 +1,4 @@
+import { navigateViaSidebar } from './support/navigation';
 import { expect, test } from "@playwright/test";
 import path from "node:path";
 
@@ -341,6 +342,7 @@ test("saved public responses, failures, retry, keyboard and responsive sources",
     path: info.outputPath("intake-failed-retry.png"),
     fullPage: true,
   });
+  if (await page.getByRole('button', {name:'Toggle navigation',exact:true}).isVisible() && !await page.getByRole('navigation', {name:'Workbench navigation',exact:true}).isVisible()) await page.getByRole('button', {name:'Toggle navigation',exact:true}).click();
   const sources = page.getByRole("link", { name: "Sources", exact: true });
   await sources.focus();
   await page.keyboard.press("Enter");
@@ -362,7 +364,7 @@ test("saved public responses, failures, retry, keyboard and responsive sources",
       body: JSON.stringify({ detail: "Synthetic service unavailable" }),
     }),
   );
-  await page.getByRole("link", { name: "Work queue", exact: true }).click();
+  await navigateViaSidebar(page, 'Work queue');
   await expect(page.getByRole("alert")).toContainText(
     "Synthetic service unavailable",
   );

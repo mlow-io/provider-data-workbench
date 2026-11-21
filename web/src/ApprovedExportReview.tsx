@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
 import { useEffect, useRef, useState } from "react";
 
 type ExportPreview = {
@@ -56,8 +59,8 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
   return <section className="mf-export-review" aria-label="Approved export review">
     <h3>Review the handoff</h3>
     <p>Prepare the approved directory with separate unresolved issues and source evidence. Later unapproved deliveries do not replace this directory.</p>
-    <button disabled={busy} onClick={() => void load()}>{busy ? "Preparing export…" : "Preview approved workbook"}</button>
-    {error && <p className="iw-error" role="alert">{error} Refresh the preview before downloading.</p>}
+    <Button variant="outline" disabled={busy} onClick={() => void load()}>{busy ? "Preparing export…" : "Preview approved workbook"}</Button>
+    {error && <Alert variant="destructive"><AlertDescription>{error} Refresh the preview before downloading.</AlertDescription></Alert>}
     {preview?.version_id === versionId && <>
       <dl className="mf-summary-counts">
         <div><dt>Directory rows</dt><dd>{preview.counts.directory}</dd></div>
@@ -68,12 +71,12 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
       {!!preview.counts.excluded_cross_scope_cases && <p className="iw-notice" role="status">{preview.counts.excluded_cross_scope_cases} cross-scope {preview.counts.excluded_cross_scope_cases === 1 ? "case" : "cases"} excluded. {preview.scope_notice || "This issue list is limited to the selected dataset scope."}</p>}
       <p className="iw-muted">Open issues as of {preview.snapshot_at}. Directory, unresolved issues and sources remain separate workbook sheets.</p>
       {preview.directory.length > 0 && <details><summary>Inspect directory sample ({Math.min(preview.directory.length, 5)} rows)</summary>
-        <div className="mf-evidence-table" role="region" aria-label="Approved directory export sample" tabIndex={0}><table><thead><tr>{sampleFields.map(field => <th key={field} scope="col">{field.replaceAll("_", " ")}</th>)}</tr></thead><tbody>{preview.directory.slice(0, 5).map((row, index) => <tr key={index}>{sampleFields.map(field => <td key={field}>{row[field] === null ? "Null" : typeof row[field] === "object" ? JSON.stringify(row[field]) : String(row[field] ?? "Absent")}</td>)}</tr>)}</tbody></table></div>
+        <div className="mf-evidence-table" role="region" aria-label="Approved directory export sample" tabIndex={0}><Table><TableHeader><TableRow>{sampleFields.map(field => <TableHead key={field} scope="col">{field.replaceAll("_", " ")}</TableHead>)}</TableRow></TableHeader><TableBody>{preview.directory.slice(0, 5).map((row, index) => <TableRow key={index}>{sampleFields.map(field => <TableCell key={field}>{row[field] === null ? "Null" : typeof row[field] === "object" ? JSON.stringify(row[field]) : String(row[field] ?? "Absent")}</TableCell>)}</TableRow>)}</TableBody></Table></div>
       </details>}
       {(preview.unresolved_issues?.length ?? 0) > 0 && <div className="mf-evidence-table" role="region" aria-label="Unresolved export issues" tabIndex={0}>
-        <table><caption>Unresolved issues · first {Math.min(preview.unresolved_issues!.length, 5)} of {preview.counts.unresolved_issues}</caption><thead><tr><th scope="col">Kind / status</th><th scope="col">Issue</th><th scope="col">Listed / proposed value</th></tr></thead><tbody>{preview.unresolved_issues!.slice(0, 5).map((issue, index) => <tr key={index}><td>{String(issue.kind ?? "Unknown")}<br />{String(issue.status ?? "Unknown")}</td><td>{String(issue.issue ?? "Not supplied")}</td><td>{String(issue.listed_value ?? "Not supplied")}<br />{String(issue.proposed_value ?? "Not supplied")}</td></tr>)}</tbody></table>
+        <Table><TableCaption>Unresolved issues · first {Math.min(preview.unresolved_issues!.length, 5)} of {preview.counts.unresolved_issues}</TableCaption><TableHeader><TableRow><TableHead scope="col">Kind / status</TableHead><TableHead scope="col">Issue</TableHead><TableHead scope="col">Listed / proposed value</TableHead></TableRow></TableHeader><TableBody>{preview.unresolved_issues!.slice(0, 5).map((issue, index) => <TableRow key={index}><TableCell>{String(issue.kind ?? "Unknown")}<br />{String(issue.status ?? "Unknown")}</TableCell><TableCell>{String(issue.issue ?? "Not supplied")}</TableCell><TableCell>{String(issue.listed_value ?? "Not supplied")}<br />{String(issue.proposed_value ?? "Not supplied")}</TableCell></TableRow>)}</TableBody></Table>
       </div>}
-      <button className="mf-primary" disabled={busy} onClick={() => void download()}>Download reviewed workbook XLSX</button>
+      <Button disabled={busy} onClick={() => void download()}>Download reviewed workbook XLSX</Button>
     </>}
   </section>;
 }

@@ -1,3 +1,6 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
 import { navigateWorkspace, useWorkspaceQuery, workspaceHref, useWorkspaceActionGuard, updateWorkspaceQuery } from "./workspaceNavigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -151,19 +154,19 @@ function Pager({
 }) {
   return (
     <div className="rc-pager" aria-label={label}>
-      <button
+      <Button variant="outline"
         disabled={offset === 0}
         onClick={() => onChange(Math.max(0, offset - 20))}
       >
         Previous
-      </button>
+      </Button>
       <span>From {offset + 1}</span>
-      <button
+      <Button variant="outline"
         disabled={next === null}
         onClick={() => next !== null && onChange(next)}
       >
         Next
-      </button>
+      </Button>
     </div>
   );
 }
@@ -428,12 +431,12 @@ export function ReconciliationWorkspace() {
           candidates separately. A candidate creates no identity or link. Rule
           ranking is not a probability.
         </p>
-        <button
+        <Button variant="outline"
           onClick={() => void refresh()}
           disabled={receipts.isFetching || run.isFetching}
         >
           Refresh sources and run status
-        </button>
+        </Button>
       </header>
       {seedRequested && <aside className="iw-card" aria-label="Approved delivery context">
         <h2>Continue from the approved delivery</h2>
@@ -518,7 +521,7 @@ export function ReconciliationWorkspace() {
                   <div className="rc-source-actions">
                     <label>
                       Entity type for {receipt.label || receipt.id}
-                      <select
+                      <NativeSelect
                         aria-label={`Entity type for ${receipt.label || receipt.id}`}
                         value={selected[receipt.id].entity_kind}
                         disabled={create.isPending}
@@ -533,21 +536,21 @@ export function ReconciliationWorkspace() {
                           setProfileOffset(0);
                         }}
                       >
-                        <option value="unknown">Unknown</option>
-                        <option value="clinician">Clinician</option>
-                        <option value="organization">Organization</option>
-                      </select>
+                        <NativeSelectOption value="unknown">Unknown</NativeSelectOption>
+                        <NativeSelectOption value="clinician">Clinician</NativeSelectOption>
+                        <NativeSelectOption value="organization">Organization</NativeSelectOption>
+                      </NativeSelect>
                     </label>
-                    <button
+                    <Button variant="outline"
                       onClick={() => {
                         setInspectId(receipt.id);
                         setProfileOffset(0);
                       }}
                     >
                       Inspect quality: {receipt.label || receipt.id}
-                    </button>
+                    </Button>
                     {selected[receipt.id].attempt_id !== receipt.attempt_id && !(seedRequested && receipt.id === seedReceipt) && (
-                      <button
+                      <Button variant="outline"
                         onClick={() =>
                           setSelected((current) => ({
                             ...current,
@@ -559,7 +562,7 @@ export function ReconciliationWorkspace() {
                         }
                       >
                         Use latest interpretation
-                      </button>
+                      </Button>
                     )}
                   </div>
                 )}
@@ -581,7 +584,7 @@ export function ReconciliationWorkspace() {
         <div className="rc-create">
           <label>
             Run reviewer
-            <input
+            <Input
               value={actor}
               onChange={(event) => setActor(event.target.value)}
               disabled={create.isPending}
@@ -589,13 +592,13 @@ export function ReconciliationWorkspace() {
           </label>
           <label>
             Run reason
-            <input
+            <Input
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               disabled={create.isPending}
             />
           </label>
-          <button
+          <Button variant="outline"
             className="button button-primary"
             disabled={
               selectedCount < 2 ||
@@ -613,7 +616,7 @@ export function ReconciliationWorkspace() {
             {create.isPending
               ? "Creating candidate run…"
               : "Create candidate run"}
-          </button>
+          </Button>
         </div>
         <ErrorMessage error={create.error} />
       </section>
@@ -714,22 +717,22 @@ export function ReconciliationWorkspace() {
         {history.isPending && <p role="status">Loading run history…</p>}
         <label>
           Saved candidate run
-          <select
+          <NativeSelect
             aria-label="Saved candidate run"
             value={runId}
             onChange={(event) => chooseRun(event.target.value)}
           >
-            <option value="">Select a run</option>
+            <NativeSelectOption value="">Select a run</NativeSelectOption>
             {run.data &&
               !history.data?.items.some((item) => item.id === runId) && (
-                <option value={runId}>{runId}</option>
+                <NativeSelectOption value={runId}>{runId}</NativeSelectOption>
               )}
             {history.data?.items.map((item) => (
-              <option key={item.id} value={item.id}>
+              <NativeSelectOption key={item.id} value={item.id}>
                 {item.created_at} · {item.actor} · {item.id}
-              </option>
+              </NativeSelectOption>
             ))}
-          </select>
+          </NativeSelect>
         </label>
         {history.data && (
           <>
@@ -771,7 +774,7 @@ export function ReconciliationWorkspace() {
             <div className="rc-filters">
               <label>
                 Candidate type
-                <select
+                <NativeSelect
                   aria-label="Candidate type"
                   value={kind}
                   onChange={(event) => {
@@ -779,13 +782,13 @@ export function ReconciliationWorkspace() {
                     setCandidateOffset(0);
                   }}
                 >
-                  <option value="clinician">Clinician</option>
-                  <option value="location">Practice location</option>
-                </select>
+                  <NativeSelectOption value="clinician">Clinician</NativeSelectOption>
+                  <NativeSelectOption value="location">Practice location</NativeSelectOption>
+                </NativeSelect>
               </label>
               <label>
                 Review eligibility
-                <select
+                <NativeSelect
                   aria-label="Review eligibility"
                   value={eligibility}
                   onChange={(event) => {
@@ -793,36 +796,36 @@ export function ReconciliationWorkspace() {
                     setCandidateOffset(0);
                   }}
                 >
-                  <option value="">All candidates</option>
-                  <option value="true">Eligible for review</option>
-                  <option value="false">Unresolved or conflicting</option>
-                </select>
+                  <NativeSelectOption value="">All candidates</NativeSelectOption>
+                  <NativeSelectOption value="true">Eligible for review</NativeSelectOption>
+                  <NativeSelectOption value="false">Unresolved or conflicting</NativeSelectOption>
+                </NativeSelect>
               </label>
               <label>
                 Evidence reason
-                <select aria-label="Evidence reason" value={evidenceReason}
+                <NativeSelect aria-label="Evidence reason" value={evidenceReason}
                   disabled={candidates.isFetching}
                   onChange={event => { updateWorkspaceQuery({ evidence_reason: event.target.value }); setCandidateOffset(0); }}>
-                  <option value="">All evidence reasons</option>
-                  {evidenceReason && !candidates.data?.reason_counts?.[evidenceReason] && <option value={evidenceReason}>{evidenceLabel(evidenceReason)} · 0 pairs</option>}
-                  {Object.entries(candidates.data?.reason_counts ?? {}).map(([code, count]) => <option key={code} value={code}>{evidenceLabel(code)} · {count} {count === 1 ? "pair" : "pairs"}</option>)}
-                </select>
+                  <NativeSelectOption value="">All evidence reasons</NativeSelectOption>
+                  {evidenceReason && !candidates.data?.reason_counts?.[evidenceReason] && <NativeSelectOption value={evidenceReason}>{evidenceLabel(evidenceReason)} · 0 pairs</NativeSelectOption>}
+                  {Object.entries(candidates.data?.reason_counts ?? {}).map(([code, count]) => <NativeSelectOption key={code} value={code}>{evidenceLabel(code)} · {count} {count === 1 ? "pair" : "pairs"}</NativeSelectOption>)}
+                </NativeSelect>
               </label>
             </div>
             <form className="rc-filters" onSubmit={event => { event.preventDefault(); const value = searchDraft.trim(); setSearchDraft(value); updateWorkspaceQuery({ candidate_search: value }); setCandidateOffset(0); }}>
               <label>Find a provider or identifier
-                <input aria-label="Find a provider or identifier" value={searchDraft} maxLength={100}
+                <Input aria-label="Find a provider or identifier" value={searchDraft} maxLength={100}
                   onChange={event => setSearchDraft(event.target.value)} />
               </label>
-              <button type="submit">Search candidates</button>
-              {search && <button type="button" onClick={() => { setSearchDraft(""); updateWorkspaceQuery({ candidate_search: null }); setCandidateOffset(0); }}>Clear search</button>}
+              <Button variant="outline" type="submit">Search candidates</Button>
+              {search && <Button variant="outline" type="button" onClick={() => { setSearchDraft(""); updateWorkspaceQuery({ candidate_search: null }); setCandidateOffset(0); }}>Clear search</Button>}
             </form>
             {search && <p role="status">Applied search: {search}</p>}
             <p className="rc-reference">Search checks either side's provider name, NPI or source-native ID across the full run. Applied terms appear in the address and bookmarks, and are sent to the local server and included in filtered exports. Share links only with people allowed to see those terms.</p>
             <p className="rc-reference">Reason counts cover the complete type, eligibility and search selection before the reason filter. A pair may have several reasons; counts are not additive. Filtering does not change eligibility or approve a link.</p>
             <a href={`/api/reconciliation/runs/${encodeURIComponent(runId)}/candidates/export?${exportParams}`}>Download filtered candidate evidence (JSON)</a>
             <p className="rc-reference">The download contains every pair in the applied filters and its retained source evidence, not only this page. Review decisions are separate.</p>
-            {evidenceReason && <p role="status" aria-label="Evidence reason summary">Showing {candidates.data?.total ?? "…"} of {candidates.data?.unfiltered_total ?? "…"} pairs for this type, eligibility and search · {evidenceLabel(evidenceReason)}. <button onClick={() => { updateWorkspaceQuery({ evidence_reason: null }); setCandidateOffset(0); }}>Clear evidence reason</button></p>}
+            {evidenceReason && <p role="status" aria-label="Evidence reason summary">Showing {candidates.data?.total ?? "…"} of {candidates.data?.unfiltered_total ?? "…"} pairs for this type, eligibility and search · {evidenceLabel(evidenceReason)}. <Button variant="outline" onClick={() => { updateWorkspaceQuery({ evidence_reason: null }); setCandidateOffset(0); }}>Clear evidence reason</Button></p>}
             <p>
               {kind === "clinician"
                 ? "Clinician candidates compare person identity evidence. Shared phones and offices do not establish clinician identity."

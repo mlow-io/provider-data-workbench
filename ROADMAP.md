@@ -4,7 +4,7 @@ Updated 2026-11-21. **Ingestion-first product evolution supersedes the November 
 
 ## Selected workbench migration
 
-The incremental S1.1 UI does not complete component-system adoption. [UI-W0–W5](docs/UI_WORKBENCH_MIGRATION.md) now sequences a populated design spike, shadcn/Tailwind foundation, one complete delivery workbench, import/mapping migration, remaining discrepancy/provider tools and retirement/qualification. Each stage has a U1 spec revision and WM acceptance gates. NEXT selects UI-W0. Resume field-candidate materialization after UI-W2; preserve all later domain milestones and separate actual-model/human gates.
+The incremental S1.1 UI does not complete component-system adoption. [UI-W0–W5](docs/UI_WORKBENCH_MIGRATION.md) now sequences a populated design spike, shadcn/Tailwind foundation, one complete delivery workbench, import/mapping migration, remaining discrepancy/provider tools and retirement/qualification. Each stage has a U1 spec revision and WM acceptance gates. The shared shell and primary delivery/import/mapping/reconciliation components are implemented; STATUS and the migration receipt identify remaining qualification/supporting-surface gates. NEXT selects performance and supporting-surface qualification. Resume field-candidate materialization after UI-W2 qualification; preserve all later domain milestones and separate actual-model/human gates.
 
 ## Active planning and first release
 

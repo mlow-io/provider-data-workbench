@@ -1,3 +1,7 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
+import { Textarea } from "./components/ui/textarea";
 import { useWorkspaceQuery, updateWorkspaceQuery, workspaceHref, useWorkspaceActionGuard } from "./workspaceNavigation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -148,19 +152,19 @@ function Pages({
 }) {
   return (
     <div className="rc-pager" role="group" aria-label={label}>
-      <button
+      <Button variant="outline"
         disabled={disabled || offset === 0}
         onClick={() => onChange(Math.max(0, offset - 20))}
       >
         Previous
-      </button>
+      </Button>
       <span>From {offset + 1}</span>
-      <button
+      <Button variant="outline"
         disabled={disabled || next === null}
         onClick={() => next !== null && onChange(next)}
       >
         Next
-      </button>
+      </Button>
     </div>
   );
 }
@@ -279,7 +283,7 @@ function Acknowledgement({
         <div className="rc-create">
           <label>
             Acknowledgement actor
-            <input
+            <Input
               aria-label="Acknowledgement actor"
               value={actor}
               onChange={(event) => setActor(event.target.value)}
@@ -287,7 +291,7 @@ function Acknowledgement({
           </label>
           <label>
             Acknowledgement reason
-            <textarea
+            <Textarea
               aria-label="Acknowledgement reason"
               value={reason}
               onChange={(event) => setReason(event.target.value)}
@@ -303,7 +307,7 @@ function Acknowledgement({
         </p>
       )}
       {requiresRefresh && (
-        <button
+        <Button variant="outline"
           disabled={locked}
           onClick={async () => {
             setRefreshError("");
@@ -321,7 +325,7 @@ function Acknowledgement({
           }}
         >
           Refresh acknowledgement context
-        </button>
+        </Button>
       )}
       {mutation.error && (
         <p className="rc-error" role="alert">
@@ -345,7 +349,7 @@ function Acknowledgement({
           changed.
         </p>
       )}
-      <button
+      <Button variant="outline"
         disabled={
           pending
             ? mutation.isPending || otherBusy
@@ -358,7 +362,7 @@ function Acknowledgement({
           : pending
             ? "Retry same acknowledgement"
             : "Record acknowledgement"}
-      </button>
+      </Button>
       <details
         onToggle={(event) => {
           if (event.currentTarget.open) setHistoryOpen(true);
@@ -373,9 +377,9 @@ function Acknowledgement({
             <p className="rc-error" role="alert">
               {history.error.message}
             </p>
-            <button disabled={locked} onClick={() => void history.refetch()}>
+            <Button variant="outline" disabled={locked} onClick={() => void history.refetch()}>
               Retry acknowledgement history
-            </button>
+            </Button>
           </>
         )}
         {history.data && (
@@ -603,9 +607,9 @@ export function FollowUpPlan({
           Preview exact review-case actions, then confirm explicitly. Existing
           case ownership and status are preserved.
         </p>
-        <button disabled={otherBusy} onClick={() => setOpened(true)}>
+        <Button variant="outline" disabled={otherBusy} onClick={() => setOpened(true)}>
           Review follow-up plan
-        </button>
+        </Button>
       </section>
     );
   return (
@@ -631,9 +635,9 @@ export function FollowUpPlan({
           <p className="rc-error" role="alert">
             {history.error.message}
           </p>
-          <button disabled={locked} onClick={() => void history.refetch()}>
+          <Button variant="outline" disabled={locked} onClick={() => void history.refetch()}>
             Retry saved confirmation lookup
-          </button>
+          </Button>
         </>
       )}
       {history.data && history.data.total > 0 && (
@@ -645,7 +649,7 @@ export function FollowUpPlan({
           </p>
           <label>
             Saved follow-up confirmation
-            <select
+            <NativeSelect
               aria-label="Saved follow-up confirmation"
               value={receiptId}
               disabled={locked}
@@ -654,13 +658,13 @@ export function FollowUpPlan({
                 setReceiptOffset(0);
               }}
             >
-              <option value="">Choose a saved confirmation</option>
+              <NativeSelectOption value="">Choose a saved confirmation</NativeSelectOption>
               {history.data.items.map((item) => (
-                <option key={item.id} value={item.id}>
+                <NativeSelectOption key={item.id} value={item.id}>
                   {item.actor} · {item.created_at} · {item.id}
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
           <Pages
             offset={listOffset}
@@ -673,7 +677,7 @@ export function FollowUpPlan({
       )}
       {history.isSuccess && history.data.total === 0 && !receiptId && (
         <>
-          <button
+          <Button variant="outline"
             disabled={locked || preview.isFetching}
             onClick={() => {
               if (previewRequested) void refreshPreview();
@@ -681,7 +685,7 @@ export function FollowUpPlan({
             }}
           >
             Preview follow-up actions
-          </button>
+          </Button>
           {preview.isFetching && (
             <p role="status">Evaluating the complete follow-up action plan…</p>
           )}
@@ -690,7 +694,7 @@ export function FollowUpPlan({
               <p className="rc-error" role="alert">
                 {preview.error.message}
               </p>
-              <button
+              <Button variant="outline"
                 disabled={locked}
                 onClick={() => {
                   setConfirmed(false);
@@ -699,7 +703,7 @@ export function FollowUpPlan({
                 }}
               >
                 Reset case choices and preview
-              </button>
+              </Button>
             </>
           )}
           {preview.data && (
@@ -761,7 +765,7 @@ export function FollowUpPlan({
                       ))}
                   <label>
                     Case choice for this target
-                    <select
+                    <NativeSelect
                       aria-label={`Case choice for ${action.target_key}`}
                       disabled={locked || preview.isFetching}
                       value={choices[action.target_key] ?? ""}
@@ -776,17 +780,17 @@ export function FollowUpPlan({
                         setConfirmed(false);
                       }}
                     >
-                      <option value="">Use the assessed default</option>
-                      <option
+                      <NativeSelectOption value="">Use the assessed default</NativeSelectOption>
+                      <NativeSelectOption
                         value="new"
                         disabled={action.available_cases.some(
                           (item) => item.eligible_for_reuse !== false,
                         )}
                       >
                         Create a new QA review case
-                      </option>
+                      </NativeSelectOption>
                       {action.available_cases.map((item) => (
-                        <option
+                        <NativeSelectOption
                           key={item.id}
                           value={item.id}
                           disabled={item.eligible_for_reuse === false}
@@ -796,9 +800,9 @@ export function FollowUpPlan({
                           {item.eligible_for_reuse === false
                             ? " · unavailable for reuse"
                             : ""}
-                        </option>
+                        </NativeSelectOption>
                       ))}
-                    </select>
+                    </NativeSelect>
                   </label>
                   <details>
                     <summary>Target and existing-case provenance</summary>
@@ -835,7 +839,7 @@ export function FollowUpPlan({
                 <div className="rc-create">
                   <label>
                     Follow-up actor
-                    <input
+                    <Input
                       aria-label="Follow-up actor"
                       value={actor}
                       onChange={(event) => setActor(event.target.value)}
@@ -843,7 +847,7 @@ export function FollowUpPlan({
                   </label>
                   <label>
                     Follow-up reason
-                    <textarea
+                    <Textarea
                       aria-label="Follow-up reason"
                       value={reason}
                       onChange={(event) => setReason(event.target.value)}
@@ -886,7 +890,7 @@ export function FollowUpPlan({
                   request ID and plan.
                 </p>
               )}
-              <button
+              <Button variant="outline"
                 disabled={
                   pending ? mutation.isPending || otherBusy : !canConfirm
                 }
@@ -897,7 +901,7 @@ export function FollowUpPlan({
                   : pending
                     ? "Retry same follow-up confirmation"
                     : "Confirm follow-up plan"}
-              </button>
+              </Button>
             </>
           )}
         </>
@@ -912,9 +916,9 @@ export function FollowUpPlan({
           <p className="rc-error" role="alert">
             {receipt.error.message}
           </p>
-          <button disabled={locked} onClick={() => void receipt.refetch()}>
+          <Button variant="outline" disabled={locked} onClick={() => void receipt.refetch()}>
             Retry saved follow-up receipt
-          </button>
+          </Button>
         </>
       )}
       {receipt.isSuccess && receipt.data?.proposal_id === proposalId && (
@@ -946,24 +950,24 @@ export function FollowUpPlan({
             </div>
           )}
           <div className="rc-filters">
-            <button
+            <Button variant="outline"
               disabled={locked || receipt.isFetching}
               onClick={() => void refreshReceipt().catch(() => {})}
             >
               Refresh saved follow-up receipt
-            </button>
-            <button
+            </Button>
+            <Button variant="outline"
               disabled={locked || receipt.isFetching}
               onClick={() => void download("json")}
             >
               Download follow-up JSON
-            </button>
-            <button
+            </Button>
+            <Button variant="outline"
               disabled={locked || receipt.isFetching}
               onClick={() => void download("xlsx")}
             >
               Download follow-up XLSX
-            </button>
+            </Button>
           </div>
           {exportError && (
             <p className="rc-error" role="alert">

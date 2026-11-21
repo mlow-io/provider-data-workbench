@@ -136,9 +136,9 @@
   flex: 1 1 140px;
   min-width: 0;
 }
-.iw-form input,
-.iw-form select,
-.iw-mapping select {
+.iw-form input:not([data-slot]),
+.iw-form select:not([data-slot]),
+.iw-mapping select:not([data-slot]) {
   padding: 10px 11px;
   border: 1px solid #bfcece;
   border-radius: 5px;
@@ -148,7 +148,7 @@
   font: inherit;
   color: #253f47;
 }
-.iw-shell button {
+.iw-shell button:not([data-slot]) {
   border: 1px solid #b6caca;
   border-radius: 5px;
   padding: 10px 13px;
@@ -159,7 +159,7 @@
   cursor: pointer;
   min-height: 40px;
 }
-.iw-shell button:disabled {
+.iw-shell button:not([data-slot]):disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -419,7 +419,7 @@
 .iw-native summary { cursor: pointer; }
 .iw-native input { max-width: 100%; }
 .iw-capture-picker { display: grid; gap: .4rem; max-width: 100%; margin-block: 1rem; }
-.iw-capture-picker select { width: 100%; min-width: 0; max-width: 42rem; padding: .6rem; font: inherit; border: 1px solid #b8cbd1; border-radius: .3rem; background: #fff; }
+.iw-capture-picker select:not([data-slot]) { width: 100%; min-width: 0; max-width: 42rem; padding: .6rem; font: inherit; border: 1px solid #b8cbd1; border-radius: .3rem; background: #fff; }
 
 /* Delivery progress reflects intake decisions, separate from dataset approval. */
 .iw-import-context { padding: 16px; margin-block: 18px; background: #f5f7f9; border: 1px solid #d6dcdf; border-radius: 4px; }
@@ -435,3 +435,7 @@
 
 .iw-inbox .iw-list { max-height: 72vh; overflow-y: auto; padding: 3px; scrollbar-gutter: stable; }
 @media (max-width: 1120px) { .iw-inbox .iw-list { max-height: 360px; } }
+
+/* Layout only: migrated controls retain their component styling. */
+.iw-shell label > [data-slot="native-select-wrapper"] { width: 100%; max-width: 100%; }
+.iw-shell [data-slot="button"] { min-height: 40px; height: auto; white-space: normal; }

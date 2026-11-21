@@ -61,6 +61,7 @@ test('combined retained workflow exposes held data, native findings, scoped NORT
     await expect(page.locator('.mf-current code')).toHaveText(report.approved_version_id);
     await expect(page.getByRole('heading',{name:'Dataset review · candidate',exact:true})).toBeVisible();
     await expect(page.getByText('missing_keys',{exact:true})).toBeVisible();
+    if (!await page.getByRole('link',{name:'Download current approved JSON',exact:true}).isVisible()) await page.getByRole('button',{name:'← Back to deliveries',exact:true}).click();
     const pending=page.waitForEvent('download');await page.getByRole('link',{name:'Download current approved JSON',exact:true}).click();
     const approvedPath=info.outputPath('approved.json');await (await pending).saveAs(approvedPath);
     const consumer=JSON.parse(execFileSync('python3',['-m','provider_directory_truth_layer.cli','consume-approved',approvedPath,

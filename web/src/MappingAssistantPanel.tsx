@@ -1,3 +1,6 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
 import { useRef, useState } from "react";
 import { useWorkspaceActionGuard } from "./workspaceNavigation";
 
@@ -83,10 +86,10 @@ export function MappingAssistantPanel({ receiptId, attemptId, onProposalReady }:
   }
   const terminal = run && ["succeeded", "failed", "cancelled", "unavailable"].includes(run.state);
   return <section className="np-assistant iw-native" aria-label="Optional mapping assistance">
-    <button type="button" aria-expanded={open} onClick={() => { setOpen(!open); if (!open && !registry) void refresh(); }}>Optional mapping assistance</button>
+    <Button variant="outline" type="button" aria-expanded={open} onClick={() => { setOpen(!open); if (!open && !registry) void refresh(); }}>Optional mapping assistance</Button>
     {open && <>
       <p>Experimental: queue a bounded sample, inspect its request, then explicitly run the model. A result can only save a proposed recipe. Manual rules below remain available.</p>
-      <button type="button" disabled={busy} onClick={() => void refresh()}>Refresh assistance</button>
+      <Button variant="outline" type="button" disabled={busy} onClick={() => void refresh()}>Refresh assistance</Button>
       {busy && <p role="status">Reading or saving local assistance history…</p>}
       {invoking && <p role="status">Model request in progress. Refresh to inspect retained state; no automatic retry will follow a failed or uncertain call.</p>}
       {error && <p className="iw-error" role="alert">{error}</p>}
@@ -96,17 +99,17 @@ export function MappingAssistantPanel({ receiptId, attemptId, onProposalReady }:
         {!registry.source_processing_allowed && <p className="iw-notice">This source has no external-processing permission in server configuration.</p>}
         <p>The sample includes at most {registry.configuration.limits.columns} columns and {registry.configuration.limits.rows} rows; cells clip at {registry.configuration.limits.cell_bytes} bytes with a visible flag. Each call reserves ${registry.configuration.limits.reserve_usd.toFixed(2)}, including uncertain outcomes. This is a conservative local allowance, not invoice-exact billing.</p>
         <div className="np-review">
-          <label>Assistance operator<input value={actor} maxLength={2000} disabled={busy} onChange={event => setActor(event.target.value)} /></label>
-          <label>Assistance reason<input value={reason} maxLength={2000} disabled={busy} onChange={event => setReason(event.target.value)} /></label>
+          <label>Assistance operator<Input value={actor} maxLength={2000} disabled={busy} onChange={event => setActor(event.target.value)} /></label>
+          <label>Assistance reason<Input value={reason} maxLength={2000} disabled={busy} onChange={event => setReason(event.target.value)} /></label>
         </div>
         <label className="np-check"><input type="checkbox" checked={permission} disabled={busy} onChange={event => setPermission(event.target.checked)} />Allow this source sample to be sent to OpenAI for this run</label>
         <label className="np-check"><input type="checkbox" checked={includeApprovedExamples} disabled={busy || invoking} onChange={event => setIncludeApprovedExamples(event.target.checked)} />Include reviewed mapping definitions from this source and scope as model examples</label>
         <p className="iw-muted">Optional: send up to three approved definitions (4,000 bytes total). Previous source cells and reviewer names/reasons are excluded. Inspect the exact request before running; model output still requires ordinary recipe review.</p>
-        <button type="button" disabled={busy || invoking || !registry.configuration.available || !registry.source_processing_allowed || !permission || !actor.trim() || !reason.trim()} onClick={() => void act("create")}>Queue model mapping</button>
-        <label className="iw-capture-picker">Retained assistance run<select value={run?.id ?? ""} disabled={busy || invoking} onChange={event => void select(event.target.value)}>
-          <option value="">Choose a retained run</option>
-          {registry.items.map(item => <option key={item.id} value={item.id}>{item.state.replaceAll("_", " ")} · {item.created_at} · {item.id}</option>)}
-        </select></label>
+        <Button variant="outline" type="button" disabled={busy || invoking || !registry.configuration.available || !registry.source_processing_allowed || !permission || !actor.trim() || !reason.trim()} onClick={() => void act("create")}>Queue model mapping</Button>
+        <label className="iw-capture-picker">Retained assistance run<NativeSelect value={run?.id ?? ""} disabled={busy || invoking} onChange={event => void select(event.target.value)}>
+          <NativeSelectOption value="">Choose a retained run</NativeSelectOption>
+          {registry.items.map(item => <NativeSelectOption key={item.id} value={item.id}>{item.state.replaceAll("_", " ")} · {item.created_at} · {item.id}</NativeSelectOption>)}
+        </NativeSelect></label>
         {registry.items.length === 0 && <p>No assistance runs recorded.</p>}
       </>}
       {run && <article aria-label="Selected mapping assistance run">
@@ -122,8 +125,8 @@ export function MappingAssistantPanel({ receiptId, attemptId, onProposalReady }:
         {!!run.result.unresolved?.length && <ul>{run.result.unresolved.map(item => <li key={item.field}>{item.field}: {item.reason}</li>)}</ul>}
         {run.proposal_id && <p>Proposed recipe <code>{run.proposal_id}</code> is available in <strong>Retained recipe proposal</strong> below. Load it, preview its rules and enter a separate approval reviewer and reason.</p>}
         {!terminal && <div className="np-actions">
-          <button type="button" disabled={busy || invoking || run.attempt_id !== attemptId} onClick={() => void act("run-once")}>{run.state === "response_ready" ? "Finish retained model response" : run.state === "running" ? "Recover interrupted run" : "Run queued model mapping"}</button>
-          <button type="button" disabled={busy || !actor.trim() || !reason.trim()} onClick={() => void act("cancel")}>Cancel mapping run</button>
+          <Button variant="outline" type="button" disabled={busy || invoking || run.attempt_id !== attemptId} onClick={() => void act("run-once")}>{run.state === "response_ready" ? "Finish retained model response" : run.state === "running" ? "Recover interrupted run" : "Run queued model mapping"}</Button>
+          <Button variant="outline" type="button" disabled={busy || !actor.trim() || !reason.trim()} onClick={() => void act("cancel")}>Cancel mapping run</Button>
         </div>}
       </article>}
     </>}

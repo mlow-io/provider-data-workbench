@@ -1,6 +1,6 @@
 # Workbench UI migration plan
 
-Proposed design contract, 2026-11-21. The prior adaptive release improved the existing React/CSS screens; it did not install a component library or complete the workbench redesign. This plan makes that migration a distinct deliverable. [STATUS](../STATUS.md) owns implementation evidence; [NEXT](../NEXT.md) selects the next task. This revision changes planning only.
+Selected design contract with implementation notes, 2026-11-21. The prior adaptive release improved the existing React/CSS screens; it did not install a component library or complete the workbench redesign. This plan makes that migration a distinct deliverable. [STATUS](../STATUS.md) owns implementation evidence; [NEXT](../NEXT.md) selects the next task. The owner subsequently authorized implementation; current evidence and remaining gates are recorded below.
 
 ## Outcome and proposed stack
 
@@ -12,9 +12,9 @@ A component library supplies reusable behavior and visual primitives. An applica
 
 Official references: [Vite installation](https://ui.shadcn.com/docs/installation/vite), [sidebar blocks](https://ui.shadcn.com/blocks/sidebar), [table composition](https://ui.shadcn.com/docs/components/data-table). These are starting references, not pinned implementation inputs. Inspect current CLI output before generating components and retain generated source for review.
 
-## Current baseline and concrete gaps
+## Pre-migration baseline and concrete gaps
 
-- React 19/Vite 6, TanStack Query 5 and Table 8 are installed. No components.json, Tailwind or shadcn dependency/configuration exists.
+- React 19/Vite 6, TanStack Query 5 and Table 8 are installed. At the start of migration, no components.json, Tailwind or shadcn dependency/configuration existed.
 - WorkbenchShell.tsx, EvidenceComparison.tsx and ApprovedExportReview.tsx contain reusable behavior, but the visual primitives remain custom.
 - Ten CSS files independently style shell, intake, normalization, managed feeds, evidence, reconciliation and network screens. Broad shell overrides already caused a primary-button hover contrast defect during the last release.
 - Delivery sections still contain substantial explanatory content and configuration/history within the main decision flow. A workbench needs stable selection and a dedicated inspector/action area.
@@ -132,6 +132,12 @@ UI stages reuse the prior UX1–5 and AI-09 acceptance boundaries; stable new ID
 
 Run AGENTS-required frontend tests, build and full browser gates for completed production slices; inspect real downloads. For UI-W0, run docs checks and the isolated spike's relevant checks, label synthetic outputs and keep user storage untouched. Preserve baseline and failed-run evidence. A rollback restores the previous frontend commit while retaining unchanged API/data storage; do not clear runtime state to recover a UI deployment.
 
-## Current status and next action
+## Current implementation and remaining gates
 
-Reviewed planning document only. Visual direction and proposed performance gates are now explicit; no benchmark or prototype has been run for this review. shadcn/Tailwind installation, primitive-base selection, isolated prototype, owner visual review and all UI-W implementation gates remain open. NEXT selects UI-W0. The prior CSS release remains the working baseline and its test results are historical receipts, not migration results.
+The migration installs Tailwind 4 and official shadcn Radix Nova source components, with Lucide icons and locally served IBM Plex Sans. The shell composes the official Sidebar primitives after inspecting sidebar-07; it contains actual product navigation rather than template accounts/projects. React/Vite, Query 5 and Table 8 remain. TypeScript and Vite aliases agree. Generated source is owned in web/src/components/ui; selected registry dependencies are locked in package-lock.json.
+
+Delivery review now uses a compact version table, selected inspector, evidence/original tabs, selected source-key comparison and pinned workbook controls. Narrow detail has explicit return navigation and query-change focus guards. Intake, mapping, normalization and reconciliation use shared controls; native checkbox and specialized selection behavior remain. The legacy QA console uses shared primary controls; supporting custom evidence/layout and remediation/native-source panels remain scoped legacy surfaces. Shell replacement removed old control overrides, and legacy styles are explicitly layered/scoped. This does not mean every historical feature stylesheet has been deleted.
+
+Major workspace modules load on demand. An isolated build of the prior revision produced a 519.08 kB initial JS chunk (145.90 kB gzip); the integrated migration build produced 365.86 kB (118.26 kB gzip), plus route chunks. Initial CSS grows from 10.74 to 16.73 kB gzip, and three local font weights add transfer. These are build measurements, not loading-time or field-performance results. Full JSON export still backs the small workbook preview; bounded server-side preview and 100/1,000/10,000-record service benchmarks remain an explicit performance follow-up. No scale qualification is asserted.
+
+See [migration receipt](evidence/canonical/workbench-migration-2026-11-21/README.md) for exact checks and captures. Owner visual acceptance, uncoached usability, stress/interaction/memory budgets and exhaustive retirement of supporting legacy surfaces remain open. The implementation authorization supersedes the earlier prototype-only stop, but does not establish these evidence outcomes.

@@ -1,3 +1,7 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
+import { Textarea } from "./components/ui/textarea";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import "./normalization-panel.css";
 import { EvidenceComparison } from "./EvidenceComparison";
@@ -268,7 +272,7 @@ function NormalizationDraft({
       >
         <label>
           {label(field)} source
-          <select
+          <NativeSelect
             aria-label={`Normalize ${label(field)} source`}
             value={column}
             disabled={busy}
@@ -283,13 +287,13 @@ function NormalizationDraft({
               edit({ ...definition, mapping, transforms });
             }}
           >
-            <option value="">Unmapped</option>
+            <NativeSelectOption value="">Unmapped</NativeSelectOption>
             {profile?.columns.map((item) => (
-              <option key={item.name} value={item.name}>
+              <NativeSelectOption key={item.name} value={item.name}>
                 {item.name}
-              </option>
+              </NativeSelectOption>
             ))}
-          </select>
+          </NativeSelect>
         </label>
         <div className="np-rules">
           <label className="np-check">
@@ -328,7 +332,7 @@ function NormalizationDraft({
           </label>
           <label>
             Case
-            <select
+            <NativeSelect
               aria-label={`${label(field)} case`}
               disabled={!column || busy}
               value={
@@ -345,15 +349,15 @@ function NormalizationDraft({
                 ])
               }
             >
-              <option value="">Keep case</option>
-              <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
-            </select>
+              <NativeSelectOption value="">Keep case</NativeSelectOption>
+              <NativeSelectOption value="uppercase">Uppercase</NativeSelectOption>
+              <NativeSelectOption value="lowercase">Lowercase</NativeSelectOption>
+            </NativeSelect>
           </label>
           {options.length > 0 && (
             <label>
               Format
-              <select
+              <NativeSelect
                 aria-label={`${label(field)} format`}
                 disabled={!column || busy}
                 value={format?.format ?? format?.op ?? ""}
@@ -371,9 +375,9 @@ function NormalizationDraft({
                   ])
                 }
               >
-                <option value="">Keep source format</option>
+                <NativeSelectOption value="">Keep source format</NativeSelectOption>
                 {options.map((op) => (
-                  <option key={op.format ?? op.op} value={op.format ?? op.op}>
+                  <NativeSelectOption key={op.format ?? op.op} value={op.format ?? op.op}>
                     {op.format
                       ? `Date ${op.format}`
                       : op.op === "phone_us"
@@ -381,9 +385,9 @@ function NormalizationDraft({
                         : op.op === "zip_us"
                           ? "US ZIP / ZIP+4"
                           : "US state abbreviation"}
-                  </option>
+                  </NativeSelectOption>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
           )}
           <label className="np-check">
@@ -410,7 +414,7 @@ function NormalizationDraft({
   return (
     <section className="np-panel" aria-label="Profile and normalization">
       <div className="np-heading">
-        <button
+        <Button variant="outline"
           type="button"
           aria-expanded={open}
           onClick={() => {
@@ -419,7 +423,7 @@ function NormalizationDraft({
           }}
         >
           Profile and normalize
-        </button>
+        </Button>
         {accepted && supported && (
           <a href={`${base}/dataset`}>Download validated dataset JSON</a>
         )}
@@ -450,13 +454,13 @@ function NormalizationDraft({
             {error && (
               <p role="alert" className="iw-error">
                 {error}{" "}
-                <button
+                <Button variant="outline"
                   type="button"
                   disabled={busy}
                   onClick={() => void load()}
                 >
                   Reload profile
-                </button>
+                </Button>
               </p>
             )}
             {status && <p role="status">{status}</p>}
@@ -513,7 +517,7 @@ function NormalizationDraft({
                   extensions are retained in separate fields; dates require a
                   declared format. Literal NA stays source data.
                 </p>
-                <button
+                <Button variant="outline"
                   type="button"
                   disabled={busy}
                   onClick={() =>
@@ -525,7 +529,7 @@ function NormalizationDraft({
                   }
                 >
                   Use suggested normalization columns
-                </button>
+                </Button>
                 {Object.entries(profile.mapping_candidates)
                   .filter(([, values]) => values.length > 1)
                   .map(([field, values]) => (
@@ -548,13 +552,13 @@ function NormalizationDraft({
                       .map(binding)}
                   </fieldset>
                 </details>
-                <button
+                <Button variant="outline"
                   type="button"
                   disabled={busy || !Object.keys(definition.mapping).length}
                   onClick={() => void previewDefinition()}
                 >
                   Preview normalization
-                </button>
+                </Button>
                 {preview && (
                   <div className="np-preview">
                     <h3>3. Review before and after</h3>
@@ -592,7 +596,7 @@ function NormalizationDraft({
                       </details>
                     ))}
                     {preview.next_offset !== null && (
-                      <button
+                      <Button variant="outline"
                         type="button"
                         disabled={busy}
                         onClick={() =>
@@ -600,7 +604,7 @@ function NormalizationDraft({
                         }
                       >
                         Next sample rows
-                      </button>
+                      </Button>
                     )}
                   </div>
                 )}
@@ -612,7 +616,7 @@ function NormalizationDraft({
                 </p>
                 <label>
                   Retained recipe proposal
-                  <select
+                  <NativeSelect
                     value={inspectedProposal?.id ?? ""}
                     disabled={busy}
                     onChange={(event) => {
@@ -641,11 +645,11 @@ function NormalizationDraft({
                       }
                     }}
                   >
-                    <option value="">Choose a retained proposal</option>
+                    <NativeSelectOption value="">Choose a retained proposal</NativeSelectOption>
                     {revisions
                       .filter((item) => item.state === "proposed")
                       .map((item) => (
-                        <option key={item.id} value={item.id}>
+                        <NativeSelectOption key={item.id} value={item.id}>
                           {item.name} ·{" "}
                           {item.receipt_id === receiptId &&
                           item.attempt_id === attemptId
@@ -654,12 +658,12 @@ function NormalizationDraft({
                               ? "older attempt — inspect only"
                               : "another receipt — copy rules"}{" "}
                           · {item.id}
-                        </option>
+                        </NativeSelectOption>
                       ))}
-                  </select>
+                  </NativeSelect>
                 </label>
                 {inspectedProposal && (
-                  <button
+                  <Button variant="outline"
                     type="button"
                     disabled={busy}
                     onClick={() => {
@@ -674,7 +678,7 @@ function NormalizationDraft({
                     }}
                   >
                     Copy proposal rules into a new draft
-                  </button>
+                  </Button>
                 )}
                 <h3>4. Save, approve and apply</h3>
                 <p>
@@ -684,7 +688,7 @@ function NormalizationDraft({
                 <div className="np-review">
                   <label>
                     Recipe name
-                    <input
+                    <Input
                       value={name}
                       disabled={busy}
                       onChange={(event) => setName(event.target.value)}
@@ -692,7 +696,7 @@ function NormalizationDraft({
                   </label>
                   <label>
                     Recipe reviewer
-                    <input
+                    <Input
                       value={actor}
                       disabled={busy}
                       onChange={(event) => setActor(event.target.value)}
@@ -700,7 +704,7 @@ function NormalizationDraft({
                   </label>
                   <label>
                     Recipe decision reason
-                    <textarea
+                    <Textarea
                       value={reason}
                       disabled={busy}
                       onChange={(event) => setReason(event.target.value)}
@@ -727,7 +731,7 @@ function NormalizationDraft({
                   </aside>
                 )}
                 <div className="np-actions">
-                  <button
+                  <Button variant="outline"
                     type="button"
                     disabled={busy || !preview || !reviewed || Boolean(saved)}
                     onClick={() =>
@@ -757,8 +761,8 @@ function NormalizationDraft({
                     }
                   >
                     Save proposed recipe
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="outline"
                     type="button"
                     disabled={
                       busy ||
@@ -784,8 +788,8 @@ function NormalizationDraft({
                     }
                   >
                     Approve recipe
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="outline"
                     type="button"
                     disabled={busy || saved?.state !== "approved"}
                     onClick={() =>
@@ -803,14 +807,14 @@ function NormalizationDraft({
                     }
                   >
                     Apply approved recipe
-                  </button>
+                  </Button>
                 </div>
                 <h3>Reuse an approved recipe</h3>
                 <p>Check reviewed source profiles against this delivery before copying their rules. A structural match is not a semantic review.</p>
-                <button type="button" disabled={busy} onClick={() => void run(async () => {
+                <Button variant="outline" type="button" disabled={busy} onClick={() => void run(async () => {
                   const result = await api<Compatibility>(`${base}/recipe-compatibility?expected_attempt=${encodeURIComponent(attemptId)}&offset=0&limit=20`);
                   if (alive.current) setCompatibility(result);
-                })}>Check reusable source profiles</button>
+                })}>Check reusable source profiles</Button>
                 {compatibility && <section aria-label="Source profile compatibility">
                   <p>{compatibility.notice}</p>
                   <p className="iw-muted">Showing {compatibility.items.length} of {compatibility.total} reviewed profiles. Manual mapping remains available.</p>
@@ -821,19 +825,19 @@ function NormalizationDraft({
                     {!!item.ambiguous_columns?.length && <p>Ambiguous source columns: {item.ambiguous_columns.join(", ")}. Choose a unique binding manually.</p>}
                     {item.added_columns.length > 0 && <p>Added columns: {item.added_columns.join(", ")}</p>}
                     {item.removed_columns.length > 0 && <p>Removed columns: {item.removed_columns.join(", ")}</p>}
-                    <button type="button" disabled={busy || !item.reusable || !actor.trim() || !reason.trim()} onClick={() => void run(async () => {
+                    <Button variant="outline" type="button" disabled={busy || !item.reusable || !actor.trim() || !reason.trim()} onClick={() => void run(async () => {
                       const proposal = await api<Revision>(`${base}/recipes/${encodeURIComponent(item.revision_id)}/reuse`, { expected_attempt: attemptId, actor, reason });
                       if (alive.current) {
                         setDefinition(proposal.definition); setName(proposal.name); setSaved(proposal); setInspectedProposal(proposal);
                         setPreview(null); setSelected(""); setRevisions([...revisions, proposal]);
                         setStatus("Reviewed profile copied into a new proposal. Preview this delivery before explicitly approving and applying it.");
                       }
-                    })}>Copy {item.name} as a proposal</button>
+                    })}>Copy {item.name} as a proposal</Button>
                   </li>)}</ul>
-                  {compatibility.next_offset !== null && <button type="button" disabled={busy} onClick={() => void run(async () => {
+                  {compatibility.next_offset !== null && <Button variant="outline" type="button" disabled={busy} onClick={() => void run(async () => {
                     const next = await api<Compatibility>(`${base}/recipe-compatibility?expected_attempt=${encodeURIComponent(attemptId)}&offset=${compatibility.next_offset}&limit=20`);
                     if (alive.current) setCompatibility({ ...next, items: [...compatibility.items, ...next.items] });
-                  })}>Load more reviewed profiles</button>}
+                  })}>Load more reviewed profiles</Button>}
                   <p className="iw-muted">Enter the recipe reviewer and decision reason above to copy a compatible profile. Copying never accepts rows or approves a dataset.</p>
                 </section>}
                 <p>
@@ -842,7 +846,7 @@ function NormalizationDraft({
                 </p>
                 <label>
                   Compatible approved recipe
-                  <select
+                  <NativeSelect
                     value={selected}
                     disabled={busy}
                     onChange={(event) => {
@@ -862,17 +866,17 @@ function NormalizationDraft({
                       }
                     }}
                   >
-                    <option value="">Choose a revision</option>
+                    <NativeSelectOption value="">Choose a revision</NativeSelectOption>
                     {revisions
                       .filter((item) => item.state === "approved")
                       .map((item) => (
-                        <option key={item.id} value={item.id}>
+                        <NativeSelectOption key={item.id} value={item.id}>
                           {item.name} · {item.id}
-                        </option>
+                        </NativeSelectOption>
                       ))}
-                  </select>
+                  </NativeSelect>
                 </label>
-                <button
+                <Button variant="outline"
                   type="button"
                   disabled={busy || !selected || !preview}
                   onClick={() =>
@@ -885,7 +889,7 @@ function NormalizationDraft({
                   }
                 >
                   Apply selected approved recipe
-                </button>
+                </Button>
               </>
             )}
           </>

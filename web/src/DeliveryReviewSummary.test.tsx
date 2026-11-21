@@ -12,7 +12,7 @@ test("delivery evidence preserves null, absent and empty values without implying
   }} />);
   expect(screen.getByText("approved-original")).toBeVisible();
   expect(screen.getByText(/Showing 1 of 81 comparison entries/)).toBeVisible();
-  const row = screen.getByRole("row", { name: /001-NORTH/ });
+  const row = screen.getByRole("region", { name: "Selected source key evidence" });
   expect(within(row).getByText("Before: Null")).toBeVisible();
   expect(within(row).getByText("After: Empty text")).toBeVisible();
   expect(within(row).getAllByText("Before: Not supplied")).toHaveLength(2);

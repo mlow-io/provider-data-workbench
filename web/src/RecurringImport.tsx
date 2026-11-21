@@ -1,3 +1,6 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
 import { useEffect, useState } from "react";
 import "./recurring-import.css";
 
@@ -113,12 +116,12 @@ export function RecurringImport({ receiptId, state, attemptId, appliedRevisionId
     <p>Applied mapping revision: <strong>{appliedRevisionId ?? "None — manual mapping"}</strong></p>
     <div className="ri-controls">
       <label>Saved mapping revision
-        <select value={selectedRevision} onChange={(event) => setSelectedRevision(event.target.value)}>
-          <option value="">Choose a reviewed revision</option>
-          {revisions.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.id}</option>)}
-        </select>
+        <NativeSelect value={selectedRevision} onChange={(event) => setSelectedRevision(event.target.value)}>
+          <NativeSelectOption value="">Choose a reviewed revision</NativeSelectOption>
+          {revisions.map((item) => <NativeSelectOption key={item.id} value={item.id}>{item.name} · {item.id}</NativeSelectOption>)}
+        </NativeSelect>
       </label>
-      <button type="button" disabled={busy || saving || !selectedRevision} onClick={() => void onRun("mapping", { mapping_revision_id: selectedRevision })}>Apply saved mapping and reprocess</button>
+      <Button variant="outline" type="button" disabled={busy || saving || !selectedRevision} onClick={() => void onRun("mapping", { mapping_revision_id: selectedRevision })}>Apply saved mapping and reprocess</Button>
     </div>
     {selectedRevision && (() => {
       const item = revisions.find((revision) => revision.id === selectedRevision);
@@ -128,10 +131,10 @@ export function RecurringImport({ receiptId, state, attemptId, appliedRevisionId
       <summary>Save this validated mapping as a revision</summary>
       <p className="iw-muted">Available only after a valid mapped preview. The current mapping, parsing settings, source and scope are saved by the service.</p>
       <form className="iw-form" onSubmit={(event) => { event.preventDefault(); void saveRevision(); }}>
-        <label>Revision name<input required value={name} onChange={(event) => setName(event.target.value)} /></label>
-        <label>Mapping reviewer<input required value={actor} onChange={(event) => setActor(event.target.value)} /></label>
-        <label>Mapping reason<input required value={reason} onChange={(event) => setReason(event.target.value)} /></label>
-        <button disabled={busy || saving || state !== "preview_ready" || !attemptId || !name || !actor || !reason}>Save mapping revision (does not accept)</button>
+        <label>Revision name<Input required value={name} onChange={(event) => setName(event.target.value)} /></label>
+        <label>Mapping reviewer<Input required value={actor} onChange={(event) => setActor(event.target.value)} /></label>
+        <label>Mapping reason<Input required value={reason} onChange={(event) => setReason(event.target.value)} /></label>
+        <Button variant="outline" disabled={busy || saving || state !== "preview_ready" || !attemptId || !name || !actor || !reason}>Save mapping revision (does not accept)</Button>
       </form>
     </details>
     {comparison && <details className="ri-comparison">
@@ -142,12 +145,12 @@ export function RecurringImport({ receiptId, state, attemptId, appliedRevisionId
         {statuses.map((item) => <li key={item}>{label(item)}: <strong>{item === "missing" ? comparison.missing_from_this_delivery ?? 0 : comparison[item] ?? 0}</strong></li>)}
       </ul>
       <p className="iw-muted">Quarantined rows remain separate evidence. Missing means absent from this delivery, not terminated. The visible comparison is bounded to 50 entries; the evidence packet retains the full result.</p>
-      <button type="button" disabled={busy || saving} onClick={refreshComparison}>Refresh comparison</button>
+      <Button variant="outline" type="button" disabled={busy || saving} onClick={refreshComparison}>Refresh comparison</Button>
       <label className="ri-filter">Filter changes
-        <select value={status} onChange={(event) => setStatus(event.target.value as ChangeStatus | "all")}>
-          <option value="all">All statuses</option>
-          {statuses.map((item) => <option key={item} value={item}>{label(item)}</option>)}
-        </select>
+        <NativeSelect value={status} onChange={(event) => setStatus(event.target.value as ChangeStatus | "all")}>
+          <NativeSelectOption value="all">All statuses</NativeSelectOption>
+          {statuses.map((item) => <NativeSelectOption key={item} value={item}>{label(item)}</NativeSelectOption>)}
+        </NativeSelect>
       </label>
       {visible.length === 0 ? <p className="iw-muted">No visible entries for this status.</p> : <ul className="ri-entries">
         {visible.map((entry, index) => <li key={`${entry.key ?? "unresolved"}-${entry.status}-${index}`}>

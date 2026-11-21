@@ -25,9 +25,9 @@
   font-weight: 600;
   min-width: 0;
 }
-.np-panel input:not([type="checkbox"]),
-.np-panel select,
-.np-panel textarea {
+.np-panel input:not([type="checkbox"]):not([data-slot]),
+.np-panel select:not([data-slot]),
+.np-panel textarea:not([data-slot]) {
   padding: 10px;
   min-height: 44px;
   border: 1px solid #b8c7d5;

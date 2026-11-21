@@ -1,3 +1,6 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import "./intake.css";
 import { EvidenceComparison } from "./EvidenceComparison";
@@ -204,7 +207,7 @@ function ErrorMessage({ error, retry }: { error: string; retry?: () => void }) {
   return error ? (
     <div className="iw-error" role="alert">
       <p>{error}</p>
-      {retry && <button onClick={retry}>Retry / refresh</button>}
+      {retry && <Button variant="outline" onClick={retry}>Retry / refresh</Button>}
     </div>
   ) : null;
 }
@@ -354,21 +357,21 @@ function IntakeInbox() {
           }}>
             <label>
               Synthetic sample
-              <select value={sampleId} onChange={(e) => setSampleId(e.target.value)}>
+              <NativeSelect value={sampleId} onChange={(e) => setSampleId(e.target.value)}>
                 {samples.data?.items.map((sample) => (
-                  <option key={sample.id} value={sample.id}>{sample.label}</option>
+                  <NativeSelectOption key={sample.id} value={sample.id}>{sample.label}</NativeSelectOption>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
-            <button className="iw-primary" disabled={busy || !selectedSample}>
+            <Button disabled={busy || !selectedSample}>
               {busy ? "Receiving…" : "Load synthetic sample"}
-            </button>
+            </Button>
           </form>
           <p className="iw-muted">{selectedSample?.description}</p>
           <div className="iw-suggestion">
-            <button type="button" disabled={busy} onClick={() => void prepareNetwork()}>
+            <Button variant="outline" type="button" disabled={busy} onClick={() => void prepareNetwork()}>
               Prepare synthetic network catalog
-            </button>
+            </Button>
             <p className="iw-muted">For the network samples, prepare CEDAR/PINE and NORTH/SOUTH source-code bindings first. This only creates reviewed synthetic catalog records. Loading and accepting deliveries remain separate steps.</p>
             {networkSetupNotice && <p className="iw-notice" role="status">{networkSetupNotice}</p>}
           </div>
@@ -412,7 +415,7 @@ function IntakeInbox() {
         >
           <label>
             Source namespace
-            <input
+            <Input
               required
               value={source}
               onChange={(e) => setSource(e.target.value)}
@@ -420,54 +423,54 @@ function IntakeInbox() {
           </label>
           <label>
             Evidence designation
-            <select
+            <NativeSelect
               value={designation}
               onChange={(e) => setDesignation(e.target.value)}
             >
-              <option value="synthetic">Synthetic demonstration</option>
-              <option value="public">Public source</option>
-              <option value="local">Local supplied evidence</option>
-            </select>
+              <NativeSelectOption value="synthetic">Synthetic demonstration</NativeSelectOption>
+              <NativeSelectOption value="public">Public source</NativeSelectOption>
+              <NativeSelectOption value="local">Local supplied evidence</NativeSelectOption>
+            </NativeSelect>
           </label>
           <label>
             Response profile
-            <select
+            <NativeSelect
               value={profile}
               onChange={(e) => { setProfile(e.target.value); if (e.target.value === "fhir-plannet-r4") setCompleteness("unknown"); }}
             >
-              <option value="flat">Flat CSV / workbook / JSON</option>
-              <option value="nppes">NPPES API response</option>
-              <option value="cms">CMS clinician response</option>
-              <option value="fhir-plannet-r4">Saved FHIR / Plan-Net searchset</option>
-            </select>
+              <NativeSelectOption value="flat">Flat CSV / workbook / JSON</NativeSelectOption>
+              <NativeSelectOption value="nppes">NPPES API response</NativeSelectOption>
+              <NativeSelectOption value="cms">CMS clinician response</NativeSelectOption>
+              <NativeSelectOption value="fhir-plannet-r4">Saved FHIR / Plan-Net searchset</NativeSelectOption>
+            </NativeSelect>
           </label>
           <details className="iw-file">
             <summary>Delivery scope and source date (optional)</summary>
             <p className="iw-muted">These describe the supplied dataset. A reported date is not a verification date or a provider identity.</p>
             <label>Dataset scope
-              <input value={datasetScope} onChange={(e) => setDatasetScope(e.target.value)} placeholder="Exact source-defined scope" />
+              <Input value={datasetScope} onChange={(e) => setDatasetScope(e.target.value)} placeholder="Exact source-defined scope" />
             </label>
             <label>Completeness
-              <select value={completeness} onChange={(e) => setCompleteness(e.target.value)}>
-                <option value="unknown">Unknown</option><option value="bounded">Bounded extract</option><option value="full" disabled={profile === "fhir-plannet-r4"}>Source-declared full scope</option>
-              </select>
+              <NativeSelect value={completeness} onChange={(e) => setCompleteness(e.target.value)}>
+                <NativeSelectOption value="unknown">Unknown</NativeSelectOption><NativeSelectOption value="bounded">Bounded extract</NativeSelectOption><NativeSelectOption value="full" disabled={profile === "fhir-plannet-r4"}>Source-declared full scope</NativeSelectOption>
+              </NativeSelect>
             </label>
             <label>Source as-of date
-              <input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)} />
+              <Input type="date" value={asOf} onChange={(e) => setAsOf(e.target.value)} />
             </label>
           </details>
           <label className="iw-file">
             Source file
-            <input
+            <Input
               required
               type="file"
               accept=".csv,.xlsx,.json"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             />
           </label>
-          <button className="iw-primary" disabled={busy || !file}>
+          <Button disabled={busy || !file}>
             {busy ? "Receiving…" : "Upload and preview"}
-          </button>
+          </Button>
         </form>
         <div className="iw-two">
           <details>
@@ -505,22 +508,22 @@ function IntakeInbox() {
             >
               <label>
                 Reference
-                <select
+                <NativeSelect
                   value={lookup.source}
                   onChange={(e) =>
                     setLookup({ ...lookup, source: e.target.value })
                   }
                 >
-                  <option value="nppes">NPPES</option>
-                  <option value="cms">CMS Doctors and Clinicians</option>
-                </select>
+                  <NativeSelectOption value="nppes">NPPES</NativeSelectOption>
+                  <NativeSelectOption value="cms">CMS Doctors and Clinicians</NativeSelectOption>
+                </NativeSelect>
               </label>
               {(["number", "city", "state", "limit"] as const)
                 .filter((key) => lookup.source !== "cms" || key !== "city")
                 .map((key) => (
                   <label key={key}>
                     {key === "number" ? "NPI (optional)" : pretty(key)}
-                    <input
+                    <Input
                       value={lookup[key]}
                       onChange={(e) =>
                         setLookup({ ...lookup, [key]: e.target.value })
@@ -528,7 +531,7 @@ function IntakeInbox() {
                     />
                   </label>
                 ))}
-              <button disabled={busy}>Fetch reference</button>
+              <Button variant="outline" disabled={busy}>Fetch reference</Button>
             </form>
           </details>
           <details>
@@ -548,7 +551,7 @@ function IntakeInbox() {
                 (key) => (
                   <label key={key}>
                     {pretty(key)}
-                    <input
+                    <Input
                       required={key !== "observed_at"}
                       type={key === "url" ? "url" : "text"}
                       value={link[key]}
@@ -562,7 +565,7 @@ function IntakeInbox() {
                   </label>
                 ),
               )}
-              <button disabled={busy}>Save asserted link</button>
+              <Button variant="outline" disabled={busy}>Save asserted link</Button>
             </form>
           </details>
         </div>
@@ -571,7 +574,7 @@ function IntakeInbox() {
         <div className="iw-card iw-inbox">
           <div className="iw-title">
             <h2>Intake inbox</h2>
-            <button onClick={() => void receipts.refresh()}>Refresh</button>
+            <Button variant="outline" onClick={() => void receipts.refresh()}>Refresh</Button>
           </div>
           <ErrorMessage error={receipts.error} retry={receipts.refresh} />
           {receipts.loading && <p role="status">Loading receipts…</p>}
@@ -847,12 +850,12 @@ function ReceiptDetail({
             quarantined · {preview.total ?? 0} total
           </p>
           {hasSuggestedNetworkSettings && <div className="iw-suggestion">
-            <button type="button" disabled={busy} onClick={() => {
+            <Button variant="outline" type="button" disabled={busy} onClick={() => {
               const settings = suggestedNetworkSettings as {bindings?:RosterBindings;fixed_network_binding_id?:string|null};
               setRosterKind("network");
               setRosterBindings(settings.bindings ?? emptyRosterBindings());
               setFixedNetworkBindingId(settings.fixed_network_binding_id ?? "");
-            }}>Use suggested network scope</button>
+            }}>Use suggested network scope</Button>
             <p className="iw-muted">Fills this form only. Open Column mapping and parsing to review exact bindings, then save mapping and reprocess. Saving a named revision and accepting valid rows are separate decisions.</p>
           </div>}
           <details
@@ -888,7 +891,7 @@ function ReceiptDetail({
               <div className="iw-form">
                 <label>
                   Sheet name (blank uses first)
-                  <input
+                  <Input
                     list="intake-sheets"
                     value={sheet}
                     onChange={(e) => {
@@ -899,13 +902,13 @@ function ReceiptDetail({
                   />
                   <datalist id="intake-sheets">
                     {preview.sheets?.map((s) => (
-                      <option key={s} value={s} />
+                      <NativeSelectOption key={s} value={s} />
                     ))}
                   </datalist>
                 </label>
                 <label>
                   Header row
-                  <input
+                  <Input
                     type="number"
                     min="1"
                     max="100"
@@ -918,14 +921,14 @@ function ReceiptDetail({
                 </label>
                 <label>
                   Encoding
-                  <input
+                  <Input
                     value={encoding}
                     onChange={(e) => setEncoding(e.target.value)}
                   />
                 </label>
                 <label>
                   Delimiter
-                  <input
+                  <Input
                     value={delimiter}
                     onChange={(e) => setDelimiter(e.target.value)}
                   />
@@ -938,11 +941,11 @@ function ReceiptDetail({
               </p>
               {hasSuggestedMapping && (
                 <div className="iw-suggestion">
-                  <button type="button" disabled={busy} onClick={() => {
+                  <Button variant="outline" type="button" disabled={busy} onClick={() => {
                     setMapping(Object.fromEntries(
                       Object.entries(suggestedMapping).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
                     ));
-                  }}>Use suggested columns</button>
+                  }}>Use suggested columns</Button>
                   <p className="iw-muted">
                     Fills this form only. Review the columns and save mapping to
                     validate; acceptance remains a separate decision.
@@ -954,21 +957,21 @@ function ReceiptDetail({
                   <label key={field}>
                     {pretty(field)}
                     {fields.indexOf(field) < 7 ? " *" : " (optional)"}
-                    <select
+                    <NativeSelect
                       value={mapping[field] ?? ""}
                       onChange={(e) =>
                         setMapping({ ...mapping, [field]: e.target.value })
                       }
                     >
-                      <option value="">Unmapped</option>
+                      <NativeSelectOption value="">Unmapped</NativeSelectOption>
                       {preview.headers?.map((h: string) => (
-                        <option key={h}>{h}</option>
+                        <NativeSelectOption key={h}>{h}</NativeSelectOption>
                       ))}
-                    </select>
+                    </NativeSelect>
                   </label>
                 ))}
               </div>
-              <button disabled={busy}>Save mapping and reprocess</button>
+              <Button variant="outline" disabled={busy}>Save mapping and reprocess</Button>
             </form>
           </details>
           <div className="iw-preview">
@@ -1001,7 +1004,7 @@ function ReceiptDetail({
           >
             <label>
               Reviewer
-              <input
+              <Input
                 required
                 value={actor}
                 onChange={(e) => setActor(e.target.value)}
@@ -1009,13 +1012,13 @@ function ReceiptDetail({
             </label>
             <label>
               Acceptance / rejection reason
-              <input
+              <Input
                 required
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
               />
             </label>
-            <button
+            <Button variant="outline"
               className="iw-primary"
               disabled={
                 busy ||
@@ -1026,8 +1029,8 @@ function ReceiptDetail({
               }
             >
               {acceptsEmptyFullNetwork ? "Accept empty snapshot as absence evidence" : "Accept valid rows"}
-            </button>
-            <button
+            </Button>
+            <Button variant="outline"
               type="button"
               disabled={busy || !actor || !reason}
               onClick={() =>
@@ -1040,7 +1043,7 @@ function ReceiptDetail({
               }
             >
               Reject intake
-            </button>
+            </Button>
           </form>
           <p className="iw-muted">
             Interactive evidence samples show up to 50 observations; the packet
@@ -1150,24 +1153,24 @@ function Observation({
         {nativeLocations.length > 0 && (
           <label>
             Native source location
-            <select
+            <NativeSelect
               value={nativeIndex}
               required={nativeLocations.length > 1}
               onChange={(e) => setNativeIndex(e.target.value)}
             >
-              <option value="">Choose source location</option>
+              <NativeSelectOption value="">Choose source location</NativeSelectOption>
               {nativeLocations.map((loc, index) => (
-                <option key={index} value={index}>
+                <NativeSelectOption key={index} value={index}>
                   {index}: {String(loc.address)} ·{" "}
                   {String(loc.purpose ?? "practice")}
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
         )}
         <label>
           Provider identity
-          <input
+          <Input
             required
             placeholder="NPI:1234567890 (exact NPI only)"
             value={provider}
@@ -1176,7 +1179,7 @@ function Observation({
         </label>
         <label>
           Local location identity
-          <input
+          <Input
             required
             value={location}
             onChange={(e) => setLocation(e.target.value)}
@@ -1184,7 +1187,7 @@ function Observation({
         </label>
         <label>
           Reviewer
-          <input
+          <Input
             required
             value={actor}
             onChange={(e) => setActor(e.target.value)}
@@ -1192,13 +1195,13 @@ function Observation({
         </label>
         <label>
           Relationship evidence / reason
-          <input
+          <Input
             required
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
         </label>
-        <button>Link observation explicitly</button>
+        <Button variant="outline">Link observation explicitly</Button>
       </form>
       <ErrorMessage error={error} />
     </details>
@@ -1273,30 +1276,30 @@ function WorkQueue() {
             </div>
             <p>Includes every durable case, evidence row and decision; ignores the filters below.</p>
           </div>
-          <button onClick={() => void resource.refresh()}>Refresh</button>
+          <Button variant="outline" onClick={() => void resource.refresh()}>Refresh</Button>
         </div>
         <div className="iw-form">
           <label>
             Search work
-            <input
+            <Input
               value={filters.search}
               onChange={(e) => update({ ...filters, search: e.target.value })}
             />
           </label>
           <label>
             Owner filter
-            <input
+            <Input
               value={filters.owner}
               onChange={(e) => update({ ...filters, owner: e.target.value })}
             />
           </label>
           <label>
             Status filter
-            <select
+            <NativeSelect
               value={filters.status}
               onChange={(e) => update({ ...filters, status: e.target.value })}
             >
-              <option value="">All statuses</option>
+              <NativeSelectOption value="">All statuses</NativeSelectOption>
               {Array.from(
                 new Set(
                   (resource.data?.items ?? []).map((i: WorkCase) =>
@@ -1304,9 +1307,9 @@ function WorkQueue() {
                   ),
                 ),
               ).map((status) => (
-                <option key={String(status)}>{String(status)}</option>
+                <NativeSelectOption key={String(status)}>{String(status)}</NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
           <label className="iw-check">
             <input
@@ -1532,16 +1535,16 @@ function WorkDetail({
         >
           <label>
             Action
-            <select
+            <NativeSelect
               value={selectedAction}
               onChange={(e) => setAction(e.target.value as WorkAction)}
             >
               {actions.map((a) => (
-                <option key={a} value={a}>
+                <NativeSelectOption key={a} value={a}>
                   {pretty(a)}
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
           {selectedAction === "outreach" && <p>Record a contact attempt or response. This does not send a message, approve a phone number, or verify a directory update. Use a contact timestamp including timezone, for example 2026-11-03T09:30:00-05:00.</p>}
           {actionFields.map((key) => (
@@ -1556,9 +1559,9 @@ function WorkDetail({
                 ["observed", "verification_note"].includes(key))
                 ? " *"
                 : ""}
-              {key === "method" || key === "outcome" ? <select value={draft[key]} onChange={(e) => setDraft({...draft, [key]: e.target.value})}>
-                {(key === "method" ? ["phone", "email", "portal", "other"] : ["no_answer", "message_left", "response_received", "unable_to_contact"]).map(value => <option key={value} value={value}>{pretty(value)}</option>)}
-              </select> : <input
+              {key === "method" || key === "outcome" ? <NativeSelect value={draft[key]} onChange={(e) => setDraft({...draft, [key]: e.target.value})}>
+                {(key === "method" ? ["phone", "email", "portal", "other"] : ["no_answer", "message_left", "response_received", "unable_to_contact"]).map(value => <NativeSelectOption key={value} value={value}>{pretty(value)}</NativeSelectOption>)}
+              </NativeSelect> : <Input
                 required={
                   ["actor", "reason"].includes(key) ||
               (selectedAction === "outreach" && (key === "contact_at" || (key === "response_summary" && draft.outcome === "response_received"))) ||
@@ -1582,9 +1585,9 @@ function WorkDetail({
               />}
             </label>
           ))}
-          <button className="iw-primary" disabled={busy}>
+          <Button disabled={busy}>
             {busy ? "Saving…" : "Save review event"}
-          </button>
+          </Button>
         </form>
         <ErrorMessage
           error={error}
@@ -1638,7 +1641,7 @@ function Sources() {
     <section className="iw-card">
       <div className="iw-title">
         <h2>Source registry</h2>
-        <button onClick={() => void resource.refresh()}>Refresh</button>
+        <Button variant="outline" onClick={() => void resource.refresh()}>Refresh</Button>
       </div>
       <p className="iw-notice">
         NPPES and CMS provide public reference evidence with different coverage

@@ -1,3 +1,7 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
+import { Textarea } from "./components/ui/textarea";
 import { useWorkspaceQuery, updateWorkspaceQuery } from "./workspaceNavigation";
 import { ChangeImpact } from "./ChangeImpact";
 import { useEffect, useState } from "react";
@@ -121,19 +125,19 @@ function Pages({
 }) {
   return (
     <div className="rc-pager" role="group" aria-label={label}>
-      <button
+      <Button variant="outline"
         disabled={disabled || offset === 0}
         onClick={() => onChange(Math.max(0, offset - 20))}
       >
         Previous
-      </button>
+      </Button>
       <span>From {offset + 1}</span>
-      <button
+      <Button variant="outline"
         disabled={disabled || next === null}
         onClick={() => next !== null && onChange(next)}
       >
         Next
-      </button>
+      </Button>
     </div>
   );
 }
@@ -162,7 +166,7 @@ function TargetPicker({
     <div style={{ minWidth: 0, flex: "1 1 280px", maxWidth: "100%" }}>
       <label>
         Find reviewed {label}
-        <input
+        <Input
           aria-label={`Find reviewed ${label}`}
           type="search"
           value={search}
@@ -177,20 +181,20 @@ function TargetPicker({
       </label>
       <label>
         Reviewed {label}
-        <select
+        <NativeSelect
           aria-label={`Reviewed ${label}`}
           disabled={disabled || targets.isFetching || targets.isError}
           value={value}
           onChange={(event) => onChange(event.target.value)}
         >
-          <option value="">Choose a reviewed {label}</option>
-          {value && !targets.data?.items.some(target => target.id === value) && <option value={value}>Selected {label} · {value}</option>}
+          <NativeSelectOption value="">Choose a reviewed {label}</NativeSelectOption>
+          {value && !targets.data?.items.some(target => target.id === value) && <NativeSelectOption value={value}>Selected {label} · {value}</NativeSelectOption>}
           {targets.data?.items.map((target) => (
-            <option key={target.id} value={target.id}>
+            <NativeSelectOption key={target.id} value={target.id}>
               {target.label} · {target.id}
-            </option>
+            </NativeSelectOption>
           ))}
-        </select>
+        </NativeSelect>
       </label>
       {targets.isFetching && (
         <p role="status">Loading reviewed {label} targets…</p>
@@ -374,17 +378,17 @@ function FieldPanel({
         <legend>Review {fieldLabel}</legend>
         <label>
           Decision for {fieldLabel}
-          <select
+          <NativeSelect
             aria-label={`Decision for ${fieldLabel}`}
             value={action}
             onChange={(event) =>
               setAction(event.target.value as "select" | "conflict" | "")
             }
           >
-            <option value="">Choose a decision</option>
-            <option value="select">Select one source assertion</option>
-            <option value="conflict">Retain an explicit conflict</option>
-          </select>
+            <NativeSelectOption value="">Choose a decision</NativeSelectOption>
+            <NativeSelectOption value="select">Select one source assertion</NativeSelectOption>
+            <NativeSelectOption value="conflict">Retain an explicit conflict</NativeSelectOption>
+          </NativeSelect>
         </label>
         <div
           className="rc-scroll"
@@ -485,7 +489,7 @@ function FieldPanel({
         <div className="rc-create">
           <label>
             Actor for {fieldLabel}
-            <input
+            <Input
               aria-label={`Actor for ${fieldLabel}`}
               value={actor}
               onChange={(event) => setActor(event.target.value)}
@@ -493,7 +497,7 @@ function FieldPanel({
           </label>
           <label>
             Reason for {fieldLabel}
-            <textarea
+            <Textarea
               aria-label={`Reason for ${fieldLabel}`}
               value={reason}
               onChange={(event) => setReason(event.target.value)}
@@ -525,7 +529,7 @@ function FieldPanel({
         </p>
       )}
       {requiresRefresh && (
-        <button
+        <Button variant="outline"
           disabled={otherBusy || mutation.isPending}
           onClick={async () => {
             setReviewed(false);
@@ -539,7 +543,7 @@ function FieldPanel({
           }}
         >
           Refresh {fieldLabel} evidence
-        </button>
+        </Button>
       )}
       {mutation.error && (
         <p className="rc-error" role="alert">
@@ -560,7 +564,7 @@ function FieldPanel({
           Source observations were preserved.
         </p>
       )}
-      <button
+      <Button variant="outline"
         disabled={pending ? mutation.isPending || otherBusy : !canSubmit}
         onClick={submit}
       >
@@ -569,7 +573,7 @@ function FieldPanel({
           : pending
             ? `Retry same ${fieldLabel} decision`
             : `Save ${fieldLabel} decision`}
-      </button>
+      </Button>
       <details>
         <summary>
           {fieldLabel} decision history · {evidence.history.length} shown of{" "}
@@ -685,9 +689,9 @@ export function FieldReconciliation() {
           Choose a reviewed clinician and optional practice location to compare
           approved source assertions and record field decisions.
         </p>
-        <button onClick={() => setOpened(true)}>
+        <Button variant="outline" onClick={() => setOpened(true)}>
           Open reconciled field evidence
-        </button>
+        </Button>
       </section>
     );
   return (
@@ -786,24 +790,24 @@ export function FieldReconciliation() {
             </p>
           )}
           <div className="rc-filters">
-            <button
+            <Button variant="outline"
               disabled={locked || query.isFetching}
               onClick={() => void refresh().catch(() => {})}
             >
               Refresh field evidence
-            </button>
-            <button
+            </Button>
+            <Button variant="outline"
               disabled={locked || query.isFetching}
               onClick={() => void download("json")}
             >
               Download reconciled JSON
-            </button>
-            <button
+            </Button>
+            <Button variant="outline"
               disabled={locked || query.isFetching}
               onClick={() => void download("xlsx")}
             >
               Download reconciled XLSX
-            </button>
+            </Button>
           </div>
           {exporting && (
             <p role="status">

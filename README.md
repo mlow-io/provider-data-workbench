@@ -4,7 +4,7 @@ A local web application for cleaning provider rosters, comparing directory sourc
 
 An analyst receives a clinic workbook and a later CSV that changes one office while omitting another. The workbench preserves the originals, applies reviewed cleaning rules, holds incomplete deliveries, and keeps the last approved dataset available to downstream users. Conflicting directory evidence can become a scoped investigation with a recorded decision history.
 
-**Python · FastAPI · React · TypeScript · SQLite**
+**Python · FastAPI · React · TypeScript · shadcn/ui · Tailwind · SQLite**
 
 ## Adaptive intake and review
 
@@ -25,7 +25,7 @@ The workbench includes scoped reuse of approved mapping recipes, structural drif
 
 The FHIR consumer targets a documented **R4 4.0.1 / Plan-Net 1.2.0 subset**. Unsupported resources and ambiguous relationships stay visible. It does not implement a conformant FHIR server or payer writeback.
 
-![Synthetic delivery review](docs/evidence/canonical/adaptive-release-2026-11-21/delivery-overview.png)
+![Synthetic delivery review](docs/evidence/canonical/workbench-migration-2026-11-21/delivery-wide.png)
 
 ## Run the web workbench
 
@@ -43,7 +43,7 @@ make workbench
 
 Open the printed local URL. The work queue is the entry point. In Receive data, load the synthetic clinic workbook, review the mapping and quarantine, then explicitly accept eligible rows. The launcher creates a fresh retained runtime; it prints the root to use when resuming.
 
-[Demo and export inspection guide](docs/OPERATIONS_DEMO.md#run-and-inspect) · [Engineering case study](docs/CASE_STUDY.md) · [Current synthetic UI](docs/evidence/canonical/adaptive-release-2026-11-21/delivery-overview.png)
+[Demo and export inspection guide](docs/OPERATIONS_DEMO.md#run-and-inspect) · [Engineering case study](docs/CASE_STUDY.md) · [Current synthetic UI](docs/evidence/canonical/workbench-migration-2026-11-21/delivery-wide.png)
 
 ## Reproduce the complete workflow
 
@@ -82,3 +82,5 @@ python3 scripts/sync_bundled_assets.py
 ```
 
 Tests use owned disposable storage. [Operator procedures](docs/operations_governance/sop_provider_remediation.md) cover stopped backup/restore. Private preparation, credentials and actual-source runtime data stay outside the repository.
+
+The component-system migration adds a responsive sidebar, delivery table/inspector, evidence tabs and shared intake/mapping/reconciliation controls. Major workspaces load on demand. The [migration record](docs/evidence/canonical/workbench-migration-2026-11-21/README.md) retains frontend/build/browser checks, inspected synthetic captures and remaining performance/supporting-surface limits.

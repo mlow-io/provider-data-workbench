@@ -1,17 +1,10 @@
-# Next task: UI-W0 workbench design and migration readiness
+# Next task: workbench performance and supporting-surface qualification
 
-Selected 2026-11-21 following the request for an explicit component-library/template migration. Planning and an isolated synthetic spike come first. The earlier reviewed-field candidate task is [retained](docs/archive/next-2026-11-21-field-materialization.md) and scheduled after the first complete UI workbench slice.
+The owner authorized migration implementation on 2026-11-21. The shared shell and primary delivery/import/mapping/reconciliation controls now use the selected component system. Read [STATUS](STATUS.md), [migration contract](docs/UI_WORKBENCH_MIGRATION.md) and [receipt](docs/evidence/canonical/workbench-migration-2026-11-21/README.md). Preserve current runtime storage and completed decisions.
 
-## Read and deliver
+1. Measure the actual HTTP path with reproducible 100/1,000/10,000-record synthetic workloads. Record response bytes, main-thread work, first useful page, repeated-navigation retention and reference/stress conditions. Do not infer scale from build sizes or small fixtures.
+2. Freeze a bounded workbook-preview contract if full-export payloads exceed the review budget. Preserve full JSON/XLSX semantics, exact population counts, scope and snapshot rejection; add affected service/UI regression checks before switching the consumer.
+3. Inventory remaining native-source/remediation/custom evidence controls and styles; migrate supporting surfaces under the shared system without changing data meaning. Verify narrow tables retain all fields through internal scroll.
+4. Record WM acceptance outcomes explicitly. Obtain owner visual feedback on populated captures and retain the independent uncoached-human gate. Actual-model/network/source expansion remains separately scoped.
 
-Read AGENTS, STATUS, SPEC, ROADMAP, [UI migration plan](docs/UI_WORKBENCH_MIGRATION.md) and OPERATOR_EXPERIENCE. Preserve the current qualified application and all user data.
-
-1. Inventory current shell/controls/CSS and map them to proposed shadcn primitives and workbench components. Identify CSS rules that must retire, state/query guards that must remain and package-version risks. Inventory actual list/preview payloads and eager module imports; record any bounded-response prerequisite without changing the API silently.
-2. Propose official @shadcn sidebar-07 as the shell starting point; inspect the registry component/block and select one consistent primitive base, icon library and token theme. Verify exact dependency compatibility in an isolated scratch checkout. Keep TanStack Table v8 unless a separate upgrade is justified.
-3. Build a populated synthetic design spike: delivery table plus selected office/evidence inspector and export action. Include a held candidate, unresolved discrepancy, loading/failure/stale states and narrow-width detail navigation. Preserve exact original/interpreted-value semantics.
-4. Record U1.0 dependency delta, layout/state map, component ownership, CSS coexistence/removal and rollback plan. Apply the migration plan’s typography/color/density brief, record production-build baseline and synthetic performance targets, and capture populated desktop/intermediate/narrow views plus adverse states for visual review. Distinguish mocked rendering evidence from actual service-path measurements.
-5. After the chosen direction is reviewed, freeze U1.1 and execute UI-W1/W2 under the existing implementation authorization. Follow the migration plan and AGENTS checks; no backend/schema changes are required by this planning task.
-
-## Planning boundary
-
-This turn selects and documents the migration plan; it does not claim an installed library or redesigned release. UI-W0 can prototype in disposable storage. Defer production dependency changes until the compatibility and visual proposal are concrete. Keep technical docs/commits free of personal preparation and publish only through the clean-history release process.
+Use at most two disjoint bounded GPT-6.1 Terra workers, medium by default/high for interaction or integration complexity. The lead owns performance design, interpretation, visual verification and sanitized publication. Continue the retained [field-materialization brief](docs/archive/next-2026-11-21-field-materialization.md) after UI performance/interaction issues affecting the primary task are resolved. This continuation does not authorize silently revising backend semantics or claiming unmeasured performance targets.

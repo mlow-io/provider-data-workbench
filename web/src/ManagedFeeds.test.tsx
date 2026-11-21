@@ -1,6 +1,7 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 import { ManagedFeeds } from "./ManagedFeeds";
+import { navigateWorkspace } from "./workspaceNavigation";
 
 afterEach(() => vi.unstubAllGlobals());
 const recipe = { id: "recipe-1", name: "Reviewed synthetic clinic", source: "synthetic-clinic", scope: "weekly-clinic", definition: { mapping: { npi: "npi", phone: "phone", location_id: "location_id" } } };
@@ -123,4 +124,28 @@ test("registration is disabled without reviewer and reason and preserves the cho
   await waitFor(() => expect(calls.find(call => call.url === "/api/feeds" && call.body)?.body).toMatchObject({ name: "New clinic", source: "synthetic-clinic", scope: "weekly-clinic", inbox: "/synthetic/new-inbox", owner: "Coordinator", actor: "Reviewer", reason: "Register reviewed scope" }));
   await screen.findByText("Feed registered and disabled. Propose and approve its contract before enabling deliveries.");
   expect(calls.some(call => call.url.endsWith("/approve") || call.url.endsWith("/configure") || call.url.endsWith("/decide"))).toBe(false);
+});
+
+
+test("deep-linked delivery opens its detail and returning to the list restores focus", async () => {
+  api();
+  window.history.replaceState({}, "", "?view=feeds&feed=feed-1&version=candidate-2");
+  const mounted = render(<ManagedFeeds />);
+  const detail = await screen.findByRole("region", { name: "Dataset review · candidate" });
+  await waitFor(() => expect(detail).toHaveFocus());
+  expect(detail.closest(".mf-workbench")).toHaveAttribute("data-detail-open", "true");
+  fireEvent.click(screen.getByRole("button", { name: /Back to deliveries/ }));
+  const selection = screen.getByRole("complementary", { name: "Delivery selection" });
+  await waitFor(() => expect(selection).toHaveFocus());
+  expect(selection.closest(".mf-workbench")).toHaveAttribute("data-detail-open", "false");
+  fireEvent.click(screen.getByRole("button", { name: /candidate · 2026-11-02/ }));
+  await waitFor(() => expect(detail).toHaveFocus());
+  fireEvent.click(screen.getByRole("button", { name: /Back to deliveries/ }));
+  act(() => navigateWorkspace("feeds", { feed: "feed-1" }));
+  act(() => navigateWorkspace("feeds", { feed: "feed-1", version: "candidate-2" }));
+  const reopened = await screen.findByRole("region", { name: "Dataset review · candidate" });
+  await waitFor(() => expect(reopened).toHaveFocus());
+  expect(reopened.closest(".mf-workbench")).toHaveAttribute("data-detail-open", "true");
+  mounted.unmount();
+  act(() => window.history.replaceState({}, "", "/"));
 });

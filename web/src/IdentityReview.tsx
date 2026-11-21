@@ -1,3 +1,7 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
+import { Textarea } from "./components/ui/textarea";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -233,7 +237,7 @@ export function IdentityReview({
     mutation.mutate(payload);
   };
   if (!opened)
-    return <button onClick={() => setOpened(true)}>Review {label} link</button>;
+    return <Button variant="outline" onClick={() => setOpened(true)}>Review {label} link</Button>;
   return (
     <section aria-label={`${label} link review`} className="rc-evidence">
       <h3>Review {label} link</h3>
@@ -242,12 +246,12 @@ export function IdentityReview({
         Clinician and location links are independent. Source acceptance and
         source values stay separate.
       </p>
-      <button
+      <Button variant="outline"
         disabled={busy || pendingRequest !== null}
         onClick={() => void refresh()}
       >
         Refresh review snapshot
-      </button>
+      </Button>
       {query.isFetching && (
         <p role="status">Loading current links and review history…</p>
       )}
@@ -340,42 +344,42 @@ export function IdentityReview({
             <div className="rc-create">
               <label>
                 Link decision
-                <select
+                <NativeSelect
                   aria-label="Link decision"
                   value={action}
                   onChange={(event) =>
                     setAction(event.target.value as Action | "")
                   }
                 >
-                  <option value="">Choose a decision</option>
-                  <option
+                  <NativeSelectOption value="">Choose a decision</NativeSelectOption>
+                  <NativeSelectOption
                     value="approve"
                     disabled={data.approval_allowed === false}
                   >
                     Approve both references to one target
-                  </option>
-                  <option value="reject">Reject this candidate pair</option>
-                  <option value="defer">Defer this candidate pair</option>
-                </select>
+                  </NativeSelectOption>
+                  <NativeSelectOption value="reject">Reject this candidate pair</NativeSelectOption>
+                  <NativeSelectOption value="defer">Defer this candidate pair</NativeSelectOption>
+                </NativeSelect>
               </label>
               {action === "approve" && (
                 <>
                   <label>
                     Target selection
-                    <select
+                    <NativeSelect
                       aria-label="Target selection"
                       value={mode}
                       onChange={(event) => setMode(event.target.value)}
                     >
-                      <option value="existing">Existing {label}</option>
-                      <option value="new">Create a new labeled {label}</option>
-                    </select>
+                      <NativeSelectOption value="existing">Existing {label}</NativeSelectOption>
+                      <NativeSelectOption value="new">Create a new labeled {label}</NativeSelectOption>
+                    </NativeSelect>
                   </label>
                   {mode === "existing" ? (
                     <div>
                       <label>
                         Find {label} target
-                        <input
+                        <Input
                           aria-label={`Find ${label} target`}
                           type="search"
                           value={targetSearch}
@@ -397,7 +401,7 @@ export function IdentityReview({
                       )}
                       <label>
                         Target {label}
-                        <select
+                        <NativeSelect
                           aria-label={`Target ${label}`}
                           value={targetId}
                           disabled={
@@ -405,13 +409,13 @@ export function IdentityReview({
                           }
                           onChange={(event) => setTargetId(event.target.value)}
                         >
-                          <option value="">Select a {label}</option>
+                          <NativeSelectOption value="">Select a {label}</NativeSelectOption>
                           {selectableTargets.map((target) => (
-                            <option key={target.id} value={target.id}>
+                            <NativeSelectOption key={target.id} value={target.id}>
                               {target.label} · {target.id}
-                            </option>
+                            </NativeSelectOption>
                           ))}
-                        </select>
+                        </NativeSelect>
                       </label>
                       {targetQuery.data && (
                         <>
@@ -429,7 +433,7 @@ export function IdentityReview({
                             role="group"
                             aria-label={`${label} target pages`}
                           >
-                            <button
+                            <Button variant="outline"
                               type="button"
                               disabled={targetOffset === 0}
                               onClick={() => {
@@ -438,9 +442,9 @@ export function IdentityReview({
                               }}
                             >
                               Previous targets
-                            </button>
+                            </Button>
                             <span>From {targetOffset + 1}</span>
-                            <button
+                            <Button variant="outline"
                               type="button"
                               disabled={targetQuery.data.next_offset === null}
                               onClick={() => {
@@ -449,7 +453,7 @@ export function IdentityReview({
                               }}
                             >
                               Next targets
-                            </button>
+                            </Button>
                           </div>
                         </>
                       )}
@@ -457,7 +461,7 @@ export function IdentityReview({
                   ) : (
                     <label>
                       New {label} label
-                      <input
+                      <Input
                         aria-label={`New ${label} label`}
                         value={newLabel}
                         onChange={(event) => setNewLabel(event.target.value)}
@@ -468,7 +472,7 @@ export function IdentityReview({
               )}
               <label>
                 Review actor
-                <input
+                <Input
                   aria-label="Review actor"
                   value={actor}
                   onChange={(event) => setActor(event.target.value)}
@@ -476,7 +480,7 @@ export function IdentityReview({
               </label>
               <label>
                 Review reason
-                <textarea
+                <Textarea
                   aria-label="Review reason"
                   value={reason}
                   onChange={(event) => setReason(event.target.value)}
@@ -524,7 +528,7 @@ export function IdentityReview({
               and decision payload.
             </p>
           )}
-          <button
+          <Button variant="outline"
             className="button button-primary"
             disabled={pendingRequest ? busy : !canSubmit}
             onClick={submit}
@@ -534,7 +538,7 @@ export function IdentityReview({
               : pendingRequest
                 ? "Retry same review decision"
                 : "Save link decision"}
-          </button>
+          </Button>
           <h4>Append-only review history</h4>
           <p>
             {data.history_total ?? data.history.length} decisions recorded for
@@ -545,7 +549,7 @@ export function IdentityReview({
             role="group"
             aria-label="Review history pages"
           >
-            <button
+            <Button variant="outline"
               disabled={busy || historyOffset === 0}
               onClick={() => {
                 setHistoryOffset(Math.max(0, historyOffset - 20));
@@ -553,9 +557,9 @@ export function IdentityReview({
               }}
             >
               Previous history
-            </button>
+            </Button>
             <span>From {historyOffset + 1}</span>
-            <button
+            <Button variant="outline"
               disabled={busy || data.history_next_offset == null}
               onClick={() => {
                 setHistoryOffset(data.history_next_offset!);
@@ -563,7 +567,7 @@ export function IdentityReview({
               }}
             >
               Next history
-            </button>
+            </Button>
           </div>
           {data.latest_decision && (
             <p>

@@ -1,3 +1,7 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { NativeSelect, NativeSelectOption } from "./components/ui/native-select";
+import { Textarea } from "./components/ui/textarea";
 import { useWorkspaceQuery, updateWorkspaceQuery, useWorkspaceActionGuard } from "./workspaceNavigation";
 import { FollowUpPlan } from "./FollowUpPlan";
 import { useEffect, useState } from "react";
@@ -144,19 +148,19 @@ function Pages({
 }) {
   return (
     <div className="rc-pager" role="group" aria-label={label}>
-      <button
+      <Button variant="outline"
         disabled={locked || offset === 0}
         onClick={() => onChange(Math.max(0, offset - 20))}
       >
         Previous
-      </button>
+      </Button>
       <span>From {offset + 1}</span>
-      <button
+      <Button variant="outline"
         disabled={locked || next === null}
         onClick={() => next !== null && onChange(next)}
       >
         Next
-      </button>
+      </Button>
     </div>
   );
 }
@@ -402,9 +406,9 @@ export function ChangeImpact({
           listings and existing work. Unlinked evidence stays visible as not
           assessed.
         </p>
-        <button disabled={otherBusy} onClick={() => setOpened(true)}>
+        <Button variant="outline" disabled={otherBusy} onClick={() => setOpened(true)}>
           Open change impact preview
-        </button>
+        </Button>
       </section>
     );
   return (
@@ -429,7 +433,7 @@ export function ChangeImpact({
         <legend>Propose a scoped field change</legend>
         <label>
           Proposed field
-          <select
+          <NativeSelect
             aria-label="Proposed field"
             value={field}
             onChange={(event) => {
@@ -447,13 +451,13 @@ export function ChangeImpact({
               setReviewed(false);
             }}
           >
-            <option value="">Choose a reviewed field</option>
+            <NativeSelectOption value="">Choose a reviewed field</NativeSelectOption>
             {fields.map((item) => (
-              <option key={item.field} value={item.field}>
+              <NativeSelectOption key={item.field} value={item.field}>
                 {human(item.field)}
-              </option>
+              </NativeSelectOption>
             ))}
-          </select>
+          </NativeSelect>
         </label>
         {field && !currentDecision && (
           <p className="rc-warning">
@@ -477,7 +481,7 @@ export function ChangeImpact({
           <div className="rc-create">
             <label>
               Proposed phone number
-              <input
+              <Input
                 aria-label="Proposed phone number"
                 value={text}
                 onChange={(event) => setText(event.target.value)}
@@ -485,7 +489,7 @@ export function ChangeImpact({
             </label>
             <label>
               Proposed phone extension
-              <input
+              <Input
                 aria-label="Proposed phone extension"
                 value={extension}
                 onChange={(event) => setExtension(event.target.value)}
@@ -505,7 +509,7 @@ export function ChangeImpact({
               ).map((component) => (
                 <label key={component}>
                   Proposed address {component}
-                  <input
+                  <Input
                     aria-label={`Proposed address ${component}`}
                     value={address[component]}
                     onChange={(event) =>
@@ -523,7 +527,7 @@ export function ChangeImpact({
           field && (
             <label>
               Proposed {human(field)}
-              <input
+              <Input
                 aria-label={`Proposed ${human(field)}`}
                 value={text}
                 onChange={(event) => setText(event.target.value)}
@@ -592,7 +596,7 @@ export function ChangeImpact({
               <>
                 <label>
                   Assessment entity type for {receipt.label ?? receipt.id}
-                  <select
+                  <NativeSelect
                     aria-label={`Assessment entity type for ${receipt.label ?? receipt.id}`}
                     value={selected[receipt.id].entity_kind}
                     onChange={(event) => {
@@ -607,15 +611,15 @@ export function ChangeImpact({
                       setReviewed(false);
                     }}
                   >
-                    <option value="unknown">
+                    <NativeSelectOption value="unknown">
                       Unknown unless supported by source evidence
-                    </option>
-                    <option value="clinician">Clinician</option>
-                    <option value="organization">Organization</option>
-                  </select>
+                    </NativeSelectOption>
+                    <NativeSelectOption value="clinician">Clinician</NativeSelectOption>
+                    <NativeSelectOption value="organization">Organization</NativeSelectOption>
+                  </NativeSelect>
                 </label>
                 {selected[receipt.id].attempt_id !== receipt.attempt_id && (
-                  <button
+                  <Button variant="outline"
                     onClick={() => {
                       setSelected((current) => ({
                         ...current,
@@ -628,7 +632,7 @@ export function ChangeImpact({
                     }}
                   >
                     Use latest assessment interpretation
-                  </button>
+                  </Button>
                 )}
               </>
             )}
@@ -650,7 +654,7 @@ export function ChangeImpact({
         <div className="rc-create">
           <label>
             Proposal actor
-            <input
+            <Input
               aria-label="Proposal actor"
               value={actor}
               onChange={(event) => setActor(event.target.value)}
@@ -658,7 +662,7 @@ export function ChangeImpact({
           </label>
           <label>
             Proposal reason
-            <textarea
+            <Textarea
               aria-label="Proposal reason"
               value={reason}
               onChange={(event) => setReason(event.target.value)}
@@ -723,7 +727,7 @@ export function ChangeImpact({
         </p>
       )}
       <div className="rc-filters">
-        <button
+        <Button variant="outline"
           disabled={pending ? mutation.isPending || otherBusy : !canCreate}
           onClick={create}
         >
@@ -732,10 +736,10 @@ export function ChangeImpact({
             : pending
               ? "Retry same change proposal"
               : "Save change proposal"}
-        </button>
-        <button disabled={locked} onClick={() => void refresh()}>
+        </Button>
+        <Button variant="outline" disabled={locked} onClick={() => void refresh()}>
           Refresh proposal evidence
-        </button>
+        </Button>
       </div>
       <h4>Saved change proposals</h4>
       {history.isFetching && (
@@ -748,7 +752,7 @@ export function ChangeImpact({
       )}
       <label>
         Saved change proposal
-        <select
+        <NativeSelect
           aria-label="Saved change proposal"
           value={selectedId}
           disabled={locked}
@@ -759,19 +763,19 @@ export function ChangeImpact({
             setWorkOffset(0);
           }}
         >
-          <option value="">Choose a saved proposal</option>
+          <NativeSelectOption value="">Choose a saved proposal</NativeSelectOption>
           {detail.data &&
             !history.data?.items.some((item) => item.id === selectedId) && (
-              <option value={selectedId}>
+              <NativeSelectOption value={selectedId}>
                 {detail.data.field} · {selectedId}
-              </option>
+              </NativeSelectOption>
             )}
           {history.data?.items.map((item) => (
-            <option key={item.id} value={item.id}>
+            <NativeSelectOption key={item.id} value={item.id}>
               {human(item.field)} · {item.actor} · {item.created_at} · {item.id}
-            </option>
+            </NativeSelectOption>
           ))}
-        </select>
+        </NativeSelect>
       </label>
       {history.data && (
         <>
@@ -810,7 +814,7 @@ export function ChangeImpact({
               })}
             </pre>
           </details>
-          <button
+          <Button variant="outline"
             disabled={locked || preview.isFetching}
             onClick={() => {
               if (previewRequested) void preview.refetch();
@@ -818,7 +822,7 @@ export function ChangeImpact({
             }}
           >
             Run read-only impact preview
-          </button>
+          </Button>
         </>
       )}
       {preview.isFetching && previewRequested && (
