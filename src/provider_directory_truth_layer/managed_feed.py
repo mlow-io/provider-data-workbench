@@ -125,12 +125,17 @@ class ManagedFeed:
             feed['scope'] = json.loads(feed['scope'])
             for key, table in (('contracts', 'feed_contract'), ('jobs', 'feed_job'), ('windows', 'feed_window'), ('issues', 'feed_issue'), ('configuration_history', 'feed_config'), ('window_history', 'feed_window_event')):
                 feed[key] = [decode(row) for row in conn.execute(f'SELECT * FROM {table} WHERE feed_id=? ORDER BY rowid', (feed_id,))]
+            for job in feed['jobs']:
+                delivery = conn.execute('SELECT manifest FROM feed_delivery WHERE id=?', (job['delivery_id'],)).fetchone()
+                job['kind'] = json.loads(delivery['manifest']).get('kind', 'source_delivery')
             feed['versions'] = [dict(row) for row in conn.execute('''SELECT v.id,v.created_at,
                 COALESCE(d.decision,'candidate') state,j.delivery_id,x.manifest
                 FROM feed_version v JOIN feed_job j ON j.id=v.job_id JOIN feed_delivery x ON x.id=j.delivery_id
                 LEFT JOIN feed_decision d ON d.version_id=v.id WHERE v.feed_id=? ORDER BY v.created_at,v.id''', (feed_id,))]
             for version in feed['versions']:
-                version['period'] = json.loads(version.pop('manifest'))['period']
+                delivery = json.loads(version.pop('manifest'))
+                version['period'] = delivery['period']
+                version['kind'] = delivery.get('kind', 'source_delivery')
         return feed
 
     def list(self):
@@ -480,7 +485,45 @@ class ManagedFeed:
         with self.store.db() as conn:
             fields = json.loads(conn.execute('SELECT definition FROM recipe_revision WHERE id=?', (recipe_id,)).fetchone()[0])['mapping']
         missing_rates = {field: sum(row['original'].get(column) in (None, '') for row in rows) / len(rows) if rows else None for field, column in fields.items()}
-        return {'counts': counts, 'comparison': comparison, 'required_field_missing_rates': missing_rates, 'baseline_version': job['baseline_version'], 'policy_version': 1, 'findings': findings}, rows
+        effective = None
+        if detail and comparison is not None and job['baseline_version']:
+            with self.store.db() as conn:
+                baseline = decode(conn.execute('SELECT * FROM feed_version WHERE id=?', (job['baseline_version'],)).fetchone())
+            corrected = [row for row in baseline['rows'] if row.get('materialization') and not row['problems']]
+            if corrected:
+                # The parser compares against immutable source observations. A
+                # corrected roster is a separate approved baseline, so expose
+                # both views instead of silently replacing source history.
+                from .recurring import identity
+                incoming = {}
+                for row in rows:
+                    key = identity(row)
+                    if key is not None:
+                        incoming.setdefault(key, []).append(row)
+                entries = []
+                for prior in corrected:
+                    key = identity(prior)
+                    matches = incoming.get(key, []) if key is not None else []
+                    current = matches[0] if len(matches) == 1 else None
+                    old = {field: prior['normalized'].get(field) for field in ('phone', 'phone_extension')}
+                    new = ({field: current['normalized'].get(field) for field in old} if current else None)
+                    status = ('unresolved' if key is None or len(matches) > 1 else
+                              'missing' if not matches else 'blocked_invalid' if current['problems'] else
+                              'unchanged' if old == new else 'changed')
+                    entries.append({'key': key, 'status': status, 'old': old, 'new': new,
+                                    'previous_locator': prior['locator'],
+                                    'current_locator': current['locator'] if current else None,
+                                    'decision_id': prior['materialization']['decision_id']})
+                effective = {'baseline_version': job['baseline_version'], 'fields': ['phone', 'phone_extension'],
+                             'notice': 'Previously corrected offices compared with this delivery; source comparison above remains against retained source observations.',
+                             'counts': {status: sum(entry['status'] == status for entry in entries)
+                                        for status in ('changed', 'unchanged', 'missing', 'blocked_invalid', 'unresolved')},
+                             'total': len(entries), 'entries': entries}
+                if any(entry['status'] != 'unchanged' for entry in entries):
+                    findings.append({'code': 'effective_correction_drift', 'severity': 'hold',
+                                     'message': 'Incoming source differs from, omits, or cannot be compared with a previously approved local correction; inspect the effective correction comparison.'})
+        return {'counts': counts, 'comparison': comparison, 'effective_corrections': effective,
+                'required_field_missing_rates': missing_rates, 'baseline_version': job['baseline_version'], 'policy_version': 1, 'findings': findings}, rows
 
     def version(self, version_id, *, full=False):
         with self.store.db() as conn:
@@ -495,6 +538,9 @@ class ManagedFeed:
             result['current_version'] = feed['current_version']
             result['review'] = [dict(r) for r in conn.execute('SELECT * FROM feed_exception WHERE version_id=? ORDER BY id', (version_id,))]
             result['delivery'] = result['manifest']['source_delivery']
+            result['kind'] = 'derived_field_candidate' if result['manifest'].get('materialization') else 'source_delivery'
+            if result['kind'] == 'derived_field_candidate':
+                result['report_notice'] = 'Quality report and acknowledgments are inherited from the approved base; comparison findings describe that base, not the correction.'
         result['row_count'] = len(result['rows'])
         if not full:
             result['rows'] = result['rows'][:50]
@@ -502,6 +548,10 @@ class ManagedFeed:
             if comparison and 'entries' in comparison:
                 comparison['entry_count'] = len(comparison['entries'])
                 comparison['entries'] = comparison['entries'][:50]
+            effective = result['report'].get('effective_corrections')
+            if effective:
+                effective['entry_count'] = len(effective['entries'])
+                effective['entries'] = effective['entries'][:50]
         return result
 
     def review(self, version_id, payload):
@@ -567,7 +617,11 @@ class ManagedFeed:
                 sha = version['manifest']['artifact_sha']
                 if hashlib.sha256((self.store.artifacts / sha).read_bytes()).hexdigest() != sha:
                     raise ValueError('Retained artifact digest mismatch')
-                self.store.commit_in_transaction(conn, version['manifest']['receipt_id'], {'actor': actor, 'reason': reason, 'policy': 'valid_rows', 'expected_attempt': version['manifest']['attempt_id']}, managed=True)
+                if version['manifest'].get('materialization'):
+                    from .field_materialization import FieldMaterialization
+                    FieldMaterialization(self.store).validate_approval(conn, version)
+                else:
+                    self.store.commit_in_transaction(conn, version['manifest']['receipt_id'], {'actor': actor, 'reason': reason, 'policy': 'valid_rows', 'expected_attempt': version['manifest']['attempt_id']}, managed=True)
                 conn.execute('UPDATE feed SET current_version=? WHERE id=?', (version_id, feed['id']))
             conn.execute('INSERT INTO feed_decision VALUES (?,?,?,?,?,?,?)', (version_id, decision, actor, reason, request_hash, key, now()))
         return self.version(version_id)
@@ -603,6 +657,9 @@ class ManagedFeed:
                     raise Conflict('Completed job cannot be cancelled')
                 conn.execute("UPDATE feed_job SET state='cancelled',token=token+1,lease_until=NULL WHERE id=?", (job_id,))
             elif action == 'reprocess':
+                delivery = conn.execute('SELECT manifest FROM feed_delivery WHERE id=?', (job['delivery_id'],)).fetchone()
+                if json.loads(delivery['manifest']).get('kind') == 'derived_field_candidate':
+                    raise Conflict('Derived field candidates cannot be reprocessed; create a new candidate from the current reviewed scope')
                 if job['state'] in {'queued', 'running', 'retry_wait'}:
                     raise Conflict('Wait for or cancel active processing before reprocessing')
                 feed = self._feed(conn, job['feed_id'])

@@ -53,8 +53,14 @@ def seed(root):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(); parser.add_argument('--root', type=Path, required=True); args = parser.parse_args()
+    parser = argparse.ArgumentParser(); parser.add_argument('--root', type=Path, required=True); parser.add_argument('--corrected', action='store_true'); args = parser.parse_args()
     store, fixtures = seed(args.root)
+    if args.corrected:
+        from corrections import qualify
+        for fixture in fixtures:
+            qualify(store, fixture)
+            fixture['version_id'] = ManagedFeed(store).current(fixture['feed_id'])['version_id']
+            fixture['corrected'] = True
     app = create_workbench(store.path, store.root, demo=False)
     @app.middleware('http')
     async def timing(request, call_next):

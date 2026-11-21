@@ -7,11 +7,12 @@ type ExportPreview = {
   version_id: string;
   snapshot_id: string;
   snapshot_at: string;
-  counts: { directory: number; unresolved_issues: number; sources: number; quarantined_rows: number; excluded_cross_scope_cases?: number };
+  counts: { directory: number; unresolved_issues: number; sources: number; quarantined_rows: number; excluded_cross_scope_cases?: number; corrections?: number };
   scope_notice?: string;
   preview?: {limit: number; returned: Record<string, number>; truncated: Record<string, boolean>; complete_export: false};
   directory: Record<string, unknown>[];
   unresolved_issues?: Record<string, unknown>[];
+  corrections?: Record<string, unknown>[];
 };
 async function check(response: Response) {
   if (!response.ok) {
@@ -42,21 +43,21 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
     } catch (value) { if (generation.current === requestGeneration) setError(value instanceof Error ? value.message : String(value)); }
     finally { if (generation.current === requestGeneration) setBusy(false); }
   }
-  async function download() {
+  async function download(format: "xlsx" | "json" = "xlsx") {
     if (!preview || preview.version_id !== versionId) return;
     const requestGeneration = ++generation.current;
     setBusy(true); setError("");
     try {
-      const response = await check(await fetch(`${base}?${new URLSearchParams({ format: "xlsx", expected_snapshot: preview.snapshot_id })}`));
+      const response = await check(await fetch(`${base}?${new URLSearchParams({ format, expected_snapshot: preview.snapshot_id })}`));
       const blob = await response.blob();
       if (generation.current !== requestGeneration) return;
       const url = URL.createObjectURL(blob), anchor = document.createElement("a");
-      anchor.href = url; anchor.download = "approved-directory-review.xlsx"; anchor.click();
+      anchor.href = url; anchor.download = `approved-directory-review.${format}`; anchor.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (value) { if (generation.current === requestGeneration) { setPreview(null); setError(value instanceof Error ? value.message : String(value)); } }
     finally { if (generation.current === requestGeneration) setBusy(false); }
   }
-  const sampleFields = ["provider_name", "npi", "location_id", "address", "city", "state", "zip", "phone"].filter(field => preview?.directory.some(row => Object.hasOwn(row, field)));
+  const sampleFields = ["provider_name", "npi", "location_id", "address", "city", "state", "zip", "phone", "phone_extension", "correction_ref"].filter(field => preview?.directory.some(row => Object.hasOwn(row, field)));
   return <section className="mf-export-review" aria-label="Approved export review">
     <h3>Review the handoff</h3>
     <p>Prepare the approved directory with separate unresolved issues and source evidence. Later unapproved deliveries do not replace this directory.</p>
@@ -68,18 +69,22 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
         <div><dt>Unresolved issues</dt><dd>{preview.counts.unresolved_issues}</dd></div>
         <div><dt>Source records</dt><dd>{preview.counts.sources}</dd></div>
         <div><dt>Quarantined rows</dt><dd>{preview.counts.quarantined_rows}</dd></div>
+        <div><dt>Reviewed corrections</dt><dd>{preview.counts.corrections ?? 0}</dd></div>
       </dl>
       {!!preview.counts.excluded_cross_scope_cases && <p className="iw-notice" role="status">{preview.counts.excluded_cross_scope_cases} cross-scope {preview.counts.excluded_cross_scope_cases === 1 ? "case" : "cases"} excluded. {preview.scope_notice || "This issue list is limited to the selected dataset scope."}</p>}
       <p className="iw-muted">Preview samples up to {preview.preview?.limit ?? 5} rows per section; the download includes all {preview.counts.directory} approved directory rows.</p>
       <p className="iw-muted mf-scroll-hint">Scroll wide tables sideways to see all columns.</p>
-      <p className="iw-muted">Open issues as of {preview.snapshot_at}. Directory, unresolved issues and sources remain separate workbook sheets.</p>
+      <p className="iw-muted">Open issues as of {preview.snapshot_at}. Directory, unresolved issues and sources remain separate workbook sheets. Corrected rows link to a Reviewed corrections sheet when present.</p>
       {preview.directory.length > 0 && <details><summary>Inspect directory sample ({Math.min(preview.directory.length, 5)} rows)</summary>
         <div className="mf-evidence-table" role="region" aria-label="Approved directory export sample" tabIndex={0}><Table><TableHeader><TableRow>{sampleFields.map(field => <TableHead key={field} scope="col">{field.replaceAll("_", " ")}</TableHead>)}</TableRow></TableHeader><TableBody>{preview.directory.slice(0, 5).map((row, index) => <TableRow key={index}>{sampleFields.map(field => <TableCell key={field}>{row[field] === null ? "Null" : typeof row[field] === "object" ? JSON.stringify(row[field]) : String(row[field] ?? "Absent")}</TableCell>)}</TableRow>)}</TableBody></Table></div>
       </details>}
       {(preview.unresolved_issues?.length ?? 0) > 0 && <div className="mf-evidence-table" role="region" aria-label="Unresolved export issues" tabIndex={0}>
         <Table><TableCaption>Unresolved issues · first {Math.min(preview.unresolved_issues!.length, 5)} of {preview.counts.unresolved_issues}</TableCaption><TableHeader><TableRow><TableHead scope="col">Kind / status</TableHead><TableHead scope="col">Issue</TableHead><TableHead scope="col">Listed / proposed value</TableHead></TableRow></TableHeader><TableBody>{preview.unresolved_issues!.slice(0, 5).map((issue, index) => <TableRow key={index}><TableCell>{String(issue.kind ?? "Unknown")}<br />{String(issue.status ?? "Unknown")}</TableCell><TableCell>{String(issue.issue ?? "Not supplied")}</TableCell><TableCell>{String(issue.listed_value ?? "Not supplied")}<br />{String(issue.proposed_value ?? "Not supplied")}</TableCell></TableRow>)}</TableBody></Table>
       </div>}
-      <Button disabled={busy} onClick={() => void download()}>Download reviewed workbook XLSX</Button>
+      {(preview.corrections?.length ?? 0) > 0 && <div className="mf-evidence-table" role="region" aria-label="Reviewed export corrections" tabIndex={0}>
+        <Table><TableCaption>Reviewed corrections · first {preview.corrections!.length} of {preview.counts.corrections}</TableCaption><TableHeader><TableRow><TableHead scope="col">Office / field</TableHead><TableHead scope="col">Original phone</TableHead><TableHead scope="col">Approved phone</TableHead><TableHead scope="col">Reviewer / reason</TableHead></TableRow></TableHeader><TableBody>{preview.corrections!.map((row, index) => <TableRow key={index}><TableCell>{String(row.source_office_id ?? "Reviewed office")}<br />{String(row.field ?? "phone")}<details><summary>Decision reference</summary>{String(row.decision_id)}</details></TableCell><TableCell>{String(row.old_phone ?? "Not supplied")}{row.old_extension ? ` ext. ${row.old_extension}` : ""}</TableCell><TableCell>{String(row.new_phone)}{row.new_extension ? ` ext. ${row.new_extension}` : ""}</TableCell><TableCell>{String(row.actor)}<br />{String(row.reason)}</TableCell></TableRow>)}</TableBody></Table>
+      </div>}
+      <div className="mf-actions"><Button disabled={busy} onClick={() => void download()}>Download reviewed workbook XLSX</Button><Button variant="outline" disabled={busy} onClick={() => void download("json")}>Download reviewed data JSON</Button></div>
     </>}
   </section>;
 }

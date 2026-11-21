@@ -49,4 +49,9 @@ Choose a source and exact delivery → inspect candidate/approved state and bloc
 
 `review-preview` bounds transfer to five rows per section by default, with a maximum requested limit of 50. Counts and snapshot token describe the full export. Section samples are independent, not a complete evidence graph. Rendering limits do not justify calling the server work constant-time; it still constructs the full SQLite snapshot. See [the workbook contract](REVIEW_WORKBOOK_CONTRACT.md).
 
-Correction approval remains separate from dataset approval. This qualification does not implement corrected-candidate materialization. Supporting source tools, broader data semantics, real-model evaluation and human observation continue under their own contracts. Roll back frontend and backend together to the preceding qualified revision if necessary; preserve data/artifacts. This slice adds no schema migration.
+Correction approval remains separate from dataset approval. This dated qualification preceded corrected-candidate materialization; its later S1.3 checks are recorded separately in STATUS. Supporting source tools, broader data semantics, real-model evaluation and human observation continue under their own contracts. Roll back frontend and backend together to the preceding qualified revision if necessary; preserve data/artifacts. This slice adds no schema migration.
+
+
+## Corrected-roster S1.3 extension
+
+Run `node web/qualify-performance.mjs /tmp/provider-correction-ui.json --corrected` to measure separately approved corrected 100/1,000-record rosters. Setup uses the same synthetic feed helper plus real identity, field decision, candidate and approval services, excluded from timing. API and touch-browser workbooks are independently opened for full row counts, correction decision/source references and the `0042` extension. [The correction receipt](evidence/canonical/correction-export-2026-11-21/README.md) records these later checks separately from the original qualification. A separate two-office browser journey covers candidate creation, approval, and later conflicting source delivery with an explicit hold.

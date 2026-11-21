@@ -119,3 +119,9 @@ Later S2 licensing/identity, S3 networks and S4 research/exchange are roadmap go
 - Preserve the existing React/TanStack runtime. Deliver consistent evidence tables and controls with shared CSS/component boundaries for this slice; introducing shadcn is deferred to a separately validated dependency migration if needed. No component library alone establishes visual acceptance.
 - Review workbook reads a pinned approved version in a consistent read snapshot. It never applies contact proposals. Existing approval and verification stages remain authoritative.
 - Optional actual-model and participant evidence remain independent open gates. A model transport is not invoked merely to claim completed adaptation quality.
+
+## S1.3 selected correction-release delta — 2026-11-21
+
+After UI qualification, the owner selected the complete reviewed-office-phone → candidate roster → separate dataset approval → pinned JSON/XLSX journey. [The materialization contract](FIELD_MATERIALIZATION_SPEC.md) freezes scope and failure semantics; [review format 2](REVIEW_WORKBOOK_CONTRACT.md) freezes extension/provenance output. Bulk and address corrections, licensing and network reconciliation remain later revisions. Existing AI-04/08/09 acceptance IDs cover decision preservation, inspected output and connected usability; the dated correction receipt records checks without substituting for participant evidence.
+
+The earlier shadcn deferral above is historical: the component-system migration and 100/1,000-record qualification are implemented; see STATUS. No new framework or dependency is selected by S1.3.

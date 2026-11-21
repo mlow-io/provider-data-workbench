@@ -86,3 +86,7 @@ Tests use owned disposable storage. [Operator procedures](docs/operations_govern
 The component-system migration adds a responsive sidebar, delivery table/inspector, evidence tabs and shared intake/mapping/reconciliation controls. Major workspaces load on demand. The [migration record](docs/evidence/canonical/workbench-migration-2026-11-21/README.md) retains frontend/build/browser checks, inspected synthetic captures and remaining performance/supporting-surface limits.
 
 The [UI qualification protocol](docs/UI_QUALIFICATION.md) includes a reproducible production-build benchmark at 100 and 1,000 synthetic records, bounded previews and complete workbook inspection. [The results and flows](docs/evidence/canonical/ui-qualification-2026-11-21/README.md) retain raw metrics, captures and limits.
+
+## Reviewed correction workflow
+
+Review exact clinician/office identity links and select a phone assertion in Reconciliation. Open the current approved delivery, inspect reviewed phone decisions, compare the number and extension, and create a complete roster candidate. Approve that candidate separately before preparing its pinned JSON/XLSX handoff. Original source bytes and earlier approved versions remain available; corrected rows include decision/source lineage. See [S1.3](docs/FIELD_MATERIALIZATION_SPEC.md), [the operator flow](docs/OPERATOR_EXPERIENCE.md#reviewed-correction-to-handoff) and [review export format 2](docs/REVIEW_WORKBOOK_CONTRACT.md).

@@ -1,0 +1,46 @@
+{
+  "scope": "Owned clean installations, synthetic product data, no actual model/source calls; React assets excluded",
+  "artifacts": [
+    {
+      "name": "provider_directory_truth_layer-2.0.0-py3-none-any.whl",
+      "sha256": "0945ec020395108e8a0b90d697ab1de1b8b05e724dcceb861213407928543240",
+      "bundled_assets": {
+        "mapping/mapping-assistant-manifest-v1.json": "03302c16a349c48041abd0f0b8549b3aa565fea70714a702fed4cff80fab9210",
+        "mapping/mapping-assistant-v1.json": "2ea25f58152ccbd5875ddfa19108c5296a257f4846155b66c071f51e6568589c",
+        "operations/expected.json": "4c981c0e5efed06aa8fab9e061afdf02df9da9f31087f57ca1166d43e5ef3999",
+        "operations/north-south.json": "3b01a66d81d89565223f8c0bd61cf616511713a5375c714d4efcd011bc29a6eb",
+        "qa/qa_rules.yml": "ad908119673254202bfe12202ab73711f1d445f44968d0b680f592d7593982a6",
+        "qa/sample_provider_directory.csv": "745f9fea16965bed80be46913fab821d57a3c74d79c411cf9af19ec1b2cfbcc1",
+        "sql/follow_up.sql": "2ad825351a49284b79e9a3d0cdd4858188c0f4224abae28db5c5e38e391f552e",
+        "sql/latest_event.sql": "e12ed19c3b65ed791aa7c15872711522127007b87f2045c5d13ef9338e9bb1c5",
+        "sql/lineage.sql": "96e890aa12ba0684eed48d4314db9ff8b582889d0c1f7201abaa3f04ce0e79b9",
+        "sql/lineage_review.sql": "b5919410f936b6e83256c3626815497e5de647baff303a529d23bd0779a51408",
+        "sql/phone_review.sql": "0a10d67a398bce8e730adced7f1556e6d5e62bea0db1b143cce76d0112cbbf11",
+        "sql/selected_delivery_diff.sql": "e0f20bfd74dad431a9dc958939b5e0be6e4ade54f2976a7d867ca8acc05399f5"
+      }
+    },
+    {
+      "name": "provider_directory_truth_layer-2.0.0.tar.gz",
+      "sha256": "076b921a7dd4f00865d19256544fa1dc245154b4d3d34ba1775f2c6a4771fcbf",
+      "bundled_assets": {
+        "mapping/mapping-assistant-manifest-v1.json": "03302c16a349c48041abd0f0b8549b3aa565fea70714a702fed4cff80fab9210",
+        "mapping/mapping-assistant-v1.json": "2ea25f58152ccbd5875ddfa19108c5296a257f4846155b66c071f51e6568589c",
+        "operations/expected.json": "4c981c0e5efed06aa8fab9e061afdf02df9da9f31087f57ca1166d43e5ef3999",
+        "operations/north-south.json": "3b01a66d81d89565223f8c0bd61cf616511713a5375c714d4efcd011bc29a6eb",
+        "qa/qa_rules.yml": "ad908119673254202bfe12202ab73711f1d445f44968d0b680f592d7593982a6",
+        "qa/sample_provider_directory.csv": "745f9fea16965bed80be46913fab821d57a3c74d79c411cf9af19ec1b2cfbcc1",
+        "sql/follow_up.sql": "2ad825351a49284b79e9a3d0cdd4858188c0f4224abae28db5c5e38e391f552e",
+        "sql/latest_event.sql": "e12ed19c3b65ed791aa7c15872711522127007b87f2045c5d13ef9338e9bb1c5",
+        "sql/lineage.sql": "96e890aa12ba0684eed48d4314db9ff8b582889d0c1f7201abaa3f04ce0e79b9",
+        "sql/lineage_review.sql": "b5919410f936b6e83256c3626815497e5de647baff303a529d23bd0779a51408",
+        "sql/phone_review.sql": "0a10d67a398bce8e730adced7f1556e6d5e62bea0db1b143cce76d0112cbbf11",
+        "sql/selected_delivery_diff.sql": "e0f20bfd74dad431a9dc958939b5e0be6e4ade54f2976a7d867ca8acc05399f5"
+      }
+    }
+  ],
+  "checks": {
+    "wheel_installed_journey": true,
+    "sdist_installed_journey": true,
+    "materialization_module_included": true
+  }
+}

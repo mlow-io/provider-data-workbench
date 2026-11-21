@@ -6,8 +6,8 @@ import { navigateWorkspace } from "./workspaceNavigation";
 afterEach(() => vi.unstubAllGlobals());
 const recipe = { id: "recipe-1", name: "Reviewed synthetic clinic", source: "synthetic-clinic", scope: "weekly-clinic", definition: { mapping: { npi: "npi", phone: "phone", location_id: "location_id" } } };
 const contract = { id: "contract-1", state: "approved", definition: { recipe_revision_id: "recipe-1", required_headers: ["npi", "phone", "location_id"], row_change_fraction: 0.2 } };
-const feed = { id: "feed-1", name: "Synthetic clinic weekly", source: recipe.source, scope: recipe.scope, revision: 2, config: { inbox: "/synthetic/inbox", owner: "Clinic coordinator", enabled: true, contract_id: "contract-1" }, contracts: [contract], jobs: [{ id: "job-1", state: "succeeded", execution_count: 1 }], versions: [{ id: "candidate-2", state: "candidate", period: "2026-11-02", delivery_id: "delivery-2", created_at: "2026-11-02T09:00:00Z" }], windows: [] };
-function api(options: { hard?: boolean; stale?: boolean } = {}) {
+const feed = { id: "feed-1", name: "Synthetic clinic weekly", source: recipe.source, scope: recipe.scope, revision: 2, config: { inbox: "/synthetic/inbox", owner: "Clinic coordinator", enabled: true, contract_id: "contract-1" }, contracts: [contract], jobs: [{ id: "job-1", kind: "source_delivery", state: "succeeded", execution_count: 1 }, { id: "job-derived", kind: "derived_field_candidate", state: "succeeded", execution_count: 0 }], versions: [{ id: "candidate-2", state: "candidate", period: "2026-11-02", delivery_id: "delivery-2", created_at: "2026-11-02T09:00:00Z" }], windows: [] };
+function api(options: { hard?: boolean; stale?: boolean; corrections?: boolean; derived?: boolean } = {}) {
   const calls: { url: string; body?: Record<string, unknown> }[] = [];
   let acknowledged = false;
   let approved = false;
@@ -23,7 +23,7 @@ function api(options: { hard?: boolean; stale?: boolean } = {}) {
     }
     if (url.endsWith("/exceptions")) acknowledged = body.disposition === "acknowledged";
     if (url.endsWith("/decide")) approved = true;
-    const version = { id: "candidate-2", state: approved ? "approved" : "candidate", report_hash: reportHash, current_version: "approved-1", report: { counts: { raw: 3, valid: 2, quarantined: 1, unique: 3 }, comparison: { baseline_version: "approved-1", missing: 1 }, findings: options.hard ? [{ code: "headers", severity: "hard", message: "Required phone header is missing" }] : [{ code: "quarantine", severity: "hold", message: "One source row is quarantined" }] }, review: acknowledged ? [{ code: "quarantine", disposition: "acknowledged", actor: "Reviewer", reason: "Reviewed invalid row" }] : [], rows: [{ original: { zip: "02108" } }], delivery: { id: "delivery-2" }, manifest: { source_delivery: { period: "2026-11-02" }, designation: "synthetic", notice: "Synthetic source assertions, not independently verified provider truth." } };
+    const version = { id: "candidate-2", kind: options.derived ? "derived_field_candidate" : "source_delivery", report_notice: options.derived ? "Inherited report" : undefined, state: approved ? "approved" : "candidate", report_hash: reportHash, current_version: "approved-1", report: { counts: { raw: 3, valid: 2, quarantined: 1, unique: 3 }, effective_corrections: options.corrections ? { baseline_version: "corrected-base", fields: ["phone", "phone_extension"], notice: "Incoming data may differ from reviewed corrections.", total: 73, counts: {changed: 2, unchanged: 70, missing: 1, blocked_invalid: 0, unresolved: 0}, entry_count: 73, entries: [{key: ["001", "NORTH"], status: "changed", old: {phone: "6175550199", phone_extension: "0042"}, new: {phone: "6175550101", phone_extension: null}, previous_locator: "row:2", current_locator: "row:3", decision_id: "decision-1"}] } : null, comparison: { baseline_version: "approved-1", missing: 1 }, findings: options.hard ? [{ code: "headers", severity: "hard", message: "Required phone header is missing" }] : [{ code: "quarantine", severity: "hold", message: "One source row is quarantined" }] }, review: acknowledged ? [{ code: "quarantine", disposition: "acknowledged", actor: "Reviewer", reason: "Reviewed invalid row" }] : [], rows: [{ original: { zip: "02108" } }], delivery: { id: "delivery-2" }, manifest: { receipt_id: "receipt-1", attempt_id: "attempt-1", source_delivery: { period: "2026-11-02" }, designation: "synthetic", notice: "Synthetic source assertions, not independently verified provider truth." } };
     const value = url === "/api/feeds" ? (body ? feed : { items: [feed] })
       : url === "/api/feeds/recipes" ? { items: [recipe] }
       : url === "/api/feeds/feed-1/current" ? { version_id: approved ? "candidate-2" : "approved-1", stale: true, notice: "A newer delivery is awaiting review" }
@@ -168,4 +168,48 @@ test("returning to deliveries does not steal focus from the operator's next cont
   expect(next).toHaveFocus();
   fireEvent.click(next);
   await waitFor(() => expect(detail).toHaveFocus());
+});
+
+
+test("derived candidate jobs are labeled and cannot be reprocessed", async () => {
+  api();
+  render(<ManagedFeeds />);
+  fireEvent.click(await screen.findByRole("button", { name: /Synthetic clinic weekly/ }));
+  fireEvent.click(await screen.findByText("Processing and delivery history"));
+  fireEvent.click(screen.getByText(/Processing history and delivery windows/));
+  const derived = screen.getByText("Reviewed phone candidate · succeeded").closest("li")!;
+  expect(within(derived).queryByRole("button", { name: /Reprocess/ })).not.toBeInTheDocument();
+  const source = screen.getByText("Source delivery · succeeded").closest("li")!;
+  expect(within(source).getByRole("button", { name: /Reprocess/ })).toBeInTheDocument();
+});
+
+
+test("incoming source separately compares the corrected roster with complete counts and a bounded sample", async () => {
+  api({ corrections: true });
+  render(<ManagedFeeds />);
+  await openCandidate();
+  const panel = screen.getByRole("region", { name: "Effective corrected roster comparison" });
+  expect(panel).toHaveTextContent("corrected-base");
+  expect(panel).toHaveTextContent("Showing 1 of 73 comparison entries");
+  expect(panel).toHaveTextContent("Corrected keys assessed73");
+  expect(panel).toHaveTextContent("Changed2");
+  expect(panel).toHaveTextContent("6175550199 · extension: 0042");
+  expect(panel).toHaveTextContent("6175550101 · extension: Not supplied");
+  expect(panel).toHaveTextContent("Missing or unresolved keys do not establish closure");
+  expect(screen.getByText("Source-to-source comparison:")).toBeInTheDocument();
+});
+
+
+test("derived approved handoff identifies reconciliation as original source evidence", async () => {
+  api({ derived: true });
+  render(<ManagedFeeds />);
+  await openCandidate();
+  fireEvent.click(screen.getByRole("button", { name: "Acknowledge quarantine" }));
+  await waitFor(() => expect(screen.getByRole("button", { name: "Approve dataset version" })).toBeEnabled());
+  fireEvent.click(screen.getByRole("button", { name: "Approve dataset version" }));
+  await screen.findByRole("heading", { name: "Dataset review · approved" });
+  expect(screen.getByText(/Reconciliation uses the retained original source interpretation/)).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Inspect original source evidence" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Prepare reconciliation from original source evidence" })).toHaveAttribute("href", expect.stringContaining("receipt=receipt-1"));
+  expect(screen.queryByRole("link", { name: "Prepare reconciliation from this approved version" })).not.toBeInTheDocument();
 });

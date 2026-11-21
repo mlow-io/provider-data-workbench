@@ -8,7 +8,7 @@ The owner authorized implementation and privacy-reviewed public delivery on 2026
 
 Implemented additions: approved-recipe compatibility/drift and proposal-only reuse through HTTP/MCP; duplicate-header abstention; opt-in bounded approved-example context for model proposals; scoped work identity with matching legacy-history reuse; registry-reported license/contact-purpose metadata; pinned approved-directory workbook preview/download; readable original/interpreted evidence tables and connected import/export controls.
 
-No new database server, queue, runtime code plugin or schema migration was introduced. Model-context transport is controlled-provider tested; actual-model usefulness is still unverified. Registry license entries are not licensing-board verification. New licensing-source profiles, expanded network analytics, case research and recipient exchange remain roadmap work. The workbook does not materialize field proposals into an approved roster.
+No new database server, queue, runtime code plugin or schema migration was introduced. Model-context transport is controlled-provider tested; actual-model usefulness is still unverified. Registry license entries are not licensing-board verification. New licensing-source profiles, expanded network analytics, case research and recipient exchange remain roadmap work. At that adaptive-release checkpoint, the workbook did not materialize field proposals into a roster; S1.3 below adds explicit candidate creation and separate approval.
 
 Existing private history is preserved separately from the clean-history public release candidate. Public delivery is source-code delivery, not a hosted production application or a claim that all long-term milestones are complete.
 
@@ -34,7 +34,7 @@ The [UI migration](docs/UI_WORKBENCH_MIGRATION.md) is now implemented for the sh
 
 The [qualification receipt](docs/evidence/canonical/ui-qualification-2026-11-21/README.md) records production-build measurements at 100/1,000 synthetic records, bounded five-row preview responses with complete counts/tokens, independently inspected full workbooks, actual touch/keyboard/list-detail behavior, repeated-navigation heap observations and a separate slowed CPU/network trial. No 10,000-record run was performed. Python 907 and frontend 144 tests pass; full browser 74 and final affected 16 scenarios pass. The receipt records scope and failures separately. Source/reference demo code was inspected without importing its private Site identity or browser-local storage design.
 
-The new preview reduces transfer but still computes the full snapshot. Primary hover contrast and coarse-pointer target sizing were refined during qualification. Owner visual/human gates and supporting legacy retirement remain separate. The user prioritized this qualification before correction features; correction/agent-evaluation drafts are retained separately and excluded from this release.
+The new preview reduces transfer but still computes the full snapshot. Primary hover contrast and coarse-pointer target sizing were refined during qualification. Owner visual/human gates and supporting legacy retirement remain separate. The user prioritized this dated qualification before correction features; its release excluded correction/agent-evaluation drafts. The later S1.3 slice is recorded below.
 
 ## Latest adaptive release verification
 
@@ -73,3 +73,13 @@ The older backend/distribution/source results come from [the integrated record](
 PX0's [v1 contract](docs/PROVIDER_OPERATIONS_CONTRACT.md) and independent two-office response fixtures define adaptive profiles, exact recipient-response correlation, CMS enrollment/NPPES relationships, finite case research and recipient packets. They introduce no runtime adapters, endpoints, migrations or new model/source trials. The [operator contract](docs/OPERATOR_EXPERIENCE.md) governs UI1; [operational measures](docs/OPERATIONAL_MEASURES.md) remain a separate planned read-only surface.
 
 [ROADMAP](ROADMAP.md) explicitly reschedules PX1/PX3/PX4 into later exchange/research work and maps PX2 evidence to licensing/network milestones. [S1.1](docs/ADAPTIVE_INGESTION_SPEC.md) owns the immediate ingestion/contact target. Existing model/human evidence gates remain open; no recipient compatibility follows from the implemented shell or planned workbook.
+
+## Reviewed correction/export S1.3
+
+Implemented one explicitly selected current office-phone assertion → immutable complete candidate → separate dataset approval → pinned JSON/XLSX handoff. Original bytes, prior approved output and unchanged offices survive; phone extensions and source/link/decision/base lineage remain inspectable in review format 2. Derived jobs cannot be source-reprocessed, and inherited base quality evidence is labeled. Exact retries survive restart; stale source/link/decision/base and conflicting/ambiguous/no-op requests fail.
+
+A subsequent file retains source-to-source history and separately compares previously corrected keys against the effective approved roster. A drift hold requires acknowledgement before separate dataset approval, so resending an old source phone cannot silently erase a local correction. Browser retries handle storage denial and malformed saved payloads. This slice adds no database migration or dependency change.
+
+[The correction receipt](docs/evidence/canonical/correction-export-2026-11-21/README.md) owns final checks, failure disposition, actual two-office UI/download captures, 100/1,000-row correction service checks and production-build measurements. Owner visual approval, participant outcomes, source-specific licensing, bulk/address changes, recipient templates, production model calls and hosting remain outside this engineering slice.
+
+S1.3 qualification: 918 Python tests, 154 frontend tests, production build, 76 full desktop/mobile browser scenarios, synthetic pipeline and installed wheel/sdist journeys passed. Production corrected-roster median populated load was 848/847 ms at 100/1,000 rows, with row-selection p95 lab proxies 33.4/33.5 ms. Complete API/touch-browser workbooks retained every row and extension/decision/source lineage. The receipt distinguishes initial test-fixture failures and concurrent service diagnostics from the final browser measurements.

@@ -10,6 +10,7 @@ process.chdir(path.dirname(fileURLToPath(import.meta.url)));
 
 const root = await mkdtemp(path.join(tmpdir(), "provider-ui-qualification-"));
 const output = process.argv[2];
+const corrected = process.argv[3] === "--corrected";
 if (!output) throw new Error("Pass an output JSON path");
 const api = spawn(
   "python3",
@@ -18,6 +19,7 @@ const api = spawn(
     "scripts/qualification/serve.py",
     "--root",
     path.join(root, "storage"),
+    ...(corrected ? ["--corrected"] : []),
   ],
   {
     cwd: path.resolve(".."),
@@ -66,6 +68,7 @@ try {
   const report = {
     format_version: 1,
     fixture_sizes: [100, 1000],
+    corrected_rosters: corrected,
     build: "production",
     browser: browser.version(),
     environment: {
@@ -288,6 +291,10 @@ try {
     if (!workbookResponse.ok) throw new Error(await workbookResponse.text());
     const workbookBytes = Buffer.from(await workbookResponse.arrayBuffer());
     const workbookMs = performance.now() - workbookStart;
+    if (corrected) {
+      const full = await (await fetch(`${url}/api/feed-versions/${fixture.version_id}/review-export`)).json();
+      if (full.counts.corrections !== 1 || full.corrections[0].new_extension !== "0042" || full.directory.find(row => row.correction_ref)?.phone !== "6155559999") throw new Error("Corrected roster preview/export lineage mismatch");
+    }
     const workbookPath = path.join(root, `directory-${fixture.count}.xlsx`);
     await writeFile(workbookPath, workbookBytes);
     execFileSync("python3", [
@@ -374,6 +381,10 @@ try {
       `browser-directory-${fixture.count}.xlsx`,
     );
     await browserDownload.saveAs(browserWorkbook);
+    if (corrected) {
+      const checkCorrection = "import sys;from openpyxl import load_workbook;b=load_workbook(sys.argv[1],read_only=True);it=b['Reviewed corrections'].iter_rows(values_only=True);h=next(it);r=next(it);assert r[h.index('new_phone')]=='6155559999';assert r[h.index('new_extension')]=='0042';assert r[h.index('decision_id')];assert r[h.index('selected_source_ref')];b.close()";
+      for (const file of [workbookPath, browserWorkbook]) execFileSync("python3", ["-c", checkCorrection, file]);
+    }
     execFileSync("python3", [
       "-c",
       "import sys;from openpyxl import load_workbook;b=load_workbook(sys.argv[1],read_only=True);assert b['Directory'].max_row==int(sys.argv[2])+1;b.close()",

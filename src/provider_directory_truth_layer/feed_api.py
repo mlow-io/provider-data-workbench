@@ -47,6 +47,16 @@ def mount(app, store):
     def version(version_id: str):
         return feeds.version(version_id)
 
+    @app.get('/api/feed-versions/{version_id}/field-materialization')
+    def field_materialization_choices(version_id: str, offset: int = 0, limit: int = 20):
+        from .field_materialization import FieldMaterialization
+        return FieldMaterialization(store).choices(version_id, offset, limit)
+
+    @app.post('/api/feed-versions/{version_id}/field-materialization')
+    def create_field_materialization(version_id: str, payload: dict):
+        from .field_materialization import FieldMaterialization
+        return feeds.version(FieldMaterialization(store).create(version_id, payload))
+
     @app.post('/api/feed-versions/{version_id}/exceptions')
     def review(version_id: str, payload: dict):
         return feeds.review(version_id, payload)

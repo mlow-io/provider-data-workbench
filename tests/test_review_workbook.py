@@ -29,7 +29,7 @@ def ready(tmp_path):
 def test_workbook_pins_approved_values_scope_identifiers_and_sources(tmp_path):
     store, service, feed, inbox, version = ready(tmp_path)
     north = snapshot(store.path, version, 'NORTH')
-    assert north['counts'] == {'directory': 1, 'unresolved_issues': 1, 'sources': 1, 'quarantined_rows': 0, 'excluded_cross_scope_cases': 0}
+    assert north['counts'] == {'directory': 1, 'corrections': 0, 'unresolved_issues': 1, 'sources': 1, 'quarantined_rows': 0, 'excluded_cross_scope_cases': 0}
     issue = north['unresolved_issues'][0]
     with store.db() as conn:
         conn.execute("UPDATE work_case SET proposal='6175550199',status='approved',version=version+1 WHERE id=?", (issue['issue_id'],))

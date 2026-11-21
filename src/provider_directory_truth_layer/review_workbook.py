@@ -15,9 +15,11 @@ from openpyxl.utils import get_column_letter
 from .intake_store import Conflict, digest, now, packed
 from .managed_feed import decode
 
-DIRECTORY_COLUMNS = ['directory_row_id', 'source_record_key', 'office_key', 'version_id', 'record_id', 'npi', 'provider_name', 'location_id', 'address', 'address_line2', 'suite', 'city', 'state', 'zip', 'phone', 'specialty', 'status', 'source_updated_at', 'source_ref']
+DIRECTORY_COLUMNS = ['directory_row_id', 'source_record_key', 'office_key', 'version_id', 'record_id', 'npi', 'provider_name', 'location_id', 'address', 'address_line2', 'suite', 'city', 'state', 'zip', 'phone', 'phone_extension', 'correction_ref', 'specialty', 'status', 'source_updated_at', 'source_ref']
 ISSUE_COLUMNS = ['issue_id', 'directory_row_id', 'source_record_key', 'office_key', 'version_id', 'kind', 'status', 'field', 'issue', 'listed_value', 'proposed_value', 'observed_value', 'case_version', 'source_ref']
 SOURCE_COLUMNS = ['source_ref', 'version_id', 'source', 'designation', 'receipt_id', 'attempt_id', 'artifact_sha256', 'row_locator', 'recipe_revision_id', 'contract_id', 'source_as_of', 'received_at']
+
+CORRECTION_COLUMNS = ['correction_ref', 'directory_row_id', 'source_record_id', 'source_office_id', 'base_version', 'clinician_id', 'location_id', 'field', 'decision_id', 'selected_ref', 'selected_source_ref', 'old_phone', 'old_extension', 'new_phone', 'new_extension', 'actor', 'reason', 'snapshot', 'evidence_snapshot', 'link_ids']
 
 
 def snapshot(path: Path, version_id: str, location_id: str | None = None, expected_snapshot: str | None = None) -> dict:
@@ -43,7 +45,7 @@ def snapshot(path: Path, version_id: str, location_id: str | None = None, expect
         rows = [row for row in version['rows'] if location_id is None or row['normalized'].get('location_id') == location_id]
         if location_id is not None and not rows:
             raise KeyError('Office not present in selected dataset version')
-        directory, issues, sources = [], [], []
+        directory, issues, sources, corrections = [], [], [], []
         seen_cases = set()
         excluded_case_ids = set()
         selected_scope = packed(json.loads(receipt['metadata']).get('scope'))
@@ -62,7 +64,24 @@ def snapshot(path: Path, version_id: str, location_id: str | None = None, expect
             if row['problems']:
                 issues.append({**common, 'issue_id': 'quarantine:' + digest([version_id, row['locator']]), 'kind': 'quarantine', 'status': 'excluded', 'issue': json.dumps(row['problems'], ensure_ascii=True)})
                 continue
-            directory.append({**common, **{key: norm.get(key) for key in DIRECTORY_COLUMNS if key not in common}})
+            entry = {**common, **{key: norm.get(key) for key in DIRECTORY_COLUMNS if key not in common}}
+            lineage = row.get('materialization')
+            if lineage:
+                correction_ref = 'correction:' + digest([version_id, row['locator'], lineage['request_hash']])
+                selected = lineage['selected_evidence']
+                selected_receipt = dict(conn.execute('SELECT * FROM receipt WHERE id=?', (selected['receipt_id'],)).fetchone())
+                selected_source_ref = 'source:' + digest([version_id, selected['receipt_id'], selected['locator']])
+                if selected_source_ref not in source_refs:
+                    source_refs.add(selected_source_ref)
+                    sources.append(dict(zip(SOURCE_COLUMNS, [selected_source_ref, version_id, selected_receipt['source'], selected_receipt['designation'], selected_receipt['id'], selected['attempt_id'], selected['artifact_sha'], selected['locator'], None, None, json.loads(selected_receipt['metadata']).get('as_of'), selected_receipt['received_at']])))
+                entry['correction_ref'] = correction_ref
+                corrections.append({'correction_ref': correction_ref, 'directory_row_id': row_id, 'source_record_id': record, 'source_office_id': office,
+                                    **{key: lineage.get(key) for key in ('base_version', 'clinician_id', 'location_id', 'field', 'decision_id', 'selected_ref', 'actor', 'reason', 'snapshot', 'evidence_snapshot')},
+                                    'selected_source_ref': selected_source_ref,
+                                    'old_phone': lineage['old_value']['number'], 'old_extension': lineage['old_value']['extension'],
+                                    'new_phone': lineage['new_value']['number'], 'new_extension': lineage['new_value']['extension'],
+                                    'link_ids': lineage['link_ids']})
+            directory.append(entry)
             observation = observations.get(row['locator'])
             if observation is None:
                 raise ValueError('Approved row has no retained observation locator')
@@ -88,7 +107,7 @@ def snapshot(path: Path, version_id: str, location_id: str | None = None, expect
             if finding['severity'] in {'hold', 'hard'}:
                 review = reviews.get(finding['code'])
                 issues.append({'issue_id': 'quality:' + digest([version_id, finding['code']]), 'version_id': version_id, 'kind': 'dataset_quality', 'status': review['disposition'] if review else 'unreviewed', 'issue': finding['message']})
-        result = {'format_version': 1, 'version_id': version_id, 'scope': {'feed_id': version['feed_id'], 'location_id': location_id, 'kind': 'approved_feed_office' if location_id is not None else 'approved_feed'}, 'manifest': manifest, 'approval': dict(approval), 'report_hash': version['report_hash'], 'directory': directory, 'unresolved_issues': sorted(issues, key=lambda issue: issue['issue_id']), 'sources': sources, 'counts': {'directory': len(directory), 'unresolved_issues': len(issues), 'sources': len(sources), 'quarantined_rows': sum(bool(row['problems']) for row in rows), 'excluded_cross_scope_cases': len(excluded_case_ids)}}
+        result = {'format_version': 2, 'version_id': version_id, 'scope': {'feed_id': version['feed_id'], 'location_id': location_id, 'kind': 'approved_feed_office' if location_id is not None else 'approved_feed'}, 'manifest': manifest, 'approval': dict(approval), 'report_hash': version['report_hash'], 'directory': directory, 'corrections': corrections, 'unresolved_issues': sorted(issues, key=lambda issue: issue['issue_id']), 'sources': sources, 'counts': {'directory': len(directory), 'corrections': len(corrections), 'unresolved_issues': len(issues), 'sources': len(sources), 'quarantined_rows': sum(bool(row['problems']) for row in rows), 'excluded_cross_scope_cases': len(excluded_case_ids)}}
         result['scope_notice'] = 'Work cases whose initial evidence belongs to a different dataset scope are excluded. Historical source-native work keys may retain links across scopes; this export does not rewrite those cases. Inspect excluded_cross_scope_cases before treating unresolved counts as complete.'
         result['snapshot_id'] = digest(result)
         if expected_snapshot is not None and expected_snapshot != result['snapshot_id']:
@@ -103,7 +122,7 @@ def preview(path: Path, version_id: str, location_id: str | None = None, expecte
     if not 1 <= limit <= 50:
         raise ValueError('Preview limit must be between 1 and 50')
     data = snapshot(path, version_id, location_id, expected_snapshot)
-    arrays = ('directory', 'unresolved_issues', 'sources')
+    arrays = ('directory', 'unresolved_issues', 'sources', 'corrections')
     result = {key: value for key, value in data.items() if key not in (*arrays, 'manifest', 'approval')}
     result.update({key: data[key][:limit] for key in arrays})
     result['preview'] = {'limit': limit, 'returned': {key: len(result[key]) for key in arrays}, 'truncated': {key: len(data[key]) > limit for key in arrays}, 'complete_export': False}
@@ -142,12 +161,14 @@ def workbook(data: dict) -> bytes:
 
     sheet('Directory', DIRECTORY_COLUMNS, data['directory'])
     sheet('Unresolved issues', ISSUE_COLUMNS, data['unresolved_issues'])
+    if data.get('corrections'):
+        sheet('Reviewed corrections', CORRECTION_COLUMNS, [{**row, 'link_ids': json.dumps(row['link_ids'])} for row in data['corrections']])
     details = [
         ('format_version', data['format_version']), ('version_id', data['version_id']), ('snapshot_id', data['snapshot_id']), ('snapshot_at_utc', data['snapshot_at']),
         ('scope', json.dumps(data['scope'], sort_keys=True)), ('counts', json.dumps(data['counts'], sort_keys=True)),
         ('approval', json.dumps(data['approval'], sort_keys=True)), ('manifest', json.dumps(data['manifest'], sort_keys=True)),
         ('report_hash', data['report_hash']), ('scope_notice', data['scope_notice']),
-        ('semantics', 'Directory contains only the selected explicitly approved source version. Pending work proposals never replace its values. Local approval is not external verification.'),
+        ('semantics', 'Directory contains only the selected explicitly approved source version. Only explicitly materialized and separately approved corrections replace values; see correction_ref and Reviewed corrections. Pending work proposals never replace values. Local approval is not external verification.'),
         ('issue_scope', 'Open work linked to retained selected-version observations with the same initial evidence dataset scope; excludes resolved/verified and separately reports excluded cross-scope case count. Quarantines are excluded from Directory. Dataset quality findings apply to the whole version, including office selections. Later unapproved deliveries are not included.'),
         ('identifiers', 'Feed-scoped source-record/office keys are not canonical clinician or office identity links. A native record ID may identify a provider-office row; no clinician key is inferred. directory_row_id is stable across feed versions for the native record/office pair. source_ref resolves below to retained receipt, artifact SHA256 and original row locator.'),
         ('values', 'All populated cells are literal text. Blank = null/absent; two quotes = empty string. XML controls are escaped in display; JSON preserves exact values. No formulas, hyperlinks or external links.'),
