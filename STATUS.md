@@ -27,7 +27,7 @@ The core non-AI operations demonstration and all R1–R4 engineering follow-ups 
 
 ## Workbench migration planning
 
-A separate [UI migration plan](docs/UI_WORKBENCH_MIGRATION.md) now proposes shadcn/ui + Tailwind and an official application-shell block. NEXT selects UI-W0. No library, dependency configuration or new workbench shell was installed by this documentation revision. Prior frontend/browser results below describe the incremental interface, not completed migration. Prototype/compatibility/visual-review gates remain open.
+A separate [UI migration plan](docs/UI_WORKBENCH_MIGRATION.md) now proposes shadcn/ui + Tailwind and an official application-shell block. NEXT selects UI-W0. No library, dependency configuration or new workbench shell was installed by this documentation revision. Prior frontend/browser results below describe the incremental interface, not completed migration. Prototype/compatibility/visual-review gates remain open. The follow-up plan review adds an audience-specific visual brief, proposed performance budgets, workload fixtures and WM-09–12 acceptance gates. Eager workspace imports and full-export JSON used for a five-row preview are code-inspected risks; timing, payload scale and memory behavior have not been benchmarked in this review.
 
 ## Latest adaptive release verification
 
