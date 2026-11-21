@@ -5,7 +5,7 @@ afterEach(() => vi.unstubAllGlobals());
 test("previews approved scope and rejects a workbook when its issue snapshot changes", async () => {
   const fetcher = vi.fn(async (url: string) => new Response(JSON.stringify(url.includes("format=xlsx")
     ? { detail: "Export snapshot changed. Refresh preview." }
-    : { version_id: "v1", snapshot_id: "snapshot-one", snapshot_at: "2026-11-21T12:00:00Z", counts: { directory: 2, unresolved_issues: 1, sources: 2, quarantined_rows: 0, excluded_cross_scope_cases: 1 }, scope_notice: "Issues from another dataset scope are excluded.", directory: [{ location_id: "NORTH", phone: "2125550101" }] }), { status: url.includes("format=xlsx") ? 409 : 200 }));
+    : { version_id: "v1", scope: {location_id: null, kind: "approved_feed"}, snapshot_id: "snapshot-one", snapshot_at: "2026-11-21T12:00:00Z", counts: { directory: 2, unresolved_issues: 1, sources: 2, quarantined_rows: 0, excluded_cross_scope_cases: 1 }, scope_notice: "Issues from another dataset scope are excluded.", directory: [{ location_id: "NORTH", phone: "2125550101" }] }), { status: url.includes("format=xlsx") ? 409 : 200 }));
   vi.stubGlobal("fetch", fetcher);
   render(<ApprovedExportReview versionId="v1" />);
   expect(fetcher).not.toHaveBeenCalled();
@@ -37,7 +37,7 @@ test("changing selected version invalidates a pending preview and its error stat
 });
 
 test("shows correction provenance and downloads complete JSON pinned to its preview", async () => {
-  const fetcher = vi.fn(async (_url: string) => new Response(JSON.stringify({ version_id: "v1", snapshot_id: "corrected-snapshot", snapshot_at: "2026-11-21T12:00:00Z", counts: { directory: 1000, unresolved_issues: 0, sources: 1001, quarantined_rows: 0, corrections: 1 }, directory: [{ location_id: "NORTH", phone: "6175550199", phone_extension: "0042", correction_ref: "c1" }], corrections: [{ location_id: "reviewed-office", decision_id: "decision-one", old_phone: "6175550101", new_phone: "6175550199", new_extension: "0042", actor: "Synthetic Reviewer", reason: "Reviewed source evidence" }] })));
+  const fetcher = vi.fn(async (_url: string) => new Response(JSON.stringify({ version_id: "v1", scope: {location_id: null, kind: "approved_feed"}, snapshot_id: "corrected-snapshot", snapshot_at: "2026-11-21T12:00:00Z", counts: { directory: 1000, unresolved_issues: 0, sources: 1001, quarantined_rows: 0, corrections: 1 }, directory: [{ location_id: "NORTH", phone: "6175550199", phone_extension: "0042", correction_ref: "c1" }], corrections: [{ location_id: "reviewed-office", decision_id: "decision-one", old_phone: "6175550101", new_phone: "6175550199", new_extension: "0042", actor: "Synthetic Reviewer", reason: "Reviewed source evidence" }] })));
   vi.stubGlobal("fetch", fetcher);
   const createURL = vi.fn(() => "blob:reviewed-export");
   vi.stubGlobal("URL", class extends URL { static createObjectURL = createURL; static revokeObjectURL = vi.fn(); });
@@ -52,4 +52,45 @@ test("shows correction provenance and downloads complete JSON pinned to its prev
   await vi.waitFor(() => expect(click).toHaveBeenCalledOnce());
   expect(fetcher.mock.calls[1][0]).toContain("format=json&expected_snapshot=corrected-snapshot");
   click.mockRestore();
+});
+
+test("office selection pins both preview and download and clears old eligibility", async () => {
+  const fetcher = vi.fn(async (url: string) => new Response(JSON.stringify({ version_id: "v1", scope: {location_id: new URL(url, "http://localhost").searchParams.get("location_id"), kind: "approved_feed_office"}, snapshot_id: "north-token", snapshot_at: "now", counts: {directory: 1, unresolved_issues: 0, sources: 1, quarantined_rows: 0}, directory: [{location_id: "NORTH"}] })));
+  vi.stubGlobal("fetch", fetcher);
+  vi.stubGlobal("URL", class extends URL { static createObjectURL = vi.fn(() => "blob:test"); static revokeObjectURL = vi.fn(); });
+  const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+  render(<ApprovedExportReview versionId="v1" />);
+  fireEvent.change(screen.getByLabelText("Source office ID (optional)"), {target: {value: "NORTH"}});
+  fireEvent.click(screen.getByRole("button", {name: "Preview approved workbook"}));
+  expect(await screen.findByText(/Source office NORTH/)).toBeVisible();
+  expect(fetcher.mock.calls[0][0]).toContain("location_id=NORTH");
+  fireEvent.click(screen.getByRole("button", {name: "Download reviewed data JSON"}));
+  await vi.waitFor(() => expect(click).toHaveBeenCalledOnce());
+  expect(fetcher.mock.calls[1][0]).toContain("expected_snapshot=north-token&location_id=NORTH");
+  fireEvent.change(screen.getByLabelText("Source office ID (optional)"), {target: {value: "SOUTH"}});
+  expect(screen.queryByRole("button", {name: "Download reviewed data JSON"})).not.toBeInTheDocument();
+  click.mockRestore();
+});
+
+test("rejects an office preview that returns a different scope", async () => {
+  vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({version_id: "v1", scope: {location_id: null}, snapshot_id: "wrong"}))));
+  render(<ApprovedExportReview versionId="v1" />);
+  fireEvent.change(screen.getByLabelText("Source office ID (optional)"), {target: {value: "NORTH"}});
+  fireEvent.click(screen.getByRole("button", {name: "Preview approved workbook"}));
+  expect(await screen.findByRole("alert")).toHaveTextContent("does not match");
+  expect(screen.queryByRole("button", {name: "Download reviewed data JSON"})).not.toBeInTheDocument();
+});
+
+test("changing office while preview loads discards the old office response", async () => {
+  let finish: (response: Response) => void = () => {};
+  vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(resolve => { finish = resolve; })));
+  render(<ApprovedExportReview versionId="v1" />);
+  fireEvent.change(screen.getByLabelText("Source office ID (optional)"), {target: {value: "NORTH"}});
+  fireEvent.click(screen.getByRole("button", {name: "Preview approved workbook"}));
+  fireEvent.change(screen.getByLabelText("Source office ID (optional)"), {target: {value: "SOUTH"}});
+  finish(new Response(JSON.stringify({version_id: "v1", scope: {location_id: "NORTH"}, snapshot_id: "old", snapshot_at: "old", counts: {directory: 1, unresolved_issues: 0, sources: 1, quarantined_rows: 0}, directory: []})));
+  await new Promise(resolve => setTimeout(resolve, 0));
+  expect(screen.queryByText(/Source office NORTH/)).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", {name: "Download reviewed data JSON"})).not.toBeInTheDocument();
+  expect(screen.getByRole("button", {name: "Preview approved workbook"})).toBeEnabled();
 });

@@ -1,3 +1,5 @@
+import { Input } from "@/components/ui/input";
+import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from "@/components/ui/table";
@@ -7,6 +9,7 @@ type ExportPreview = {
   version_id: string;
   snapshot_id: string;
   snapshot_at: string;
+  scope: { location_id: string | null; kind: string };
   counts: { directory: number; unresolved_issues: number; sources: number; quarantined_rows: number; excluded_cross_scope_cases?: number; corrections?: number };
   scope_notice?: string;
   preview?: {limit: number; returned: Record<string, number>; truncated: Record<string, boolean>; complete_export: false};
@@ -22,12 +25,13 @@ async function check(response: Response) {
   return response;
 }
 export function ApprovedExportReview({ versionId }: { versionId: string }) {
+  const [officeId, setOfficeId] = useState("");
   const [preview, setPreview] = useState<ExportPreview | null>(null);
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
   const generation = useRef(0);
   useEffect(() => {
     generation.current += 1;
-    setPreview(null); setError(""); setBusy(false);
+    setPreview(null); setError(""); setBusy(false); setOfficeId("");
     return () => { generation.current += 1; };
   }, [versionId]);
   const base = `/api/feed-versions/${encodeURIComponent(versionId)}/review-export`;
@@ -35,9 +39,11 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
     const requestGeneration = ++generation.current;
     setBusy(true); setError(""); setPreview(null);
     try {
-      const data = await (await check(await fetch(`${base.replace("review-export", "review-preview")}?limit=5`))).json() as ExportPreview;
+      const params = new URLSearchParams({limit: "5"});
+      if (officeId !== "") params.set("location_id", officeId);
+      const data = await (await check(await fetch(`${base.replace("review-export", "review-preview")}?${params}`))).json() as ExportPreview;
       if (generation.current === requestGeneration) {
-        if (data.version_id !== versionId) throw new Error("Export preview does not match the selected dataset version.");
+        if (data.version_id !== versionId || data.scope?.location_id !== (officeId || null)) throw new Error("Export preview does not match the selected dataset version and office.");
         setPreview(data);
       }
     } catch (value) { if (generation.current === requestGeneration) setError(value instanceof Error ? value.message : String(value)); }
@@ -48,7 +54,9 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
     const requestGeneration = ++generation.current;
     setBusy(true); setError("");
     try {
-      const response = await check(await fetch(`${base}?${new URLSearchParams({ format, expected_snapshot: preview.snapshot_id })}`));
+      const params = new URLSearchParams({format, expected_snapshot: preview.snapshot_id});
+      if (preview.scope.location_id !== null) params.set("location_id", preview.scope.location_id);
+      const response = await check(await fetch(`${base}?${params}`));
       const blob = await response.blob();
       if (generation.current !== requestGeneration) return;
       const url = URL.createObjectURL(blob), anchor = document.createElement("a");
@@ -61,9 +69,11 @@ export function ApprovedExportReview({ versionId }: { versionId: string }) {
   return <section className="mf-export-review" aria-label="Approved export review">
     <h3>Review the handoff</h3>
     <p>Prepare the approved directory with separate unresolved issues and source evidence. Later unapproved deliveries do not replace this directory.</p>
+    <Field><FieldLabel htmlFor="handoff-office-id">Source office ID (optional)</FieldLabel><Input id="handoff-office-id" value={officeId} onChange={event => { generation.current += 1; setOfficeId(event.target.value); setPreview(null); setError(""); setBusy(false); }} /><FieldDescription>Leave blank for the entire approved roster, or enter an exact office ID from the source. This is not a clinician ID.</FieldDescription></Field>
     <Button variant="outline" disabled={busy} onClick={() => void load()}>{busy ? "Preparing export…" : "Preview approved workbook"}</Button>
     {error && <Alert variant="destructive"><AlertDescription>{error} Refresh the preview before downloading.</AlertDescription></Alert>}
     {preview?.version_id === versionId && <>
+      <p><strong>Handoff scope:</strong> {preview.scope.location_id === null ? "Entire approved roster" : `Source office ${preview.scope.location_id}`}</p>
       <dl className="mf-summary-counts">
         <div><dt>Directory rows</dt><dd>{preview.counts.directory}</dd></div>
         <div><dt>Unresolved issues</dt><dd>{preview.counts.unresolved_issues}</dd></div>

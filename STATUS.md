@@ -47,3 +47,9 @@ Production-model client quality on its frozen corpus, broader generalization and
 ## Correction comparison paging — 2026-11-21
 
 Operators can filter the complete persisted corrected-roster comparison by status and page through it before dataset approval. The page endpoint requires the inspected report hash; mismatches return a conflict. Full counts and the existing complete JSON report remain available. Tests cover a changed 51st office, filtered/empty results, invalid limits/status and stale hash, plus actual desktop/mobile review. Python 920, frontend 155, production build and full browser 76 passed. The service currently reads the complete persisted report before slicing; no constant-time or capacity claim is made.
+
+## Office-scoped handoff — 2026-11-21
+
+The approved handoff UI can select an exact source-native office ID or the entire roster. It validates response scope and carries the same ID and snapshot token through JSON/XLSX downloads; changing the selection clears earlier download eligibility, including an in-flight preview. Unknown offices return an error. The backend office scope and its complete workbook semantics were already implemented.
+
+Frontend 158 and production build passed on the final rerun. The full browser run had 75 passes and one desktop three-source identity-review timeout; that exact case passed on an isolated rerun. Final scoped JSON/XLSX correction journeys passed separately on desktop and mobile. A repeated frontend run initially had two unrelated timing failures under load; the full rerun passed. No new backend semantics or measurements are claimed.

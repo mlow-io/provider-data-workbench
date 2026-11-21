@@ -91,6 +91,30 @@ test('reviewed phone creates a separately approved candidate with complete corre
   expect(workbook['Reviewed corrections']).toBeTruthy();
   expect(JSON.stringify(workbook['Reviewed corrections'])).toContain('6175550199');
   expect(JSON.stringify(workbook['Reviewed corrections'])).toContain('0042');
+  await page.getByLabel('Source office ID (optional)').fill('NORTH');
+  await expect(page.getByRole('button',{name:'Download reviewed data JSON'})).toHaveCount(0);
+  await page.getByRole('button',{name:'Preview approved workbook'}).click();
+  await expect(page.getByText('Source office NORTH',{exact:false})).toBeVisible();
+  const scopedDownload = page.waitForEvent('download');
+  await page.getByRole('button',{name:'Download reviewed data JSON'}).click();
+  const scoped = JSON.parse(readFileSync((await (await scopedDownload).path())!, 'utf8'));
+  expect(scoped.scope.location_id).toBe('NORTH');
+  expect(scoped.directory).toHaveLength(1);
+  expect(scoped.directory[0].phone_extension).toBe('0042');
+  expect(scoped.corrections).toHaveLength(1);
+  const scopedXlsxDownload = page.waitForEvent('download');
+  await page.getByRole('button',{name:'Download reviewed workbook XLSX'}).click();
+  const scopedPath = info.outputPath('north-correction.xlsx');
+  await (await scopedXlsxDownload).saveAs(scopedPath);
+  const scopedWorkbook = JSON.parse(execFileSync('python3',['-c',"import json,sys; from openpyxl import load_workbook; w=load_workbook(sys.argv[1],read_only=True,data_only=True); print(json.dumps({s:list(w[s].values) for s in w.sheetnames},default=str))",scopedPath],{encoding:'utf8'}));
+  expect(scopedWorkbook.Directory).toHaveLength(2); // Header plus NORTH only.
+  expect(JSON.stringify(scopedWorkbook.Directory)).toContain('NORTH');
+  expect(JSON.stringify(scopedWorkbook.Directory)).not.toContain('SOUTH');
+  expect(JSON.stringify(scopedWorkbook['Reviewed corrections'])).toContain('0042');
+  await page.getByLabel('Source office ID (optional)').fill('UNKNOWN-OFFICE');
+  await page.getByRole('button',{name:'Preview approved workbook'}).click();
+  await expect(page.getByRole('alert')).toContainText('Office not present');
+  await expect(page.getByRole('button',{name:'Download reviewed data JSON'})).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
 
   // A later source delivery repeats the original phone. Source-to-source is

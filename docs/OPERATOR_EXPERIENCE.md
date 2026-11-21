@@ -105,3 +105,5 @@ A later file keeps its source-to-source comparison against retained observations
 During selected-version loading, show progress without an editable attribution placeholder. Reviewer/reason controls become available with the actual selected evidence, preventing input into a form that will be replaced by the arriving version.
 
 When reviewing a later delivery, use **Filter correction comparisons** to inspect changed, missing, invalid or unresolved offices across the full persisted report. Previous/Next pages retain the selected report hash. The counts summarize all corrected offices; the filter controls the displayed entries. The complete quality-report JSON remains available before approval.
+
+For a handoff covering one office, enter its exact source office ID in the approved export review before previewing. The preview names the scope and its downloads use the same selection; clear the field to return to the entire roster. The ID is source-native, not a reviewed clinician identity. Changing it invalidates the previous preview.
