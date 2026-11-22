@@ -7,6 +7,7 @@ import type {
   FeedVersionDetail,
   IntakeSession,
   ManagedFeedSummary,
+  PhoneReviewScope,
   SchemaCatalogStatus,
   SchemaVariantSummary,
   SourceSchemaInspection,
@@ -24,13 +25,31 @@ export function isDemoMode(): boolean {
   return false;
 }
 
+/** A response the server refused; a request without one may still have been applied. */
+export class RequestRejected extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+  }
+}
+
 async function httpJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, init);
   if (!response.ok) {
     const body = await response.json().catch(() => ({ detail: `HTTP ${response.status}` }));
-    throw new Error(typeof body.detail === "string" ? body.detail : `Request failed (${response.status})`);
+    throw new RequestRejected(
+      typeof body.detail === "string" ? body.detail : `Request failed (${response.status})`,
+      response.status
+    );
   }
   return response.json() as Promise<T>;
+}
+
+function postJson<T>(path: string, payload: unknown): Promise<T> {
+  return httpJson<T>(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 }
 
 const liveSessions = new Map<string, { payloadText: string; mapping: Record<string, string> }>();
@@ -370,6 +389,57 @@ export const dataClient = {
       committed: committed.preview?.valid_count ?? 0,
       quarantined: committed.preview?.quarantined_count ?? 0,
     };
+  },
+
+  async phoneReviews(): Promise<PhoneReviewScope[]> {
+    if (isDemoMode()) return demoClient.phoneReviews();
+    const res = await httpJson<{ items: PhoneReviewScope[] }>("/api/workbench/phone-reviews");
+    return res.items;
+  },
+
+  async decidePhone(params: {
+    scope: PhoneReviewScope;
+    selectedRef: string;
+    requestId: string;
+    actor: string;
+    reason: string;
+  }): Promise<void> {
+    if (isDemoMode()) return demoClient.decidePhone(params);
+    await postJson("/api/reconciliation/field-decisions", {
+      clinician_id: params.scope.clinician_id,
+      location_id: params.scope.location_id,
+      field: "phone",
+      decision: "select",
+      selected_ref: params.selectedRef,
+      expected_snapshot: params.scope.snapshot,
+      expected_decision: params.scope.decision?.id ?? null,
+      request_id: params.requestId,
+      actor: params.actor,
+      reason: params.reason,
+    });
+  },
+
+  async createPhoneCandidate(params: {
+    scope: PhoneReviewScope;
+    idempotencyKey: string;
+    actor: string;
+    reason: string;
+  }): Promise<FeedVersionDetail> {
+    const { scope } = params;
+    if (!scope.base_version || !scope.decision) throw new Error("A selected phone decision and approved base are required");
+    if (isDemoMode()) return demoClient.createPhoneCandidate(params);
+    return postJson<FeedVersionDetail>(
+      `/api/feed-versions/${encodeURIComponent(scope.base_version)}/field-materialization`,
+      {
+        clinician_id: scope.clinician_id,
+        location_id: scope.location_id,
+        snapshot: scope.snapshot,
+        decision_id: scope.decision.id,
+        actor: params.actor,
+        reason: params.reason,
+        idempotency_key: params.idempotencyKey,
+      }
+    );
   },
 
   async feeds(): Promise<ManagedFeedSummary[]> {

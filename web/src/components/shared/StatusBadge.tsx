@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { riskLabel, statusLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-export function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status, label }: { status: string; label?: string }) {
   const tone =
     status === "verified" || status === "resolved" || status === "approved" || status === "exact"
       ? "bg-status-success-bg text-status-success border-transparent"
@@ -18,7 +18,7 @@ export function StatusBadge({ status }: { status: string }) {
 
   return (
     <Badge variant="outline" className={cn("font-medium", tone)}>
-      {statusLabel(status)}
+      {label ?? statusLabel(status)}
     </Badge>
   );
 }

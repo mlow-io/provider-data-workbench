@@ -1,4 +1,4 @@
-export type WorkspaceView = "work" | "intake" | "deliveries" | "directory";
+export type WorkspaceView = "work" | "intake" | "corrections" | "deliveries" | "directory";
 
 export interface WorkbenchOverview {
   total_providers: number;
@@ -262,10 +262,32 @@ export interface ManagedFeedSummary {
   versions: FeedVersionSummary[];
 }
 
+export interface PhoneValue {
+  number: string | null;
+  extension: string | null;
+}
+
+/** Pinned lineage of a roster candidate created from one reviewed phone decision. */
+export interface PhoneMaterialization {
+  base_version: string;
+  clinician_id: string;
+  location_id: string;
+  decision_id: string;
+  decision_reason: string;
+  row_locator: string;
+  old_value: PhoneValue;
+  new_value: PhoneValue;
+  selected_evidence: { source: string; locator: string };
+  actor: string;
+  reason: string;
+}
+
 export interface FeedVersionDetail {
   id: string;
   feed_id: string;
   state: "candidate" | "approved" | "rejected";
+  kind?: string;
+  manifest?: { materialization?: PhoneMaterialization };
   current_version: string | null;
   created_at: string;
   row_count: number;
@@ -319,6 +341,53 @@ export interface FeedVersionDetail {
     normalized: Record<string, unknown>;
     problems: string[];
     comparison?: string;
+    materialization?: PhoneMaterialization;
+  }>;
+}
+
+export interface PhoneSourceOption {
+  ref: string;
+  source: string;
+  number: string | null;
+  extension: string | null;
+  locator: string;
+  selectable: boolean;
+  findings: string[];
+  from_approved_roster: boolean;
+}
+
+export type PhoneCorrectionState =
+  | { status: "not_selected" | "no_roster" }
+  | { status: "no_change" | "ineligible"; reason: string }
+  | { status: "eligible"; row_locator: string; old_value: PhoneValue; new_value: PhoneValue };
+
+/** One reviewed clinician/office scope; both identity links are required to appear here. */
+export interface PhoneReviewScope {
+  clinician_id: string;
+  clinician_label: string;
+  location_id: string;
+  location_label: string;
+  snapshot: string;
+  inputs_fresh: boolean;
+  status: string;
+  sources_agree: boolean;
+  options: PhoneSourceOption[];
+  decision: {
+    id: string;
+    decision: string;
+    selected_ref: string | null;
+    actor: string;
+    reason: string;
+    created_at: string;
+  } | null;
+  base_version: string | null;
+  correction: PhoneCorrectionState;
+  candidates: Array<{
+    version_id: string;
+    state: "candidate" | "approved" | "rejected";
+    decision_id: string;
+    old_value: PhoneValue;
+    new_value: PhoneValue;
   }>;
 }
 

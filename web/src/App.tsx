@@ -5,11 +5,12 @@ import { dataClient } from "@/lib/dataClient";
 import type { WorkspaceView } from "@/lib/types";
 import { DeliveriesPage } from "@/pages/DeliveriesPage";
 import { ImportAdaptPage } from "@/pages/ImportAdaptPage";
+import { PhoneCorrectionsPage } from "@/pages/PhoneCorrectionsPage";
 import { ProviderDirectoryPage } from "@/pages/ProviderDirectoryPage";
 import { WorkQueuePage } from "@/pages/WorkQueuePage";
 import { useWorkspaceQuery } from "@/workspaceNavigation";
 
-const VIEWS: WorkspaceView[] = ["work", "intake", "deliveries", "directory"];
+const VIEWS: WorkspaceView[] = ["work", "intake", "corrections", "deliveries", "directory"];
 
 export function App() {
   const queryClient = useQueryClient();
@@ -41,6 +42,8 @@ export function App() {
         <WorkQueuePage />
       ) : workspace === "intake" ? (
         <ImportAdaptPage />
+      ) : workspace === "corrections" ? (
+        <PhoneCorrectionsPage />
       ) : workspace === "deliveries" ? (
         <DeliveriesPage />
       ) : (

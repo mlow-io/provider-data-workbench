@@ -348,11 +348,12 @@ def seed_tennessee_demo(store: IntakeStore, schema_catalog: Any = None) -> dict[
             **actor_meta,
         },
     )
+    location_ids: dict[str, str] = {}
     for clinic in TN_CLINICS:
-        store.create_catalog(
+        location_ids[clinic["zip"]] = store.create_catalog(
             "locations",
             {"label": clinic["name"], "organization_id": group_org["id"], **actor_meta},
-        )
+        )["id"]
 
     baseline_csv = _csv_bytes(_build_rows("2026-11-02"))
     candidate_csv = _csv_bytes(_build_rows("2026-11-16", include_franklin=False, update_morales=True, include_bad=True))
@@ -585,4 +586,106 @@ def seed_tennessee_demo(store: IntakeStore, schema_catalog: Any = None) -> dict[
                 expected_revision=snapshot.revision,
             )
 
-    return {"seeded": True, "feed_id": feed["id"], "approved_version": v1_id, "held_version": v2_id}
+    phone_review = _seed_phone_review(store, v1_detail["manifest"], location_ids)
+
+    return {
+        "seeded": True,
+        "feed_id": feed["id"],
+        "approved_version": v1_id,
+        "held_version": v2_id,
+        "phone_review": phone_review,
+    }
+
+
+# Payer directory assertions for the two offices Dr. Okafor shares with the clinic roster.
+PAYER_DIRECTORY_SOURCE = "volunteer-directory"
+PAYER_DIRECTORY_RECORDS: list[dict[str, str]] = [
+    {"record_id": "VHP-BRNT-PARK", "location_id": "BRNT-PARK", "phone": "6155550139"},
+    {"record_id": "VHP-NASH-MAIN", "location_id": "NASH-MAIN", "phone": "6155550101"},
+]
+OKAFOR_NPI = "1990001038"
+OKAFOR_NAME = "Dr. Samuel Okafor, MD"
+
+
+def _seed_phone_review(store: IntakeStore, roster_manifest: dict[str, Any], location_ids: dict[str, str]) -> dict[str, Any]:
+    """Prepare reviewed identity links so an operator can choose an office phone.
+
+    The seed approves clinician and office links only. The phone choice itself,
+    candidate creation and dataset approval stay operator actions in the UI.
+    """
+    import uuid
+
+    from .identity_review import IdentityReview
+    from .reconciliation_store import ReconciliationStore
+
+    records = []
+    for item in PAYER_DIRECTORY_RECORDS:
+        clinic = _CLINIC_BY_CODE[item["location_id"]]
+        records.append(
+            {
+                "record_id": item["record_id"],
+                "npi": OKAFOR_NPI,
+                "provider_name": OKAFOR_NAME,
+                "entity_type": "clinician",
+                "address": clinic["address"],
+                "city": clinic["city"],
+                "state": clinic["state"],
+                "zip": clinic["zip"],
+                "phone": item["phone"],
+                "location_id": item["location_id"],
+            }
+        )
+    reference = store.receive(
+        json.dumps(records, indent=2).encode(),
+        "volunteer-directory-extract-2026-11-14.json",
+        source=PAYER_DIRECTORY_SOURCE,
+        designation="synthetic",
+    )
+    comparison = ReconciliationStore(store)
+    run = comparison.create_run(
+        {
+            "inputs": [
+                {"receipt_id": roster_manifest["receipt_id"], "attempt_id": roster_manifest["attempt_id"], "entity_kind": "clinician"},
+                {"receipt_id": reference["id"], "attempt_id": reference["attempt_id"], "entity_kind": "clinician"},
+            ],
+            "actor": "Operations Lead",
+            "reason": "Compare approved clinic roster with Volunteer payer directory extract",
+        }
+    )
+    review = IdentityReview(store)
+
+    def approve(candidate: dict[str, Any], reason: str, **target: str) -> str:
+        context = review.inspect(run["id"], candidate["id"])
+        decision = review.decide(
+            {
+                "run_id": run["id"],
+                "candidate_id": candidate["id"],
+                "decision": "approve",
+                "request_id": uuid.uuid4().hex,
+                "expected_snapshot": context["review_snapshot"],
+                "expected_revisions": {ref: link["id"] if link else None for ref, link in context["current_links"].items()},
+                "expected_decision": context["latest_decision"]["id"] if context["latest_decision"] else None,
+                "actor": "Operations Lead",
+                "reason": reason,
+                **target,
+            }
+        )
+        return decision["decision"]["target_id"]
+
+    def same_office(candidate: dict[str, Any]) -> bool:
+        left, right = candidate["left_record"]["comparison"], candidate["right_record"]["comparison"]
+        return left["npi"] == right["npi"] == OKAFOR_NPI and left["address"]["line1"] == right["address"]["line1"]
+
+    # Link only same-office pairs; a shared NPI alone never selects an office.
+    clinician_id = None
+    for candidate in comparison.candidates(run["id"], kind="clinician", eligible=True, limit=100)["items"]:
+        if same_office(candidate):
+            target = {"target_id": clinician_id} if clinician_id else {"new_label": OKAFOR_NAME}
+            clinician_id = approve(candidate, "Same NPI, name and office address in both sources", **target)
+    # Office links target the existing catalog locations rather than new duplicates.
+    linked: list[str] = []
+    for candidate in comparison.candidates(run["id"], kind="location", eligible=True, limit=100)["items"]:
+        if same_office(candidate):
+            target_id = location_ids[candidate["left_record"]["comparison"]["address"]["zip_base"]]
+            linked.append(approve(candidate, "Same street address and suite in both sources", target_id=target_id))
+    return {"run_id": run["id"], "clinician_id": clinician_id, "location_ids": sorted(set(linked)), "reference_receipt": reference["id"]}

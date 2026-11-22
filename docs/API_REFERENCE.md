@@ -8,6 +8,7 @@ All routes are served by FastAPI (`provider_directory_truth_layer.intake_api:cre
 |---|---|---|
 | `GET` | `/api/workbench/overview` | Executive & operations KPIs (`clean_rate_pct`, `open_discrepancies`, `held_deliveries`, `sla_at_risk`, `quarantined_rows`, `schema_variants_count`) |
 | `GET` | `/api/workbench/directory` | Deduplicated clinician-location listings (`?search=&location=&network=`), Luhn NPI check status, and open issue counts |
+| `GET` | `/api/workbench/phone-reviews` | Reviewed clinician/office phone scopes: source assertions, current decision, correction eligibility against the current approved roster, and derived candidates. A scope requires both a reviewed clinician link and a reviewed office link; bounded to 50 clinicians |
 | `GET` | `/api/schema-catalog/status` | Embedded `provider-network-intake` catalog revision and active reviewed schema variants |
 | `POST` | `/api/intakes/{receipt_id}/source-schema/inspect` | Inspect CSV headers against scoped `provider-network-intake` variants |
 | `POST` | `/api/intakes/{receipt_id}/source-schema/preview` | Preview Luhn NPI checks, transforms, value maps, and findings with pinned `preview_token` |
@@ -37,6 +38,15 @@ All routes are served by FastAPI (`provider_directory_truth_layer.intake_api:cre
 | `GET` | `/api/feed-versions/{version_id}` | Candidate or approved dataset version detail and diff counts |
 | `GET` | `/api/feed-versions/{version_id}/quality-report` | Complete unclipped quality & comparison findings JSON |
 | `POST` | `/api/feed-versions/{version_id}/exceptions` | Acknowledge or defer a soft quality hold (`expected_report` required) |
-| `POST` | `/api/feed-versions/{version_id}/decide` | Approve or reject a dataset version (`expected_report`, `expected_current`, `idempotency_key`) |
+| `POST` | `/api/feed-versions/{version_id}/decide` | Approve or reject a dataset version (`expected_report`, `expected_current`, `idempotency_key`). A correction candidate is rechecked against its pinned base, links, decision and source file |
+| `GET` | `/api/feed-versions/{version_id}/field-materialization` | Paged selected office-phone decisions that would change exactly one row of this current approved version |
+| `POST` | `/api/feed-versions/{version_id}/field-materialization` | Create an immutable roster candidate from one selected phone decision (`clinician_id`, `location_id`, `snapshot`, `decision_id`, `actor`, `reason`, `idempotency_key`). Never approves or promotes |
+
+## Reviewed field decisions
+
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/reconciliation/fields/{clinician_id}` | Field view for a reviewed clinician, optionally at one `location_id`, with every source assertion and decision history |
+| `POST` | `/api/reconciliation/field-decisions` | Append a `select` or `conflict` decision (`expected_snapshot`, `expected_decision`, `request_id`). Changes no source observation or roster value |
 | `GET` | `/api/feed-versions/{version_id}/review-preview` | Snapshot-pinned export preview (`location_id` optional for single-office scope) |
 | `GET` | `/api/feed-versions/{version_id}/review-export` | Download complete `xlsx` or `json` approved roster (`expected_snapshot` required for `xlsx`) |

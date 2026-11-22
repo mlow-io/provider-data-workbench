@@ -12,6 +12,7 @@ Provider Data Workbench combines a deterministic Python/FastAPI/SQLite operation
 
 - **Prevents silent ghost networks:** Recurring deliveries that omit an active office (such as Franklin Cool Springs Clinic in a partial EHR extract) are held automatically while the last approved directory version stays live for consumers.
 - **Separates schema review from operational approval:** Powered by [`provider-network-intake`](https://github.com/mlow-io/provider-network-intake), analysts (or proposal-only AI/MCP tools) review renamed headers and inverted boolean flags once, then replay every future delivery deterministically with zero LLM calls.
+- **Reviewed corrections become approved data, not just notes:** When the clinic roster and a payer directory disagree on an office phone, an operator picks the value, the workbench builds a complete candidate roster that changes only that office's row, and a separate approval promotes it with pinned lineage. A clinician's other offices are never touched, and NPI alone never selects an office.
 - **Visual field-level triage & append-only audit trail:** Operators inspect exact before/after diffs (`Clinic Roster` vs `NPPES` / `Payer`), record outreach and corrections under optimistic concurrency, and export snapshot-pinned XLSX/JSON rosters scoped to an entire network or a single clinic.
 - **CMS NPI check-digit validation & bounded FHIR/NPPES support:** Validates 10-digit NPIs with the CMS ISO 7812 Luhn algorithm (`80840` prefix) and conservatively interprets saved NPPES API 2.1 and FHIR R4 / Plan-Net 1.2.0 Bundles.
 
@@ -70,7 +71,7 @@ provider-truth-layer rehearse-operations --root .runtime/rehearsal-1
 - [Data Model](docs/DATA_MODEL.md) — Clinician/office/network separation, SQLite triggers, and quarantine rules
 - [Healthcare Standards](docs/FHIR_AND_STANDARDS.md) — No Surprises Act SLAs, FHIR R4 / Plan-Net 1.2 subset, CMS NPI Luhn checks, and AI boundaries
 - [API Reference](docs/API_REFERENCE.md) — REST endpoints and concurrency guards
-- [3-Minute Demo Walkthrough](docs/DEMO_WALKTHROUGH.md) — Guided click-through of all four operator views
+- [3-Minute Demo Walkthrough](docs/DEMO_WALKTHROUGH.md) — Guided click-through of all five operator views
 
 ## Scope & non-goals
 

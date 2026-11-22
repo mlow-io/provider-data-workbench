@@ -7,6 +7,11 @@ import type {
   IntakeSampleOption,
   IntakeSession,
   ManagedFeedSummary,
+  PhoneCorrectionState,
+  PhoneMaterialization,
+  PhoneReviewScope,
+  PhoneSourceOption,
+  PhoneValue,
   SchemaCatalogStatus,
   SchemaVariantSummary,
   SourceSchemaInspection,
@@ -124,6 +129,17 @@ export const SAMPLE_OPTIONS: IntakeSampleOption[] = [
   },
 ];
 
+interface DemoPhoneScope {
+  clinician_id: string;
+  clinician_label: string;
+  location_id: string;
+  location_code: string;
+  location_label: string;
+  options: PhoneSourceOption[];
+  decision: PhoneReviewScope["decision"];
+  revision: number;
+}
+
 interface DemoState {
   directory: DirectoryRecord[];
   cases: WorkCaseDetail[];
@@ -132,6 +148,120 @@ interface DemoState {
   feeds: ManagedFeedSummary[];
   versions: Record<string, FeedVersionDetail>;
   intakes: Record<string, { session: IntakeSession; rawText: string }>;
+  phoneScopes: DemoPhoneScope[];
+  /** Request key → result, so a retried request returns its original outcome. */
+  phoneRequests: Record<string, { hash: string; versionId?: string }>;
+}
+
+const OKAFOR_NPI = "1990001038";
+// Payer directory assertions for the two offices Dr. Okafor shares with the clinic roster.
+const PAYER_DIRECTORY_PHONES: Array<{ code: string; label: string; phone: string }> = [
+  { code: "BRNT-PARK", label: "Brentwood Maryland Farms", phone: "6155550139" },
+  { code: "NASH-MAIN", label: "Nashville Midtown Clinic", phone: "6155550101" },
+];
+
+function buildPhoneScopes(rows: FeedVersionDetail["rows"]): DemoPhoneScope[] {
+  return PAYER_DIRECTORY_PHONES.map((office, index) => {
+    const roster = rows.find(
+      (r) => r.normalized.npi === OKAFOR_NPI && r.normalized.location_id === office.code
+    );
+    if (!roster) throw new Error(`Demo roster lacks Dr. Okafor at ${office.code}`);
+    return {
+      clinician_id: "clin-okafor",
+      clinician_label: "Dr. Samuel Okafor, MD",
+      location_id: `loc-${office.code.toLowerCase()}`,
+      location_code: office.code,
+      location_label: office.label,
+      decision: null,
+      revision: 0,
+      options: [
+        {
+          ref: `ref-volunteer-${office.code.toLowerCase()}`,
+          source: "volunteer-directory",
+          number: office.phone,
+          extension: null,
+          locator: `$[${index}]`,
+          selectable: true,
+          findings: [],
+          from_approved_roster: false,
+        },
+        {
+          ref: `ref-roster-${office.code.toLowerCase()}`,
+          source: "cumberland-clinic",
+          number: String(roster.normalized.phone ?? ""),
+          extension: null,
+          locator: roster.locator,
+          selectable: true,
+          findings: [],
+          from_approved_roster: true,
+        },
+      ],
+    };
+  });
+}
+
+function phoneSnapshot(scope: DemoPhoneScope): string {
+  return `demo-snap-${scope.location_code}-${scope.revision}`;
+}
+
+function samePhone(a: PhoneValue, b: PhoneValue): boolean {
+  return a.number === b.number && (a.extension ?? null) === (b.extension ?? null);
+}
+
+function phoneScopeView(scope: DemoPhoneScope): PhoneReviewScope {
+  const feed = state.feeds[0];
+  const base = feed?.current_version ? state.versions[feed.current_version] : undefined;
+  const values = new Set(scope.options.filter((o) => o.selectable).map((o) => `${o.number}|${o.extension}`));
+  const candidates = Object.values(state.versions)
+    .filter(
+      (v) =>
+        v.manifest?.materialization?.clinician_id === scope.clinician_id &&
+        v.manifest.materialization.location_id === scope.location_id
+    )
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .map((v) => ({
+      version_id: v.id,
+      state: v.state,
+      decision_id: v.manifest!.materialization!.decision_id,
+      old_value: v.manifest!.materialization!.old_value,
+      new_value: v.manifest!.materialization!.new_value,
+    }));
+  let correction: PhoneCorrectionState = { status: "not_selected" };
+  if (!base) {
+    correction = { status: "no_roster" };
+  } else if (scope.decision) {
+    const option = scope.options.find((o) => o.ref === scope.decision!.selected_ref);
+    const row = base.rows.find(
+      (r) =>
+        r.problems.length === 0 &&
+        r.normalized.npi === OKAFOR_NPI &&
+        r.normalized.location_id === scope.location_code
+    );
+    if (!option || !row) {
+      correction = { status: "ineligible", reason: "Reviewed identity must link exactly one eligible row in this dataset version" };
+    } else {
+      const old_value = { number: String(row.normalized.phone ?? ""), extension: (row.normalized.phone_extension as string | undefined) ?? null };
+      const new_value = { number: option.number, extension: option.extension };
+      correction = samePhone(old_value, new_value)
+        ? { status: "no_change", reason: "Selected phone does not change this row" }
+        : { status: "eligible", row_locator: row.locator, old_value, new_value };
+    }
+  }
+  return {
+    clinician_id: scope.clinician_id,
+    clinician_label: scope.clinician_label,
+    location_id: scope.location_id,
+    location_label: scope.location_label,
+    snapshot: phoneSnapshot(scope),
+    inputs_fresh: true,
+    status: scope.decision ? "selected" : "unreviewed",
+    sources_agree: values.size <= 1,
+    options: structuredClone(scope.options),
+    decision: structuredClone(scope.decision),
+    base_version: base?.id ?? null,
+    correction,
+    candidates,
+  };
 }
 
 function buildInitialDirectory(): DirectoryRecord[] {
@@ -1018,6 +1148,10 @@ function buildInitialState(): DemoState {
     },
   };
 
+  // The directory shows Okafor's payer-verified Brentwood phone; the approved roster
+  // file still carries the clinic's original value until a reviewed correction lands.
+  const rosterPhone = (item: DirectoryRecord) =>
+    item.id === `${OKAFOR_NPI}:BRNT-PARK` ? "6155550103" : item.phone;
   const v1Rows = directory.map((item, idx) => ({
     locator: `row:${idx + 2}`,
     original: {
@@ -1026,7 +1160,7 @@ function buildInitialState(): DemoState {
       provider_name: item.provider_name,
       location_id: item.location_code,
       location_name: item.location_name,
-      phone: item.phone,
+      phone: rosterPhone(item),
       Dir_Exclude_Flag: item.directory_visible ? "N" : "Y",
     },
     normalized: {
@@ -1038,7 +1172,7 @@ function buildInitialState(): DemoState {
       city: item.city,
       state: item.state,
       zip: item.zip,
-      phone: item.phone,
+      phone: rosterPhone(item),
     },
     problems: [],
     comparison: "new",
@@ -1218,6 +1352,8 @@ function buildInitialState(): DemoState {
       },
     },
     intakes: {},
+    phoneScopes: buildPhoneScopes(v1Rows),
+    phoneRequests: {},
   };
 }
 
@@ -1294,11 +1430,12 @@ export const demoClient = {
     const highRisk = openCases.filter((c) => c.risk_level === "high");
     const clean = state.directory.filter((d) => d.open_issues === 0).length;
     const heldCount = state.feeds.reduce(
-      (acc, f) => acc + f.versions.filter((v) => v.state === "candidate").length,
+      (acc, f) =>
+        acc + f.versions.filter((v) => v.state === "candidate" && v.kind !== "derived_field_candidate").length,
       0
     );
     const quarantined = Object.values(state.versions)
-      .filter((v) => v.state === "candidate")
+      .filter((v) => v.state === "candidate" && v.kind !== "derived_field_candidate")
       .reduce((acc, v) => acc + Number(v.report.counts.quarantined ?? 0), 0);
     return {
       total_providers: new Set(state.directory.map((d) => d.npi)).size,
@@ -1721,6 +1858,120 @@ export const demoClient = {
     return { committed: valid, quarantined };
   },
 
+  async phoneReviews(): Promise<PhoneReviewScope[]> {
+    return state.phoneScopes.map(phoneScopeView);
+  },
+
+  async decidePhone(params: {
+    scope: PhoneReviewScope;
+    selectedRef: string;
+    requestId: string;
+    actor: string;
+    reason: string;
+  }): Promise<void> {
+    const hash = JSON.stringify([params.scope.location_id, params.scope.snapshot, params.selectedRef, params.actor, params.reason]);
+    const prior = state.phoneRequests[params.requestId];
+    if (prior) {
+      if (prior.hash !== hash) throw new Error("Request ID already used with different field decision content");
+      return;
+    }
+    const scope = state.phoneScopes.find((s) => s.location_id === params.scope.location_id && s.clinician_id === params.scope.clinician_id);
+    if (!scope) throw new Error("Reviewed clinician not found");
+    if (phoneSnapshot(scope) !== params.scope.snapshot) throw new Error("Source/link/field snapshot changed; inspect and review again");
+    if ((scope.decision?.id ?? null) !== (params.scope.decision?.id ?? null)) throw new Error("Field decision changed; review again");
+    if (!scope.options.some((o) => o.ref === params.selectedRef && o.selectable)) {
+      throw new Error("Select a valid source assertion in this exact reviewed scope");
+    }
+    scope.decision = {
+      id: `dec-${scope.location_code.toLowerCase()}-${scope.revision + 1}`,
+      decision: "select",
+      selected_ref: params.selectedRef,
+      actor: params.actor,
+      reason: params.reason,
+      created_at: new Date().toISOString(),
+    };
+    scope.revision += 1;
+    state.phoneRequests[params.requestId] = { hash };
+  },
+
+  async createPhoneCandidate(params: {
+    scope: PhoneReviewScope;
+    idempotencyKey: string;
+    actor: string;
+    reason: string;
+  }): Promise<FeedVersionDetail> {
+    const { scope: requested } = params;
+    const key = `materialize:${params.idempotencyKey}`;
+    const hash = JSON.stringify([requested.base_version, requested.location_id, requested.snapshot, requested.decision?.id, params.actor, params.reason]);
+    const prior = state.phoneRequests[key];
+    if (prior) {
+      if (prior.hash !== hash) throw new Error("Request key already used with different inputs");
+      return structuredClone(state.versions[prior.versionId!]);
+    }
+    const scope = state.phoneScopes.find((s) => s.location_id === requested.location_id && s.clinician_id === requested.clinician_id);
+    const feed = state.feeds[0];
+    const base = requested.base_version ? state.versions[requested.base_version] : undefined;
+    if (!scope || !feed || !base || base.state !== "approved" || feed.current_version !== base.id) {
+      throw new Error("Base must be the current approved version");
+    }
+    if (phoneSnapshot(scope) !== requested.snapshot) throw new Error("Reviewed source, link or field snapshot changed; inspect again");
+    const view = phoneScopeView(scope);
+    if (!scope.decision || scope.decision.id !== requested.decision?.id) throw new Error("A current selected phone decision is required");
+    if (view.correction.status !== "eligible") {
+      throw new Error("reason" in view.correction ? view.correction.reason : "Selected phone is not eligible for a candidate");
+    }
+    if (view.candidates.some((c) => c.decision_id === scope.decision!.id && state.versions[c.version_id]?.manifest?.materialization?.base_version === base.id)) {
+      throw new Error("This reviewed decision already has a candidate for this base; reuse its original request key");
+    }
+    const correction = view.correction;
+    const option = scope.options.find((o) => o.ref === scope.decision!.selected_ref)!;
+    const lineage: PhoneMaterialization = {
+      base_version: base.id,
+      clinician_id: scope.clinician_id,
+      location_id: scope.location_id,
+      decision_id: scope.decision.id,
+      decision_reason: scope.decision.reason,
+      row_locator: correction.row_locator,
+      old_value: correction.old_value,
+      new_value: correction.new_value,
+      selected_evidence: { source: option.source, locator: option.locator },
+      actor: params.actor,
+      reason: params.reason,
+    };
+    const id = `ver-correction-${Object.keys(state.versions).length + 1}`;
+    const created_at = new Date().toISOString();
+    const rows = structuredClone(base.rows).map((row) =>
+      row.locator === correction.row_locator
+        ? { ...row, normalized: { ...row.normalized, phone: correction.new_value.number, phone_extension: correction.new_value.extension }, materialization: lineage }
+        : row
+    );
+    state.versions[id] = {
+      ...structuredClone(base),
+      id,
+      state: "candidate",
+      kind: "derived_field_candidate",
+      manifest: { materialization: lineage },
+      current_version: base.id,
+      created_at,
+      decision: null,
+      report_hash: `hash-${id}`,
+      rows,
+    };
+    state.feeds = state.feeds.map((f) =>
+      f.id === base.feed_id
+        ? {
+            ...f,
+            versions: [
+              { id, created_at, state: "candidate", delivery_id: base.delivery.delivery_id, period: base.delivery.period, kind: "derived_field_candidate" },
+              ...f.versions,
+            ],
+          }
+        : f
+    );
+    state.phoneRequests[key] = { hash, versionId: id };
+    return structuredClone(state.versions[id]);
+  },
+
   async feeds(): Promise<ManagedFeedSummary[]> {
     return structuredClone(state.feeds);
   },
@@ -1764,6 +2015,17 @@ export const demoClient = {
     const acked = new Set(version.review.filter((r) => r.disposition === "acknowledged").map((r) => r.code));
     if (params.decision === "approved" && holds.some((code) => !acked.has(code))) {
       throw new Error("Acknowledge all soft quality holds before approving this version");
+    }
+    const feed = state.feeds.find((f) => f.id === version.feed_id);
+    if (params.decision === "approved" && feed?.current_version !== version.current_version) {
+      throw new Error("Baseline or feed configuration changed; reprocess before approval");
+    }
+    const lineage = version.manifest?.materialization;
+    if (params.decision === "approved" && lineage) {
+      const scope = state.phoneScopes.find((s) => s.location_id === lineage.location_id && s.clinician_id === lineage.clinician_id);
+      if (feed?.current_version !== lineage.base_version || scope?.decision?.id !== lineage.decision_id) {
+        throw new Error("Pinned field materialization evidence changed; create a new candidate");
+      }
     }
     version.state = params.decision;
     version.decision = {
@@ -1822,7 +2084,7 @@ export const demoClient = {
         (c) => !["verified", "resolved", "deferred"].includes(c.status)
       ).length,
       quarantined_count: version.rows.filter((r) => r.problems.length > 0).length,
-      reviewed_corrections_count: state.cases.filter((c) => c.status === "verified").length,
+      reviewed_corrections_count: valid.filter((r) => r.materialization).length,
       directory_sample: scoped.slice(0, 5).map((r) => r.normalized),
     };
   },
@@ -1849,6 +2111,9 @@ export const demoClient = {
             location_scope: locationId ?? "ALL",
             row_count: valid.length,
             records: valid,
+            corrections: version.rows
+              .filter((r) => r.materialization && (!locationId || r.normalized.location_id === locationId))
+              .map((r) => ({ locator: r.locator, ...r.materialization })),
           },
           null,
           2
