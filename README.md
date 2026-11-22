@@ -1,74 +1,77 @@
-# Provider Directory Workbench
+# Provider Data Workbench
 
-A local application for importing inconsistent provider files, reviewing office discrepancies, and exporting approved datasets with traceable evidence.
+**A healthcare provider-directory operations console for catching ghost-network regressions, adapting messy clinic rosters, and exporting audit-ready directories.**
 
-An operator receives a clinic workbook and a later delivery that changes one office while omitting another. The workbench retains originals, applies reviewed cleaning rules, holds incomplete data and keeps the last approved version usable. A reviewed phone can become a new roster candidate; approval remains a separate action.
+Payers and medical groups face strict **No Surprises Act** directory timelines (90-day verification, 2-business-day updates), yet routine roster spreadsheets frequently drop active clinics, invert directory exclusion flags (`Dir_Exclude_Flag = Y`), or disagree with NPPES/payer records on scheduling phone numbers.
 
-**Python · FastAPI · React · TypeScript · shadcn/ui · Tailwind · SQLite**
+Provider Data Workbench combines a deterministic Python/FastAPI/SQLite operations backend, the [`provider-network-intake`](https://github.com/mlow-io/provider-network-intake) schema-adaptation library, and a clean React + shadcn/ui workstation.
 
-## What it does
+![Work queue KPI strip and discrepancy table](docs/images/workbench-overview.png)
 
-| Area | Implemented behavior |
+## Why it matters in healthcare operations
+
+- **Prevents silent ghost networks:** Recurring deliveries that omit an active office (such as Franklin Cool Springs Clinic in a partial EHR extract) are held automatically while the last approved directory version stays live for consumers.
+- **Separates schema review from operational approval:** Powered by [`provider-network-intake`](https://github.com/mlow-io/provider-network-intake), analysts (or proposal-only AI/MCP tools) review renamed headers and inverted boolean flags once, then replay every future delivery deterministically with zero LLM calls.
+- **Visual field-level triage & append-only audit trail:** Operators inspect exact before/after diffs (`Clinic Roster` vs `NPPES` / `Payer`), record outreach and corrections under optimistic concurrency, and export snapshot-pinned XLSX/JSON rosters scoped to an entire network or a single clinic.
+- **CMS NPI check-digit validation & bounded FHIR/NPPES support:** Validates 10-digit NPIs with the CMS ISO 7812 Luhn algorithm (`80840` prefix) and conservatively interprets saved NPPES API 2.1 and FHIR R4 / Plan-Net 1.2.0 Bundles.
+
+| Discrepancy Diff Inspector | Import & Schema Adaptation |
 |---|---|
-| Intake | CSV/XLSX, declared JSON profiles, bounded NPPES/CMS lookups, saved FHIR directory Bundles and fixed-source capture |
-| Cleaning | Column profiling, reviewed normalization recipes, compatibility/drift reports, quarantine and explicit acceptance |
-| Review | Separate clinician/office links, conflicting source assertions, local field decisions and investigation history |
-| Delivery | Recurring feeds, quality holds, separately approved phone corrections and version-pinned consumer output |
-| Exports | Complete approved JSON/XLSX, extensions, correction/source lineage and separate complete quality evidence for review |
-| Recovery | Retained versions/artifacts, stale-write checks, retry/restart and stopped database-plus-artifact recovery |
-| Optional assistance | MCP/model mapping proposals through normal review; manual operation works without model access |
+| ![Slide-over discrepancy inspector](docs/images/discrepancy-inspector.png) | ![Import and schema adaptation flow](docs/images/import-adapt.png) |
 
-The application is single-user and local. FHIR support is a documented **R4 4.0.1 / Plan-Net 1.2.0 subset**, not a conformant server. Licensing-board integration, expanded network analysis, recipient exchange and hosting are future work. Local approval is not independent provider verification or payer writeback.
+## Architecture
 
-![Synthetic correction review](docs/evidence/canonical/documentation-code-audit-2026-11-21/quality-review-wide.png)
+```mermaid
+flowchart LR
+    Src[Clinic CSV / XLSX / FHIR Plan-Net / NPPES] --> Engine[provider-network-intake]
+    Engine -->|Variant match + Luhn NPI check| API[FastAPI + SQLite Store]
+    API -->|Missing clinics / bad rows| Held[Held Candidate Version]
+    API -->|Reviewed approval| Export[Office or Network XLSX / JSON]
+    UI[React · TypeScript · shadcn/ui] <--> API
+```
 
-## Run it
+## Quickstart
 
-Use Python 3.10+ and Node 22.12+ within 22.x; [web/package.json](web/package.json) lists other allowed Node versions. CI uses Python 3.13 and Node 22.
+### 1. Run the full local workbench (Python 3.11+ & Node 22+)
 
 ```sh
 git clone https://github.com/mlow-io/provider-data-workbench.git
 cd provider-data-workbench
 python3 -m venv .venv
 source .venv/bin/activate
-python3 -m pip install -e '.[dev,mcp]'
+python3 -m pip install -e '.[dev,intake]'
 npm ci --prefix web
 make workbench
 ```
 
-Open the printed local URL. The launcher prints an invocation-owned demo root and its `inputs` directory, including the synthetic clinic workbook/CSV. Start in Receive data to inspect a file, map its columns and separately accept valid rows. Storage is retained; resume with `python3 scripts/demo.py --root <existing-demo-root>`. The work queue is the default entry point.
+Open the printed local URL (`http://127.0.0.1:5173/`). Fresh demo workspaces launch pre-loaded with the synthetic **Cumberland Valley Medical Group** Middle Tennessee dataset (12 clinicians, 5 clinics, 5 active discrepancies, 1 verified correction, and 1 held partial feed).
 
-For a headless connected rehearsal after setup:
+### 2. Run the standalone interactive browser demo (no Python backend)
 
 ```sh
-mkdir -p .runtime
-provider-truth-layer rehearse-operations --root .runtime/operations-demo-NEW
+npm ci --prefix web
+npm run build:demo --prefix web
+npx --prefix web vite preview --outDir dist-demo
 ```
 
-Choose a new root. The rehearsal uses synthetic files and controlled loopback HTTP, preserves the last approved roster while a delivery is held, inspects exports and exercises restart/backup/restore. It makes no public payer or model calls. See [run/export inspection](docs/OPERATIONS_DEMO.md#run-and-inspect) and [portable Python installation](docs/OPERATIONS_DEMO.md#portable-python-installation); the web interface requires the source/Node setup above.
+The static build runs an interactive in-memory replica of the Middle Tennessee showcase suitable for GitHub Pages or Vercel previews.
 
-## Correction and handoff
-
-Review clinician/office links and select a source phone in Reconciliation. Open the current approved delivery, inspect reviewed phone decisions, compare number/extension/source, and create a candidate. Review its complete quality evidence and approve it separately. Then preview/download approved JSON or XLSX. Earlier versions and original bytes remain readable. See [the operator flow](docs/OPERATOR_EXPERIENCE.md#reviewed-correction-to-handoff) and [correction contract](docs/FIELD_MATERIALIZATION_SPEC.md).
-
-## Verification and limits
-
-[STATUS](STATUS.md) is the current implementation/checkpoint summary; [dated receipts](docs/evidence/canonical/README.md) retain exact builds, commands, failures and limits. [CI](https://github.com/mlow-io/provider-data-workbench/actions) runs the required checks. The [UI protocol](docs/UI_QUALIFICATION.md) records production-build measurements at 100/1,000 records; samples do not truncate complete exports.
-
-[The independent mapping challenge](docs/AI_MAPPING_EVALUATION.md) is one blinded external-agent observation against frozen synthetic expectations. Saved-proposal replay runs without model access. Neither that challenge nor controlled transport tests establish production-model quality, broad injection resistance or human time savings. Owner visual acceptance, uncoached-user outcomes and broader source conformance remain open.
-
-## Contribute
-
-Start with [AGENTS](AGENTS.md), [NEXT](NEXT.md) and [STATUS](STATUS.md), then the relevant contract. [SPEC](SPEC.md) owns product behavior, [architecture](docs/ARCHITECTURE.md) service boundaries, and [ROADMAP](ROADMAP.md) future scope.
-
-[API reference](docs/API_REFERENCE.md) · [Data dictionary](docs/DATA_DICTIONARY.md) · [Operator procedures](docs/operations_governance/sop_provider_remediation.md) · [Design decisions](docs/DECISIONS.md)
+### 3. Headless pipeline validation & rehearsal
 
 ```sh
 make validate
-npm test --prefix web
-npm run build --prefix web
-npm run test:e2e --prefix web
-python3 scripts/check_project_docs.py
+mkdir -p .runtime
+provider-truth-layer rehearse-operations --root .runtime/rehearsal-1
 ```
 
-Use invocation-owned synthetic storage and reuse warm dependencies. Credentials, actual-source runtime data and private preparation stay outside Git. [AGENTS](AGENTS.md) defines checks and publication boundaries; a passing link checker does not prove documentation accuracy.
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) — System boundaries and `provider-network-intake` integration
+- [Data Model](docs/DATA_MODEL.md) — Clinician/office/network separation, SQLite triggers, and quarantine rules
+- [Healthcare Standards](docs/FHIR_AND_STANDARDS.md) — No Surprises Act SLAs, FHIR R4 / Plan-Net 1.2 subset, CMS NPI Luhn checks, and AI boundaries
+- [API Reference](docs/API_REFERENCE.md) — REST endpoints and concurrency guards
+- [3-Minute Demo Walkthrough](docs/DEMO_WALKTHROUGH.md) — Guided click-through of all four operator views
+
+## Scope & non-goals
+
+This is a single-user local engineering showcase using strictly synthetic records (`1990001xxx` Luhn-valid synthetic NPIs, `(615) 555-01xx` reserved numbers). It does not connect to live payer clearinghouses, certify state licensure/CAQH credentialing, or execute full HL7 FHIR terminology servers without external validation attachments.

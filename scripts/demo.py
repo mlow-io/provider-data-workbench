@@ -63,12 +63,22 @@ def main(argv=None):
         generate(root/'inputs')
     env = dict(os.environ, PDTL_ROOT=str(root), PDTL_DB=str(root/'directory.sqlite3'),
                PYTHONPATH='src', PDTL_API='http://127.0.0.1:8000', PDTL_DEMO='1')
-    # Seed legacy evidence only if this explicitly selected demo root is new.
-    if not (root/'directory.sqlite3').exists():
+    # Seed Tennessee showcase only if this explicitly selected demo root is new.
+    db_is_new = not (root/'directory.sqlite3').exists()
+    if db_is_new:
         subprocess.run([sys.executable, '-m', 'provider_directory_truth_layer.cli', 'run', '--as-of',
                         '2026-06-26', '--payer-listings', 'data/raw/synthetic_payer_directory_listings.csv'], env=env, check=True)
     from provider_directory_truth_layer.intake_store import IntakeStore
-    IntakeStore(root/'directory.sqlite3', root)
+    store = IntakeStore(root/'directory.sqlite3', root)
+    if db_is_new:
+        from provider_directory_truth_layer.demo_tennessee import seed_tennessee_demo
+        schema_catalog = None
+        try:
+            from provider_network_intake import CatalogStore
+            schema_catalog = CatalogStore(root/'source-schema-catalog.sqlite3')
+        except ImportError:
+            pass
+        seed_tennessee_demo(store, schema_catalog)
     print(f'Demo root: {root}\nInputs: {root / "inputs"}\nOpen http://127.0.0.1:5173/', flush=True)
     if args.prepare_only:
         return 0

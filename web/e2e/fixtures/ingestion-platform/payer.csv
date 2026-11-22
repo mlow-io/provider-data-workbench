@@ -1,5 +1,0 @@
-record_id,npi,provider_name,address,city,state,zip,phone,phone_extension,location_id,entity_type,network_code,organization_code,participation_status,effective_date,end_date
-P-N-CEDAR,1000000001,Alex RI1 Synthetic,10 Example St Suite 04,Boston,MA,02108-0042,2125550199,004,NORTH,clinician,CEDAR,CLINIC,listed,2026-01-01,
-P-N-PINE,1000000001,Alex RI1 Synthetic,10 Example St Suite 04,Boston,MA,02108-0042,2125550198,004,NORTH,clinician,PINE,CLINIC,listed,2026-01-01,
-P-S-CEDAR,1000000001,Alex RI1 Synthetic,20 Sample Ave Suite 200,Boston,MA,02109-0005,2125550102,,SOUTH,clinician,CEDAR,CLINIC,listed,2026-01-01,
-P-U-UNLINKED,,Unlinked RI1 Synthetic,10 Example St Suite 04,Boston,MA,02108-0042,2125550188,,NORTH,clinician,PINE,CLINIC,listed,2026-01-01,

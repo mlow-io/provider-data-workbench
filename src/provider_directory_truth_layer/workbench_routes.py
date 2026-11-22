@@ -1,0 +1,324 @@
+"""Read models and optional schema-catalog integration for the operator workbench UI."""
+from __future__ import annotations
+
+import json
+import re
+from datetime import date, datetime, timezone
+from typing import Any
+
+from .managed_feed import ManagedFeed
+from .normalize import normalize_phone
+
+
+def is_valid_npi(value: str | None) -> bool:
+    """Validate 10-digit NPI using CMS ISO 7812 Luhn check digit (80840 prefix)."""
+    if not isinstance(value, str) or not re.fullmatch(r"\d{10}", value):
+        return False
+    try:
+        from provider_network_intake import is_valid_npi as intake_luhn
+
+        return bool(intake_luhn(value))
+    except ImportError:
+        digits = [int(ch) for ch in f"80840{value[:-1]}"]
+        total = 0
+        for idx, digit in enumerate(reversed(digits)):
+            if idx % 2 == 0:
+                digit *= 2
+                if digit > 9:
+                    digit -= 9
+            total += digit
+        return ((10 - (total % 10)) % 10) == int(value[-1])
+
+
+def _location_code(raw_location: str | None, norm: dict[str, Any]) -> str:
+    if norm.get("location_id"):
+        return str(norm["location_id"])
+    if raw_location and ":" in raw_location:
+        return raw_location.split(":", 1)[1]
+    return raw_location or "UNASSIGNED"
+
+
+def _open_cases_index(store) -> tuple[list[dict[str, Any]], dict[tuple[str, str], list[str]], dict[str, list[str]]]:
+    work = store.work()
+    cases = work.get("items", [])
+    by_provider_loc: dict[tuple[str, str], list[str]] = {}
+    by_npi: dict[str, list[str]] = {}
+    with store.db() as conn:
+        evidence_rows = {
+            row["id"]: json.loads(row["evidence"])
+            for row in conn.execute("SELECT id, evidence FROM work_case")
+        }
+    for case in cases:
+        if case["status"] in {"verified", "resolved", "deferred"}:
+            continue
+        ev = evidence_rows.get(case["id"], {})
+        norm = ev.get("normalized") or {}
+        npi = str(norm.get("npi") or "")
+        if not npi and str(ev.get("provider_id") or "").startswith("NPI:"):
+            npi = str(ev["provider_id"]).split("NPI:", 1)[1]
+        loc = _location_code(case.get("location_id"), norm)
+        if npi:
+            by_provider_loc.setdefault((npi, loc), []).append(case["id"])
+            by_npi.setdefault(npi, []).append(case["id"])
+    return cases, by_provider_loc, by_npi
+
+
+def build_directory_records(
+    store,
+    *,
+    search: str = "",
+    location: str = "",
+    network: str = "",
+) -> list[dict[str, Any]]:
+    """Aggregate deduplicated clinician-location records from committed observations and catalog metadata."""
+    _, by_provider_loc, _ = _open_cases_index(store)
+    catalog_data = store.catalog()
+    loc_labels = {item["id"]: item["label"] for item in catalog_data.get("locations", [])}
+    net_labels = {item["id"]: item["label"] for item in catalog_data.get("networks", [])}
+
+    with store.db() as conn:
+        obs_rows = conn.execute(
+            """
+            SELECT o.*, r.source, r.metadata AS receipt_metadata, r.received_at,
+                   p.practice_location_id, p.network_id, p.listed_status, p.effective_date
+            FROM observation o
+            JOIN attempt a ON a.id = o.attempt_id
+            JOIN receipt r ON r.id = a.receipt_id
+            LEFT JOIN participation_observation p ON p.observation_id = o.id
+            WHERE a.state = 'committed'
+            ORDER BY o.retrieved_at ASC, o.rowid ASC
+            """
+        ).fetchall()
+
+    records: dict[tuple[str, str], dict[str, Any]] = {}
+    for row in obs_rows:
+        norm = json.loads(row["normalized"])
+        orig = json.loads(row["original"])
+        npi = str(norm.get("npi") or "")
+        if not npi and row["provider_id"] and str(row["provider_id"]).startswith("NPI:"):
+            npi = str(row["provider_id"]).split("NPI:", 1)[1]
+        if not npi:
+            continue
+        code = _location_code(row["location_id"], norm)
+        key = (npi, code)
+        existing = records.get(key)
+        networks_set = set(existing["networks"]) if existing else set()
+        if row["network_id"] and row["network_id"] in net_labels:
+            networks_set.add(net_labels[row["network_id"]])
+        for net_key in ("network_label", "network_name", "networks"):
+            raw_net = norm.get(net_key) or orig.get(net_key)
+            if isinstance(raw_net, str) and raw_net.strip():
+                for part in raw_net.split(";"):
+                    if part.strip():
+                        networks_set.add(part.strip())
+            elif isinstance(raw_net, list):
+                networks_set.update(str(v).strip() for v in raw_net if str(v).strip())
+
+        loc_name = (
+            loc_labels.get(row["practice_location_id"])
+            or norm.get("location_name")
+            or orig.get("location_name")
+            or orig.get("clinic_name")
+            or code
+        )
+        raw_visible = norm.get("directory_visible")
+        if raw_visible is None and row["listed_status"]:
+            raw_visible = row["listed_status"] != "not_listed"
+        if raw_visible is None:
+            excl = str(orig.get("Dir_Exclude_Flag") or orig.get("exclude_flag") or "").strip().upper()
+            raw_visible = False if excl == "Y" else True
+
+        phone = normalize_phone(norm.get("phone") or orig.get("phone") or "")
+        ext = norm.get("phone_extension") or orig.get("phone_extension") or None
+        specialty = norm.get("specialty") or orig.get("specialty") or "General Practice"
+        verified_at = (
+            row["human_verified_at"]
+            or norm.get("source_updated_at")
+            or row["source_updated_at"]
+            or row["retrieved_at"]
+        )
+        case_ids = by_provider_loc.get(key, [])
+        records[key] = {
+            "id": f"{npi}:{code}",
+            "provider_name": str(norm.get("provider_name") or orig.get("provider_name") or f"NPI {npi}"),
+            "npi": npi,
+            "npi_luhn_valid": is_valid_npi(npi),
+            "specialty": str(specialty),
+            "location_code": code,
+            "location_name": str(loc_name),
+            "address": str(norm.get("address") or orig.get("address") or ""),
+            "city": str(norm.get("city") or orig.get("city") or ""),
+            "state": str(norm.get("state") or orig.get("state") or ""),
+            "zip": str(norm.get("zip") or orig.get("zip") or ""),
+            "phone": phone,
+            "phone_extension": str(ext) if ext else None,
+            "networks": sorted(networks_set),
+            "directory_visible": bool(raw_visible),
+            "verified_at": str(verified_at),
+            "open_issues": len(case_ids),
+            "primary_case_id": case_ids[0] if case_ids else None,
+            "source": row["source"],
+        }
+
+    items = sorted(records.values(), key=lambda r: (r["open_issues"] == 0, r["provider_name"], r["location_code"]))
+    q = search.strip().lower()
+    if q:
+        items = [
+            item
+            for item in items
+            if q in item["provider_name"].lower()
+            or q in item["npi"].lower()
+            or q in item["specialty"].lower()
+            or q in item["location_code"].lower()
+            or q in item["location_name"].lower()
+            or q in item["city"].lower()
+        ]
+    if location.strip():
+        items = [item for item in items if item["location_code"] == location.strip()]
+    if network.strip():
+        items = [item for item in items if network.strip() in item["networks"]]
+    return items
+
+
+def build_overview(store, schema_catalog=None) -> dict[str, Any]:
+    """Build executive & operational KPI metrics across work queue, feeds, directory, and schema catalog."""
+    cases, _, _ = _open_cases_index(store)
+    directory = build_directory_records(store)
+    today_iso = date.today().isoformat()
+
+    open_cases = [c for c in cases if c["status"] not in {"verified", "resolved", "deferred"}]
+    high_risk = [c for c in open_cases if c["risk_level"] == "high"]
+    sla_at_risk = [
+        c
+        for c in open_cases
+        if c["risk_level"] == "high" or (c.get("follow_up") and str(c["follow_up"]) < today_iso)
+    ]
+
+    feeds = ManagedFeed(store).list().get("items", [])
+    approved_feeds = sum(1 for f in feeds if f.get("current_version"))
+    held_deliveries = sum(
+        1
+        for f in feeds
+        for v in f.get("versions", [])
+        if v.get("state") == "candidate"
+    )
+    quarantined_rows = 0
+    feed_service = ManagedFeed(store)
+    for f in feeds:
+        for v in f.get("versions", []):
+            if v.get("state") == "candidate" or v["id"] == f.get("current_version"):
+                detail = feed_service.version(v["id"])
+                quarantined_rows += int((detail.get("report", {}).get("counts") or {}).get("quarantined") or 0)
+
+    total_records = len(directory)
+    clean_records = sum(1 for r in directory if r["open_issues"] == 0)
+    clean_rate_pct = round(100.0 * clean_records / total_records, 1) if total_records else 100.0
+    unique_providers = len({r["npi"] for r in directory})
+    unique_locations = len({r["location_code"] for r in directory})
+
+    variants_count = 0
+    if schema_catalog is not None:
+        variants_count = len(schema_catalog.snapshot().variants)
+
+    return {
+        "total_providers": unique_providers,
+        "total_locations": unique_locations,
+        "total_directory_listings": total_records,
+        "clean_rate_pct": clean_rate_pct,
+        "open_discrepancies": len(open_cases),
+        "high_risk_discrepancies": len(high_risk),
+        "held_deliveries": held_deliveries,
+        "approved_feeds": approved_feeds,
+        "sla_at_risk": len(sla_at_risk),
+        "quarantined_rows": quarantined_rows,
+        "schema_variants_count": variants_count,
+        "mode": "live",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def schema_catalog_status(schema_catalog=None) -> dict[str, Any]:
+    """Summarize active reviewed schema variants from provider-network-intake."""
+    if schema_catalog is None:
+        return {"enabled": False, "catalog_revision": 0, "variants": []}
+    snapshot = schema_catalog.snapshot()
+    variants = []
+    for variant in snapshot.variants:
+        body = variant.to_dict()
+        variants.append(
+            {
+                "id": variant.id,
+                "source": body["source"],
+                "payer": body.get("payer"),
+                "network": body.get("network"),
+                "source_version": body.get("source_version"),
+                "contract": body["contract"],
+                "grain": body["grain"],
+                "headers": body["headers"],
+                "mapping": body["mapping"],
+                "transforms": body["transforms"],
+                "source_notes": body["source_notes"],
+            }
+        )
+    return {
+        "enabled": True,
+        "catalog_revision": snapshot.revision,
+        "variants": variants,
+    }
+
+
+def build_work_queue(store) -> list[dict[str, Any]]:
+    """Return work queue items enriched with formatted field diffs and clinic metadata."""
+    items = store.work().get("items", [])
+    with store.db() as conn:
+        ev_rows = {
+            row["id"]: json.loads(row["evidence"])
+            for row in conn.execute("SELECT id, evidence FROM work_case")
+        }
+    loc_names = {
+        "NASH-MAIN": "Nashville Midtown Clinic",
+        "FRNK-WEST": "Franklin Cool Springs Clinic",
+        "BRNT-PARK": "Brentwood Maryland Farms",
+        "MURF-EAST": "Murfreesboro Medical Plaza",
+        "HEND-LAKE": "Hendersonville Indian Lake",
+    }
+    enriched: list[dict[str, Any]] = []
+    for item in items:
+        ev = ev_rows.get(item["id"], {})
+        norm = ev.get("normalized") or {}
+        npi = str(norm.get("npi") or "")
+        if not npi and str(ev.get("provider_id") or "").startswith("NPI:"):
+            npi = str(ev["provider_id"]).split("NPI:", 1)[1]
+        code = _location_code(item.get("location_id"), norm)
+        clinic_name = item.get("location_label") or loc_names.get(code) or code
+        enriched.append(
+            {
+                **item,
+                "listing_value": ev.get("listing_value"),
+                "reference_value": ev.get("reference_value"),
+                "npi": npi or None,
+                "location_code": code,
+                "clinic_name": clinic_name,
+            }
+        )
+    return enriched
+
+
+def mount_workbench_routes(app, store, schema_catalog=None) -> None:
+    """Attach clean overview, directory, work-queue, and schema-catalog read endpoints."""
+
+    @app.get("/api/schema-catalog/status")
+    def get_schema_catalog_status():
+        return schema_catalog_status(schema_catalog)
+
+    @app.get("/api/workbench/overview")
+    def get_workbench_overview():
+        return build_overview(store, schema_catalog)
+
+    @app.get("/api/workbench/directory")
+    def get_workbench_directory(search: str = "", location: str = "", network: str = ""):
+        return {"items": build_directory_records(store, search=search, location=location, network=network)}
+
+    @app.get("/api/workbench/work")
+    def get_workbench_work():
+        return {"items": build_work_queue(store)}

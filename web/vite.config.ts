@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
+  base: process.env.VITE_DEMO_MODE === "true" ? "./" : "/",
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   server: {
@@ -16,6 +17,6 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/test-setup.ts",
     globals: true,
-    exclude: ["e2e/**", "node_modules/**", "dist/**"],
+    exclude: ["e2e/**", "node_modules/**", "dist/**", "dist-demo/**"],
   },
 });

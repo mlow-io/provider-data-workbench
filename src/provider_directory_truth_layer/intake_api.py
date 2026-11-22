@@ -20,6 +20,20 @@ def create_workbench(path: Path | None = None, root: Path | None = None, *, demo
     path = path or database_path()
     store = IntakeStore(path, root or storage_root())
     app = create_app(path)
+    schema_catalog = None
+    try:
+        from provider_network_intake import CatalogStore
+        from provider_network_intake.workbench import mount as mount_source_catalog
+
+        schema_catalog = CatalogStore(store.root / "source-schema-catalog.sqlite3")
+        app.state.source_catalog_store = schema_catalog
+        app.state.source_catalog = mount_source_catalog(app, store, schema_catalog)
+    except ImportError:
+        app.state.source_catalog_store = None
+        app.state.source_catalog = None
+    from .workbench_routes import mount_workbench_routes
+
+    mount_workbench_routes(app, store, schema_catalog)
     from .fhir_acquisition_api import mount as mount_acquisitions
     mount_acquisitions(app, store)
     from .mapping_assistant_api import mount as mount_assistance

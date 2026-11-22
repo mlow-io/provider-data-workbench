@@ -15,6 +15,15 @@ os.environ['PDTL_DB'] = str(root / 'directory.sqlite3')
 os.environ['PYTHONPATH'] = 'src'
 os.environ['PDTL_DEMO'] = '1'
 subprocess.run(['python3','-m','provider_directory_truth_layer.cli','run','--as-of','2026-06-26','--payer-listings','data/raw/synthetic_payer_directory_listings.csv'], check=True)
+from provider_directory_truth_layer.demo_tennessee import seed_tennessee_demo
+from provider_directory_truth_layer.intake_store import IntakeStore
+_seed_store = IntakeStore(root / 'directory.sqlite3', root)
+try:
+    from provider_network_intake import CatalogStore
+    _seed_catalog = CatalogStore(root / 'source-schema-catalog.sqlite3')
+except ImportError:
+    _seed_catalog = None
+seed_tennessee_demo(_seed_store, _seed_catalog)
 from provider_directory_truth_layer.intake_api import create_workbench
 from provider_directory_truth_layer import fhir_acquisition_api
 from provider_directory_truth_layer.fhir_acquisition import Acquisition

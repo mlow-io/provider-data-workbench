@@ -1,26 +1,51 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { App } from "./App";
 
-const batch = { batch_id: "qa-test", source_label: "Synthetic sample provider-directory batch", record_count: 12, exception_count: 3, records_with_issues: 3, issue_counts: { missing_required_field: 1, stale_verification: 1, possible_duplicate_provider_location: 1 }, severity_mix: { high: 1, medium: 2, low: 0 }, source_summary: { "payer directory": 2 }, data_notice: "This console is using synthetic sample data.", limitations: "Duplicate candidates require human review." };
-const caseItem = { case_id: "case-1", record_id: "REC-1", provider_name: "Sample Provider", issue_code: "missing_required_field", severity: "high", field_name: "phone", source: "payer directory", review_status: "new", assigned_to: null, updated_at: "2026-06-26T00:00:00Z" };
-
-function renderApp() { const client = new QueryClient({ defaultOptions: { queries: { retry: false } } }); return render(<QueryClientProvider client={client}><App /></QueryClientProvider>); }
-
-test("shows bounded-data labeling, filters queue, and opens case evidence", async () => {
-  const fetchMock = vi.fn((url: string) => {
-    if (url.includes("batches")) return Promise.resolve(new Response(JSON.stringify(batch)));
-    if (url.includes("/api/cases/case-1")) return Promise.resolve(new Response(JSON.stringify({ case: caseItem, exception: { values: {} }, normalized_records: [{ values: { provider_name: "Sample Provider", phone: "" } }], recommendation: "verify_phone", explanation: "Phone is required.", notes: null, history: [], duplicate: null })));
-    return Promise.resolve(new Response(JSON.stringify({ items: [caseItem], total: 1 })));
+function renderApp(initialPath = "/?demo=1") {
+  window.history.replaceState(null, "", initialPath);
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
   });
-  vi.stubGlobal("fetch", fetchMock);
-  window.history.replaceState(null, "", "/?view=qa");
-  renderApp();
-  expect(await screen.findByText("Batch exception review")).toBeInTheDocument();
-  expect(screen.getByText(/synthetic sample data/i)).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: /missing required field/i }));
-  await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("issue_code=missing_required_field"), undefined));
-  fireEvent.click(await screen.findByText("Sample Provider"));
-  expect(await screen.findByText("Phone is required.")).toBeInTheDocument();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  );
+}
+
+describe("App shell navigation and demo controls", () => {
+  it("renders only the four primary navigation destinations without legacy labels", async () => {
+    renderApp("/?demo=1");
+
+    expect(
+      (await screen.findAllByRole("link", { name: /Work Queue/i })).length
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("link", { name: /Import & Adapt/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Deliveries & Export/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Provider Directory/i })).toBeInTheDocument();
+
+    expect(screen.queryByText(/Source Mapping/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Operations Hub/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Interactive Demo · Synthetic TN/i)).toBeInTheDocument();
+    expect(screen.getByText(/Static Demo Sandbox/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Reset Demo/i })).toBeInTheDocument();
+  });
+
+  it("switches workspaces via sidebar links and preserves demo mode", async () => {
+    renderApp("/?demo=1");
+
+    fireEvent.click(await screen.findByRole("link", { name: /Import & Adapt/i }));
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /Import & Schema Adaptation/i })).toBeInTheDocument();
+    });
+    expect(window.location.search).toContain("view=intake");
+    expect(window.location.search).toContain("demo=1");
+
+    fireEvent.click(screen.getByRole("link", { name: /Provider Directory/i }));
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: /Provider & Clinic Directory/i })).toBeInTheDocument();
+    });
+  });
 });

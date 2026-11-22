@@ -1,14 +1,18 @@
-"""Check local Markdown files, heading anchors and canonical entrypoints.
-
-Supports the repository's ATX headings and explicit HTML anchors. Fenced code
-is excluded so example Markdown cannot accidentally satisfy a broken link.
-"""
+"""Check local Markdown files, heading anchors, and canonical documentation entrypoints."""
 from pathlib import Path
 import re
 import sys
 from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
+ENTRYPOINTS = (
+    'README.md',
+    'docs/ARCHITECTURE.md',
+    'docs/DATA_MODEL.md',
+    'docs/FHIR_AND_STANDARDS.md',
+    'docs/API_REFERENCE.md',
+    'docs/DEMO_WALKTHROUGH.md',
+)
 
 
 def prose_lines(text):
@@ -50,7 +54,7 @@ def anchors(text):
 
 def check(root=ROOT):
     errors = []
-    for name in ('SPEC.md', 'ROADMAP.md', 'STATUS.md', 'NEXT.md', 'AGENTS.md', 'README.md'):
+    for name in ENTRYPOINTS:
         if not (root / name).is_file():
             errors.append(f'Missing canonical entrypoint: {name}')
     documents = sorted((root / 'docs').rglob('*.md')) + sorted(root.glob('*.md'))
@@ -75,6 +79,7 @@ def check(root=ROOT):
 
 if __name__ == '__main__':
     documents, errors = check()
-    for error in errors: print(error, file=sys.stderr)
+    for error in errors:
+        print(error, file=sys.stderr)
     print(f'Checked {len(documents)} Markdown documents; {len(errors)} local link or entrypoint errors')
     raise SystemExit(bool(errors))

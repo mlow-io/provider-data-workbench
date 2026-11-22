@@ -1,34 +1,51 @@
-import { lazy, Suspense } from "react";
-import { navigateWorkspace, useWorkspaceQuery } from "./workspaceNavigation";
-import type { IntakePage } from "./IntakeWorkbench";
-import { WorkbenchShell } from "./WorkbenchShell";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { AppShell } from "@/components/layout/AppShell";
+import { dataClient } from "@/lib/dataClient";
+import type { WorkspaceView } from "@/lib/types";
+import { DeliveriesPage } from "@/pages/DeliveriesPage";
+import { ImportAdaptPage } from "@/pages/ImportAdaptPage";
+import { ProviderDirectoryPage } from "@/pages/ProviderDirectoryPage";
+import { WorkQueuePage } from "@/pages/WorkQueuePage";
+import { useWorkspaceQuery } from "@/workspaceNavigation";
 
-const ManagedFeeds = lazy(() => import("./ManagedFeeds").then(m => ({ default: m.ManagedFeeds })));
-const ReconciliationWorkspace = lazy(() => import("./ReconciliationWorkspace").then(m => ({ default: m.ReconciliationWorkspace })));
-const RemediationWorkspace = lazy(() => import("./RemediationWorkspace").then(m => ({ default: m.RemediationWorkspace })));
-const IntakeWorkbench = lazy(() => import("./IntakeWorkbench").then(m => ({ default: m.IntakeWorkbench })));
-const ReviewConsole = lazy(() => import("./ReviewConsole").then(m => ({ default: m.ReviewConsole })));
+const VIEWS: WorkspaceView[] = ["work", "intake", "deliveries", "directory"];
 
 export function App() {
+  const queryClient = useQueryClient();
   const query = useWorkspaceQuery();
-  const requestedView = query.get("view");
-  const workspace = requestedView && ["intake", "feeds", "reconciliation", "work", "sources", "qa", "remediation"].includes(requestedView) ? requestedView : "work";
-  const navigate = (view: string) => navigateWorkspace(view);
+  const requested = query.get("view") as WorkspaceView | null;
+  const workspace: WorkspaceView =
+    requested && VIEWS.includes(requested) ? requested : "work";
+
+  const overviewQuery = useQuery({
+    queryKey: ["workbench-overview"],
+    queryFn: () => dataClient.overview(),
+  });
+
+  async function handleResetDemo() {
+    dataClient.resetDemo();
+    await queryClient.invalidateQueries();
+    toast.success("Demo workspace reset to initial Middle Tennessee state");
+  }
+
   return (
-    <WorkbenchShell workspace={workspace}>
-      <Suspense fallback={<div role="status" className="loading">Loading workspace…</div>}>
-      {["intake", "work", "sources"].includes(workspace) ? (
-        <IntakeWorkbench page={workspace as IntakePage} />
-      ) : workspace === "feeds" ? (
-        <ManagedFeeds />
-      ) : workspace === "reconciliation" ? (
-        <ReconciliationWorkspace />
-      ) : workspace === "remediation" ? (
-        <RemediationWorkspace onExit={() => navigate("qa")} />
+    <AppShell
+      workspace={workspace}
+      openDiscrepancies={overviewQuery.data?.open_discrepancies}
+      heldDeliveries={overviewQuery.data?.held_deliveries}
+      demoMode={dataClient.isDemoMode()}
+      onResetDemo={handleResetDemo}
+    >
+      {workspace === "work" ? (
+        <WorkQueuePage />
+      ) : workspace === "intake" ? (
+        <ImportAdaptPage />
+      ) : workspace === "deliveries" ? (
+        <DeliveriesPage />
       ) : (
-        <ReviewConsole onOpenRemediation={() => navigate("remediation")} />
+        <ProviderDirectoryPage />
       )}
-      </Suspense>
-    </WorkbenchShell>
+    </AppShell>
   );
 }

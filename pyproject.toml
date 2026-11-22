@@ -19,6 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 mcp = ["mcp>=1.14,<2"]
+intake = ["provider-network-intake>=0.1.0"]
 dev = [
   "build>=1.2",
   "httpx>=0.27",

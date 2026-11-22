@@ -17,6 +17,12 @@ export function useWorkspaceQuery() {
 
 export function workspaceHref(view: string, values: Record<string, string | null | undefined> = {}) {
   const query = new URLSearchParams({ view });
+  if (typeof window !== "undefined") {
+    const currentDemo = new URLSearchParams(window.location.search).get("demo");
+    if (currentDemo && !("demo" in values)) {
+      query.set("demo", currentDemo);
+    }
+  }
   for (const [key, value] of Object.entries(values)) if (value) query.set(key, value);
   return `?${query}`;
 }
@@ -33,7 +39,7 @@ export function updateWorkspaceQuery(values: Record<string, string | null | unde
   for (const [key, value] of Object.entries(values)) {
     if (value) query.set(key, value); else query.delete(key);
   }
-  const view = query.get("view") ?? "reconciliation";
+  const view = query.get("view") ?? "work";
   query.delete("view");
   navigateWorkspace(view, Object.fromEntries(query), replace);
 }

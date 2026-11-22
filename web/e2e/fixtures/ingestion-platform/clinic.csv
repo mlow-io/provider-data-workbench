@@ -1,3 +1,0 @@
-record_id,npi,provider_name,address,city,state,zip,Office tel,location_id,entity_type
-C-NORTH,1000000001,Alex RI1 Synthetic,10 Example Street STE 04,Boston, ma ,02108-0042, +1 (212) 555-0101 ext 004 ,NORTH,clinician
-C-SOUTH,1000000001,Alex RI1 Synthetic,20 Sample Avenue STE 200,Boston,ma,02109-0005,(212) 555-0102,SOUTH,clinician
