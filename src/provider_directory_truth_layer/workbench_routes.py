@@ -196,17 +196,20 @@ def build_overview(store, schema_catalog=None) -> dict[str, Any]:
 
     feeds = ManagedFeed(store).list().get("items", [])
     approved_feeds = sum(1 for f in feeds if f.get("current_version"))
+    # Reviewed-correction candidates await approval but are not held source deliveries.
     held_deliveries = sum(
         1
         for f in feeds
         for v in f.get("versions", [])
-        if v.get("state") == "candidate"
+        if v.get("state") == "candidate" and v.get("kind") != "derived_field_candidate"
     )
     quarantined_rows = 0
     feed_service = ManagedFeed(store)
     for f in feeds:
         for v in f.get("versions", []):
-            if v.get("state") == "candidate" or v["id"] == f.get("current_version"):
+            # A correction candidate repeats its base's quarantine counts; count each source once.
+            held = v.get("state") == "candidate" and v.get("kind") != "derived_field_candidate"
+            if held or v["id"] == f.get("current_version"):
                 detail = feed_service.version(v["id"])
                 quarantined_rows += int((detail.get("report", {}).get("counts") or {}).get("quarantined") or 0)
 
@@ -304,6 +307,106 @@ def build_work_queue(store) -> list[dict[str, Any]]:
     return enriched
 
 
+PHONE_REVIEW_LIMIT = 50
+
+
+def _phone_option(option: dict[str, Any], roster_receipts: set[str]) -> dict[str, Any]:
+    value = option.get("comparison_value") or {}
+    return {
+        "ref": option["ref"],
+        "source": option["source"],
+        "number": value.get("number"),
+        "extension": value.get("extension"),
+        "locator": option["locator"],
+        "selectable": bool(option["selectable"]),
+        "findings": option.get("findings") or [],
+        "from_approved_roster": option["receipt_id"] in roster_receipts,
+    }
+
+
+def build_phone_reviews(store) -> dict[str, Any]:
+    """List reviewed clinician/office phone scopes with their correction state.
+
+    Scopes come only from current reviewed clinician and office links; a scope
+    needs both, so an NPI alone never places a phone at an office. Bounded to
+    PHONE_REVIEW_LIMIT clinicians for the workbench view.
+    """
+    from .field_materialization import FieldMaterialization
+    from .field_reconciliation import FieldReconciliation
+
+    feeds = ManagedFeed(store)
+    current = [f["current_version"] for f in feeds.list().get("items", []) if f.get("current_version")]
+    fields, materialization = FieldReconciliation(store), FieldMaterialization(store)
+    current_links = """FROM reviewed_identity_link l WHERE NOT EXISTS (
+        SELECT 1 FROM reviewed_identity_link n WHERE n.kind=l.kind AND n.ref=l.ref AND n.seq>l.seq)"""
+    items: list[dict[str, Any]] = []
+    with store.db() as conn:
+        conn.execute("BEGIN")
+        clinicians = [r[0] for r in conn.execute(
+            f"SELECT DISTINCT l.clinician_id {current_links} AND l.kind='clinician' ORDER BY l.clinician_id LIMIT ?",
+            (PHONE_REVIEW_LIMIT,))]
+        locations = [r[0] for r in conn.execute(
+            f"SELECT DISTINCT l.practice_location_id {current_links} AND l.kind='location' ORDER BY l.practice_location_id")]
+        bases = {}
+        for version_id in current:
+            manifest = json.loads(conn.execute("SELECT manifest FROM feed_version WHERE id=?", (version_id,)).fetchone()[0])
+            bases[manifest["receipt_id"]] = version_id
+        for clinician_id in clinicians:
+            for location_id in locations:
+                view = fields._view(conn, clinician_id, location_id)
+                phone = next(f for f in view["fields"] if f["field"] == "phone")
+                if not phone["options"]:
+                    continue
+                receipts = {o["receipt_id"] for o in phone["options"]}
+                base = next((bases[r] for r in receipts if r in bases), None)
+                options = [_phone_option(o, set(bases)) for o in phone["options"]]
+                values = {(o["number"], o["extension"]) for o in options if o["selectable"]}
+                decision = phone["decision"]
+                lineage = conn.execute(
+                    """SELECT v.id FROM feed_version v
+                       WHERE json_extract(v.manifest,'$.materialization.clinician_id')=?
+                         AND json_extract(v.manifest,'$.materialization.location_id')=?
+                       ORDER BY v.created_at DESC""",
+                    (clinician_id, location_id)).fetchall()
+                candidates = []
+                for row in lineage:
+                    state = conn.execute(
+                        "SELECT decision FROM feed_decision WHERE version_id=? ORDER BY created_at DESC LIMIT 1",
+                        (row["id"],)).fetchone()
+                    manifest = json.loads(conn.execute("SELECT manifest FROM feed_version WHERE id=?", (row["id"],)).fetchone()[0])
+                    candidates.append({
+                        "version_id": row["id"],
+                        "state": state["decision"] if state else "candidate",
+                        "decision_id": manifest["materialization"]["decision_id"],
+                        "old_value": manifest["materialization"]["old_value"],
+                        "new_value": manifest["materialization"]["new_value"],
+                    })
+                correction = {"status": "no_roster"} if base is None else materialization.assess(conn, base, clinician_id, location_id, view)
+                items.append({
+                    "clinician_id": clinician_id,
+                    "clinician_label": view["clinician"]["label"],
+                    "location_id": location_id,
+                    "location_label": view["location"]["label"],
+                    "snapshot": view["snapshot"],
+                    "inputs_fresh": view["inputs_fresh"],
+                    "status": phone["status"],
+                    "sources_agree": len(values) <= 1,
+                    "options": options,
+                    "decision": None if decision is None else {
+                        "id": decision["id"],
+                        "decision": decision["decision"],
+                        "selected_ref": decision["selected_ref"],
+                        "actor": decision["actor"],
+                        "reason": decision["reason"],
+                        "created_at": decision["created_at"],
+                    },
+                    "base_version": base,
+                    "correction": correction,
+                    "candidates": candidates,
+                })
+    return {"items": items, "limit": PHONE_REVIEW_LIMIT, "truncated": len(clinicians) == PHONE_REVIEW_LIMIT}
+
+
 def mount_workbench_routes(app, store, schema_catalog=None) -> None:
     """Attach clean overview, directory, work-queue, and schema-catalog read endpoints."""
 
@@ -322,3 +425,7 @@ def mount_workbench_routes(app, store, schema_catalog=None) -> None:
     @app.get("/api/workbench/work")
     def get_workbench_work():
         return {"items": build_work_queue(store)}
+
+    @app.get("/api/workbench/phone-reviews")
+    def get_workbench_phone_reviews():
+        return build_phone_reviews(store)

@@ -16,13 +16,14 @@ function renderApp(initialPath = "/?demo=1") {
 }
 
 describe("App shell navigation and demo controls", () => {
-  it("renders only the four primary navigation destinations without legacy labels", async () => {
+  it("renders only the five primary navigation destinations without legacy labels", async () => {
     renderApp("/?demo=1");
 
     expect(
       (await screen.findAllByRole("link", { name: /Work Queue/i })).length
     ).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("link", { name: /Import & Adapt/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Phone Corrections/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Deliveries & Export/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Provider Directory/i })).toBeInTheDocument();
 

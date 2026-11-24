@@ -4,6 +4,7 @@ import {
   Building2,
   FileSpreadsheet,
   GitCompareArrows,
+  PhoneCall,
   RotateCcw,
   ShieldCheck,
   Stethoscope,
@@ -75,6 +76,11 @@ function AppSidebar({
       view: "intake",
       label: "Import & Adapt",
       icon: FileSpreadsheet,
+    },
+    {
+      view: "corrections",
+      label: "Phone Corrections",
+      icon: PhoneCall,
     },
     {
       view: "deliveries",
@@ -168,6 +174,7 @@ function AppSidebar({
 const VIEW_TITLES: Record<WorkspaceView, string> = {
   work: "Work Queue",
   intake: "Import & Adapt",
+  corrections: "Phone Corrections",
   deliveries: "Deliveries & Export",
   directory: "Provider Directory",
 };

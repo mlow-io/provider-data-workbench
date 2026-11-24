@@ -96,6 +96,22 @@ class FieldMaterialization:
             return {'base_version': version_id, 'choices': choices, 'total': total,
                     'next_offset': offset + limit if offset + limit < total else None}
 
+    def assess(self, conn, version_id, clinician_id, location_id, view):
+        """Explain whether one reviewed scope can become a candidate of this version."""
+        field = next(f for f in view['fields'] if f['field'] == 'phone')
+        if field['status'] != 'selected' or not field['decision']:
+            return {'status': 'not_selected'}
+        base = decode(conn.execute('SELECT * FROM feed_version WHERE id=?', (version_id,)).fetchone())
+        try:
+            selection = self._selection(conn, base, clinician_id, location_id, view['snapshot'], field['decision']['id'], view=view)
+        except ValueError as exc:
+            status = 'no_change' if 'does not change' in str(exc) else 'ineligible'
+            return {'status': status, 'reason': str(exc)}
+        except Conflict as exc:
+            return {'status': 'ineligible', 'reason': str(exc)}
+        return {'status': 'eligible', 'row_locator': selection['row_locator'],
+                'old_value': selection['old_value'], 'new_value': selection['new_value']}
+
     def create(self, version_id, payload):
         keys = {'clinician_id', 'location_id', 'snapshot', 'decision_id', 'actor', 'reason', 'idempotency_key'}
         if not isinstance(payload, dict) or set(payload) != keys:

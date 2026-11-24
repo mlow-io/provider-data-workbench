@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, CheckCircle2, Download, ShieldCheck, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2, Download, PhoneCall, ShieldCheck, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ExportDialog } from "@/components/deliveries/ExportDialog";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -29,10 +29,19 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { dataClient } from "@/lib/dataClient";
 import { clinicDisplayName, formatPhone, formatShortDate } from "@/lib/format";
+import type { FeedVersionSummary } from "@/lib/types";
+import { useWorkspaceQuery } from "@/workspaceNavigation";
+
+function versionTitle(ver: Pick<FeedVersionSummary, "kind" | "period">) {
+  return ver.kind === "derived_field_candidate"
+    ? "Reviewed phone correction"
+    : `${formatShortDate(ver.period)} Delivery`;
+}
 
 export function DeliveriesPage() {
   const queryClient = useQueryClient();
-  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null);
+  const requestedVersion = useWorkspaceQuery().get("version");
+  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(requestedVersion);
   const [rowFilter, setRowFilter] = useState("all");
   const [rowSearch, setRowSearch] = useState("");
   const [exportOpen, setExportOpen] = useState(false);
@@ -44,6 +53,10 @@ export function DeliveriesPage() {
   });
 
   const primaryFeed = feedsQuery.data?.[0] ?? null;
+
+  useEffect(() => {
+    if (requestedVersion) setSelectedVersionId(requestedVersion);
+  }, [requestedVersion]);
 
   useEffect(() => {
     if (!primaryFeed || selectedVersionId) return;
@@ -99,6 +112,7 @@ export function DeliveriesPage() {
     [version]
   );
   const allHoldsAcked = softHolds.every((h) => acknowledgedCodes.has(h.code));
+  const lineage = version?.manifest?.materialization ?? null;
 
   async function handleAcknowledge(code: string) {
     if (!version) return;
@@ -130,8 +144,11 @@ export function DeliveriesPage() {
         expectedReport: version.report_hash,
         expectedCurrent: primaryFeed.current_version,
         actor: "Operations Lead",
-        reason:
-          decision === "approved"
+        reason: lineage
+          ? decision === "approved"
+            ? "Approved reviewed phone correction"
+            : "Rejected reviewed phone correction candidate"
+          : decision === "approved"
             ? "Acknowledged holds and approved roster version"
             : "Rejected incomplete candidate to protect active baseline",
       });
@@ -141,7 +158,7 @@ export function DeliveriesPage() {
         queryClient.invalidateQueries({ queryKey: ["workbench-overview"] }),
       ]);
       toast.success(
-        decision === "approved" ? "Dataset version approved" : "Held candidate rejected"
+        decision === "approved" ? "Dataset version approved" : "Candidate rejected"
       );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Decision failed");
@@ -200,12 +217,23 @@ export function DeliveriesPage() {
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-medium text-foreground">
-                          {formatShortDate(ver.period)} Delivery
+                          {versionTitle(ver)}
                         </span>
-                        <StatusBadge status={ver.state} />
+                        <StatusBadge
+                          status={ver.state}
+                          label={
+                            ver.kind === "derived_field_candidate" && ver.state === "candidate"
+                              ? "Awaiting Approval"
+                              : undefined
+                          }
+                        />
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span className="font-mono">{ver.delivery_id}</span>
+                        <span className="font-mono">
+                          {ver.kind === "derived_field_candidate"
+                            ? `from ${ver.delivery_id}`
+                            : ver.delivery_id}
+                        </span>
                         {isCurrent && (
                           <Badge
                             variant="outline"
@@ -231,12 +259,18 @@ export function DeliveriesPage() {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <CardTitle>{version.delivery.filename}</CardTitle>
-                        <StatusBadge status={version.state} />
+                        <CardTitle>
+                          {lineage ? "Reviewed phone correction" : version.delivery.filename}
+                        </CardTitle>
+                        <StatusBadge
+                          status={version.state}
+                          label={lineage && version.state === "candidate" ? "Awaiting Approval" : undefined}
+                        />
                       </div>
                       <CardDescription>
-                        Period {formatShortDate(version.delivery.period)} ·{" "}
-                        {version.delivery.delivery_id}
+                        {lineage
+                          ? `Derived from the approved ${formatShortDate(version.delivery.period)} roster`
+                          : `Period ${formatShortDate(version.delivery.period)} · ${version.delivery.delivery_id}`}
                       </CardDescription>
                     </div>
                     <Button
@@ -277,11 +311,54 @@ export function DeliveriesPage() {
                     </div>
                   </div>
 
-                  {version.state === "candidate" && softHolds.length > 0 && (
+                  {lineage && (
+                    <div className="flex flex-col gap-3 rounded-lg border p-3.5">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <PhoneCall className="size-4 text-muted-foreground" aria-hidden="true" />
+                        Correction lineage
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 font-mono text-sm">
+                        <span className="line-through decoration-muted-foreground/60">
+                          {formatPhone(lineage.old_value.number, lineage.old_value.extension)}
+                        </span>
+                        <ArrowRight className="size-4 text-muted-foreground" aria-label="changed to" />
+                        <span className="font-medium">
+                          {formatPhone(lineage.new_value.number, lineage.new_value.extension)}
+                        </span>
+                        <span className="text-xs text-muted-foreground">row {lineage.row_locator}</span>
+                      </div>
+                      <dl className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs sm:grid-cols-[max-content_1fr]">
+                        <dt className="text-muted-foreground">Selected source</dt>
+                        <dd className="font-mono">
+                          {lineage.selected_evidence.source} · {lineage.selected_evidence.locator}
+                        </dd>
+                        <dt className="text-muted-foreground">Phone decision</dt>
+                        <dd>{lineage.decision_reason}</dd>
+                        <dt className="text-muted-foreground">Candidate</dt>
+                        <dd>
+                          {lineage.actor}: {lineage.reason}
+                        </dd>
+                      </dl>
+                      {version.state === "candidate" && (
+                        <p className="text-xs text-muted-foreground">
+                          Every other row matches the approved base. Approval rechecks the base, links,
+                          decision and source file, and rejects the candidate if any changed.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {version.state === "candidate" && (
                     <Alert>
-                      <AlertTriangle className="size-4 text-status-warning" />
+                      {softHolds.length > 0 ? (
+                        <AlertTriangle className="size-4 text-status-warning" />
+                      ) : (
+                        <ShieldCheck className="size-4" />
+                      )}
                       <AlertTitle>
-                        Candidate Held Automatically — Active Approved Baseline Protected
+                        {softHolds.length > 0
+                          ? "Candidate Held Automatically — Active Approved Baseline Protected"
+                          : "Candidate Awaiting Approval — Active Approved Baseline Protected"}
                       </AlertTitle>
                       <AlertDescription className="mt-2 flex flex-col gap-3">
                         <div className="flex flex-col gap-2">
@@ -405,10 +482,20 @@ export function DeliveriesPage() {
                                 {clinicDisplayName(String(row.normalized.location_id ?? ""))}
                               </TableCell>
                               <TableCell className="font-mono text-xs">
-                                {formatPhone(String(row.normalized.phone ?? ""))}
+                                {formatPhone(
+                                  String(row.normalized.phone ?? ""),
+                                  (row.normalized.phone_extension as string | null | undefined) ?? null
+                                )}
                               </TableCell>
                               <TableCell>
-                                {row.problems.length > 0 ? (
+                                {row.materialization ? (
+                                  <Badge
+                                    variant="outline"
+                                    className="border-transparent bg-status-success-bg text-status-success"
+                                  >
+                                    Corrected
+                                  </Badge>
+                                ) : row.problems.length > 0 ? (
                                   <Badge
                                     variant="outline"
                                     className="border-transparent bg-status-danger-bg text-status-danger"
