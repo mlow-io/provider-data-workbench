@@ -2,6 +2,8 @@
 
 **A healthcare provider-directory operations console for catching ghost-network regressions, adapting messy clinic rosters, and exporting audit-ready directories.**
 
+**[Launch Live Interactive Browser Demo](https://mlow-io.github.io/provider-data-workbench/)** *(runs 100% client-side in your browser using the synthetic Middle Tennessee showcase—no Python or database setup required)*
+
 Payers and medical groups face strict **No Surprises Act** directory timelines (90-day verification, 2-business-day updates), yet routine roster spreadsheets frequently drop active clinics, invert directory exclusion flags (`Dir_Exclude_Flag = Y`), or disagree with NPPES/payer records on scheduling phone numbers.
 
 Provider Data Workbench combines a deterministic Python/FastAPI/SQLite operations backend, the [`provider-network-intake`](https://github.com/mlow-io/provider-network-intake) schema-adaptation library, and a clean React + shadcn/ui workstation.
