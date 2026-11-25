@@ -6,7 +6,7 @@ import {
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { ArrowUpRight, Building2, Eye, EyeOff, Search, ShieldAlert, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Building2, Eye, EyeOff, Info, Search, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +36,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { dataClient } from "@/lib/dataClient";
 import { daysUntilNsaCheck, formatPhone } from "@/lib/format";
 import type { DirectoryRecord } from "@/lib/types";
@@ -46,11 +53,30 @@ export function ProviderDirectoryPage() {
   const [clinic, setClinic] = useState("all");
   const [network, setNetwork] = useState("all");
   const [visibility, setVisibility] = useState("all");
+  const [quickFilter, setQuickFilter] = useState<"all" | "exceptions" | "issues" | "suppressed">("all");
 
   const directoryQuery = useQuery({
     queryKey: ["directory-records"],
     queryFn: () => dataClient.directory(),
   });
+
+  const isExceptionRow = (item: DirectoryRecord) =>
+    Boolean(
+      item.hospital_based_newpt_risk ||
+        !item.directory_visible ||
+        item.four_gate_evidence?.gate2_licensure.status ===
+          "out_of_state_license_only_unverified_psv"
+    );
+
+  const counts = useMemo(() => {
+    const items = directoryQuery.data ?? [];
+    return {
+      all: items.length,
+      exceptions: items.filter(isExceptionRow).length,
+      issues: items.filter((i) => i.open_issues > 0).length,
+      suppressed: items.filter((i) => !i.directory_visible).length,
+    };
+  }, [directoryQuery.data]);
 
   const clinics = useMemo(() => {
     const map = new Map<string, string>();
@@ -73,6 +99,9 @@ export function ProviderDirectoryPage() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return (directoryQuery.data ?? []).filter((item) => {
+      if (quickFilter === "exceptions" && !isExceptionRow(item)) return false;
+      if (quickFilter === "issues" && item.open_issues === 0) return false;
+      if (quickFilter === "suppressed" && item.directory_visible) return false;
       if (clinic !== "all" && item.location_code !== clinic) return false;
       if (network !== "all" && !item.networks.includes(network)) return false;
       if (visibility === "listed" && !item.directory_visible) return false;
@@ -83,7 +112,7 @@ export function ProviderDirectoryPage() {
       }
       return true;
     });
-  }, [directoryQuery.data, search, clinic, network, visibility]);
+  }, [directoryQuery.data, quickFilter, search, clinic, network, visibility]);
 
   const columns = useMemo<ColumnDef<DirectoryRecord>[]>(
     () => [
@@ -107,10 +136,30 @@ export function ProviderDirectoryPage() {
       },
       {
         id: "npi",
-        header: "NPI & Checksum",
+        header: () => (
+          <div className="inline-flex items-center gap-1">
+            <span>NPI & Checksum</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Primary-source licensure verification note"
+                    className="inline-flex text-muted-foreground hover:text-foreground"
+                  >
+                    <Info className="size-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Self-reported licensure states always require primary-source board verification (PSV).
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        ),
         cell: ({ row }) => (
           <div className="flex flex-col gap-1">
-            <span className="font-mono text-xs font-medium">{row.original.npi}</span>
+            <span className="font-mono text-xs font-medium tabular-nums">{row.original.npi}</span>
             {row.original.npi_luhn_valid ? (
               <Badge
                 variant="outline"
@@ -128,15 +177,11 @@ export function ProviderDirectoryPage() {
                 Invalid Checksum
               </Badge>
             )}
-            {row.original.four_gate_evidence?.gate2_licensure.psv_required && (
-              row.original.four_gate_evidence.gate2_licensure.status ===
-              "out_of_state_license_only_unverified_psv" ? (
-                <span className="text-xs font-medium text-status-warning">
-                  Out-of-state license · PSV Required
-                </span>
-              ) : (
-                <span className="text-xs text-muted-foreground">PSV Required</span>
-              )
+            {row.original.four_gate_evidence?.gate2_licensure.status ===
+              "out_of_state_license_only_unverified_psv" && (
+              <span className="text-xs font-medium text-status-warning">
+                Out-of-state license · PSV Required
+              </span>
             )}
           </div>
         ),
@@ -157,7 +202,7 @@ export function ProviderDirectoryPage() {
         id: "phone",
         header: "Scheduling Phone",
         cell: ({ row }) => (
-          <span className="font-mono text-xs">
+          <span className="font-mono text-xs tabular-nums">
             {formatPhone(row.original.phone, row.original.phone_extension)}
           </span>
         ),
@@ -264,6 +309,18 @@ export function ProviderDirectoryPage() {
               never erase active contracts.
             </CardDescription>
           </div>
+          <Tabs
+            value={quickFilter}
+            onValueChange={(v) => setQuickFilter(v as typeof quickFilter)}
+            className="mt-3"
+          >
+            <TabsList className="flex-wrap">
+              <TabsTrigger value="all">All ({counts.all})</TabsTrigger>
+              <TabsTrigger value="exceptions">Exceptions ({counts.exceptions})</TabsTrigger>
+              <TabsTrigger value="issues">Open Issues ({counts.issues})</TabsTrigger>
+              <TabsTrigger value="suppressed">Suppressed ({counts.suppressed})</TabsTrigger>
+            </TabsList>
+          </Tabs>
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
             <div className="relative">
               <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" />

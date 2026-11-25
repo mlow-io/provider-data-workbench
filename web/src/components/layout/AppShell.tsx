@@ -65,17 +65,12 @@ function AppSidebar({
   demoMode,
 }: Omit<AppShellProps, "children" | "onResetDemo">) {
   const { setOpenMobile } = useSidebar();
-  const items: NavItem[] = [
+  const triageItems: NavItem[] = [
     {
       view: "work",
       label: "Work Queue",
       icon: BriefcaseBusiness,
       badge: openDiscrepancies,
-    },
-    {
-      view: "intake",
-      label: "Import & Adapt",
-      icon: FileSpreadsheet,
     },
     {
       view: "corrections",
@@ -88,6 +83,13 @@ function AppSidebar({
       icon: GitCompareArrows,
       badge: heldDeliveries,
     },
+  ];
+  const directoryItems: NavItem[] = [
+    {
+      view: "intake",
+      label: "Import & Adapt",
+      icon: FileSpreadsheet,
+    },
     {
       view: "directory",
       label: "Provider Directory",
@@ -95,8 +97,43 @@ function AppSidebar({
     },
   ];
 
+  function renderNavItems(items: NavItem[]) {
+    return items.map((item) => (
+      <SidebarMenuItem key={item.view}>
+        <SidebarMenuButton
+          asChild
+          isActive={workspace === item.view}
+          tooltip={item.label}
+        >
+          <a
+            href={workspaceHref(item.view)}
+            onClick={(event) => {
+              if (
+                event.button === 0 &&
+                !event.ctrlKey &&
+                !event.metaKey &&
+                !event.shiftKey &&
+                !event.altKey
+              ) {
+                event.preventDefault();
+                navigateWorkspace(item.view);
+                setOpenMobile(false);
+              }
+            }}
+          >
+            <item.icon />
+            <span>{item.label}</span>
+          </a>
+        </SidebarMenuButton>
+        {typeof item.badge === "number" && item.badge > 0 && (
+          <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+        )}
+      </SidebarMenuItem>
+    ));
+  }
+
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar variant="inset" collapsible="icon">
       <SidebarHeader className="border-b px-3 py-3">
         <div className="flex items-center gap-2.5 overflow-hidden">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -115,42 +152,15 @@ function AppSidebar({
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Operations</SidebarGroupLabel>
+          <SidebarGroupLabel>Triage & Ops</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.view}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={workspace === item.view}
-                    tooltip={item.label}
-                  >
-                    <a
-                      href={workspaceHref(item.view)}
-                      onClick={(event) => {
-                        if (
-                          event.button === 0 &&
-                          !event.ctrlKey &&
-                          !event.metaKey &&
-                          !event.shiftKey &&
-                          !event.altKey
-                        ) {
-                          event.preventDefault();
-                          navigateWorkspace(item.view);
-                          setOpenMobile(false);
-                        }
-                      }}
-                    >
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </a>
-                  </SidebarMenuButton>
-                  {typeof item.badge === "number" && item.badge > 0 && (
-                    <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
-                  )}
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <SidebarMenu>{renderNavItems(triageItems)}</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Data & Directory</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>{renderNavItems(directoryItems)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
@@ -197,7 +207,7 @@ export function AppShell({
           demoMode={demoMode}
         />
         <SidebarInset className="min-w-0">
-          <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 lg:px-6">
+          <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-card px-4 md:rounded-t-xl lg:px-6">
             <div className="flex min-w-0 items-center gap-3">
               <SidebarTrigger aria-label="Toggle navigation" />
               <Separator orientation="vertical" className="h-4" />

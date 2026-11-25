@@ -27,6 +27,18 @@ describe("ProviderDirectoryPage", () => {
     expect(screen.getByText("Out-of-state license · PSV Required")).toBeInTheDocument();
     expect(screen.getAllByText(/Medicaid \/ TennCare MCO/i).length).toBeGreaterThanOrEqual(1);
 
+    const exceptionsTab = screen.getByRole("tab", { name: /Exceptions/i });
+    fireEvent.mouseDown(exceptionsTab, { button: 0 });
+    fireEvent.click(exceptionsTab);
+    await waitFor(() => {
+      expect(screen.queryByText(/Dr\. Elena Morales, MD/i)).not.toBeInTheDocument();
+    });
+    expect(screen.getByText(/Dr\. Rachel Alvarez, MD/i)).toBeInTheDocument();
+    const allTab = screen.getByRole("tab", { name: /^All \(15\)$/i });
+    fireEvent.mouseDown(allTab, { button: 0 });
+    fireEvent.click(allTab);
+    expect(await screen.findAllByText(/Dr\. Elena Morales, MD/i)).not.toHaveLength(0);
+
     const search = screen.getByLabelText("Search directory");
     fireEvent.change(search, { target: { value: "Morales" } });
 

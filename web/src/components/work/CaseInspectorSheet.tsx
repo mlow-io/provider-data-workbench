@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, CheckCircle2, ChevronDown, Clock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { RiskBadge, StatusBadge } from "@/components/shared/StatusBadge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +28,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   clinicDisplayName,
   formatDateTime,
   formatPhone,
@@ -34,6 +41,7 @@ import {
   statusLabel,
 } from "@/lib/format";
 import type { CaseActionInput, WorkCaseDetail } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface CaseInspectorSheetProps {
   open: boolean;
@@ -105,6 +113,7 @@ export function CaseInspectorSheet({
   >("response_received");
   const [outreachSummary, setOutreachSummary] = useState("");
   const [saving, setSaving] = useState(false);
+  const [gateOpen, setGateOpen] = useState(false);
 
   useEffect(() => {
     if (!caseDetail) return;
@@ -211,13 +220,16 @@ export function CaseInspectorSheet({
               </>
             )}
             {caseDetail?.regulatory_regime && (
-              <Badge
-                variant="outline"
-                className="font-normal"
-                title={caseDetail.regulatory_regime.sla_note}
-              >
-                {caseDetail.regulatory_regime.label}
-              </Badge>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="outline" className="cursor-help font-normal">
+                      {caseDetail.regulatory_regime.label}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>{caseDetail.regulatory_regime.sla_note}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </SheetDescription>
         </SheetHeader>
@@ -256,84 +268,128 @@ export function CaseInspectorSheet({
                     </div>
                   </div>
                   {caseDetail.phone_conflict && (
-                    <div className="rounded-lg border bg-muted/40 p-2.5 text-xs">
-                      <div className="font-medium text-foreground">
+                    <Alert>
+                      <AlertTitle>
                         Phone Conflict Triage: {caseDetail.phone_conflict.label}
-                      </div>
-                      <p className="mt-0.5 text-muted-foreground">
-                        {caseDetail.phone_conflict.guidance}
-                      </p>
-                    </div>
+                      </AlertTitle>
+                      <AlertDescription>{caseDetail.phone_conflict.guidance}</AlertDescription>
+                    </Alert>
                   )}
                 </CardContent>
               </Card>
 
               {caseDetail.four_gate_evidence && (
-                <Card size="sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">4-Gate Provider Truth</CardTitle>
-                  </CardHeader>
-                  <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
-                      <div className="font-medium text-muted-foreground">1. Identity</div>
-                      <div className="mt-0.5 font-medium text-foreground">
-                        {caseDetail.four_gate_evidence.gate1_identity.label}
+                <Collapsible open={gateOpen} onOpenChange={setGateOpen}>
+                  <Card size="sm">
+                    <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <CardTitle className="text-sm font-medium">4-Gate Provider Truth</CardTitle>
+                        <Badge variant="secondary" className="text-[11px] font-normal">
+                          {npiValid ? "Identity ✓" : "Identity !"}
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "border-transparent text-[11px]",
+                            caseDetail.four_gate_evidence.gate2_licensure.psv_required
+                              ? "bg-status-warning-bg text-status-warning"
+                              : "bg-status-success-bg text-status-success"
+                          )}
+                        >
+                          {caseDetail.four_gate_evidence.gate2_licensure.psv_required
+                            ? "PSV Required"
+                            : "PSV Verified"}
+                        </Badge>
+                        <Badge variant="secondary" className="text-[11px] font-normal">
+                          {caseDetail.four_gate_evidence.gate3_enrollment.leie_clear
+                            ? "LEIE Clear"
+                            : "LEIE Alert"}
+                        </Badge>
+                        {caseDetail.four_gate_evidence.gate4_directory.hospital_based_newpt_leak && (
+                          <Badge
+                            variant="outline"
+                            className="border-transparent bg-status-warning-bg text-[11px] text-status-warning"
+                          >
+                            Hospital-Based
+                          </Badge>
+                        )}
                       </div>
-                      <div className="text-[11px] text-muted-foreground">
-                        {caseDetail.four_gate_evidence.gate1_identity.source}
-                      </div>
-                    </div>
-                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
-                      <div className="font-medium text-muted-foreground">
-                        2. State Licensure [PSV]
-                      </div>
-                      <div
-                        className={
-                          caseDetail.four_gate_evidence.gate2_licensure.psv_required
-                            ? "mt-0.5 font-medium text-status-warning"
-                            : "mt-0.5 font-medium text-status-success"
-                        }
-                      >
-                        {caseDetail.four_gate_evidence.gate2_licensure.label}
-                      </div>
-                      <div className="text-[11px] text-muted-foreground">
-                        {caseDetail.four_gate_evidence.gate2_licensure.psv_required
-                          ? "PSV Required"
-                          : "PSV Verified"}
-                      </div>
-                    </div>
-                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
-                      <div className="font-medium text-muted-foreground">
-                        3. Enrollment / LEIE
-                      </div>
-                      <div className="mt-0.5 font-medium text-foreground">
-                        {caseDetail.four_gate_evidence.gate3_enrollment.label}
-                      </div>
-                      <div className="text-[11px] text-muted-foreground">
-                        {caseDetail.four_gate_evidence.gate3_enrollment.leie_clear
-                          ? "LEIE Clear"
-                          : "LEIE Alert"}
-                      </div>
-                    </div>
-                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
-                      <div className="font-medium text-muted-foreground">
-                        4. Directory / Panel
-                      </div>
-                      <div
-                        className={
-                          caseDetail.four_gate_evidence.gate4_directory.hospital_based_newpt_leak
-                            ? "mt-0.5 font-medium text-status-warning"
-                            : "mt-0.5 font-medium text-foreground"
-                        }
-                      >
-                        {caseDetail.four_gate_evidence.gate4_directory.label}
-                      </div>
-                      <div className="text-[11px] text-muted-foreground">
-                        {caseDetail.four_gate_evidence.gate4_directory.note}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="xs">
+                          <span>Details</span>
+                          <ChevronDown
+                            data-icon="inline-end"
+                            className={cn("transition-transform", gateOpen && "rotate-180")}
+                          />
+                        </Button>
+                      </CollapsibleTrigger>
+                    </CardHeader>
+                    <CollapsibleContent>
+                      <CardContent className="grid grid-cols-1 gap-2 border-t pt-3 sm:grid-cols-2">
+                        <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                          <div className="font-medium text-muted-foreground">1. Identity</div>
+                          <div className="mt-0.5 font-medium text-foreground">
+                            {caseDetail.four_gate_evidence.gate1_identity.label}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {caseDetail.four_gate_evidence.gate1_identity.source}
+                          </div>
+                        </div>
+                        <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                          <div className="font-medium text-muted-foreground">
+                            2. State Licensure [PSV]
+                          </div>
+                          <div
+                            className={cn(
+                              "mt-0.5 font-medium",
+                              caseDetail.four_gate_evidence.gate2_licensure.psv_required
+                                ? "text-status-warning"
+                                : "text-status-success"
+                            )}
+                          >
+                            {caseDetail.four_gate_evidence.gate2_licensure.label}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {caseDetail.four_gate_evidence.gate2_licensure.psv_required
+                              ? "PSV Required"
+                              : "PSV Verified"}
+                          </div>
+                        </div>
+                        <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                          <div className="font-medium text-muted-foreground">
+                            3. Enrollment / LEIE
+                          </div>
+                          <div className="mt-0.5 font-medium text-foreground">
+                            {caseDetail.four_gate_evidence.gate3_enrollment.label}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {caseDetail.four_gate_evidence.gate3_enrollment.leie_clear
+                              ? "LEIE Clear"
+                              : "LEIE Alert"}
+                          </div>
+                        </div>
+                        <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                          <div className="font-medium text-muted-foreground">
+                            4. Directory / Panel
+                          </div>
+                          <div
+                            className={cn(
+                              "mt-0.5 font-medium",
+                              caseDetail.four_gate_evidence.gate4_directory.hospital_based_newpt_leak
+                                ? "text-status-warning"
+                                : "text-foreground"
+                            )}
+                          >
+                            {caseDetail.four_gate_evidence.gate4_directory.label}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground">
+                            {caseDetail.four_gate_evidence.gate4_directory.note}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Card>
+                </Collapsible>
               )}
 
               <Tabs defaultValue="review">

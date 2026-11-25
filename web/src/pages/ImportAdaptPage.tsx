@@ -62,6 +62,21 @@ const TARGET_FIELDS = [
   "source_updated_at",
 ];
 
+const FIELD_LABELS: Record<string, string> = {
+  record_id: "Record ID",
+  practitioner_npi: "Practitioner NPI",
+  provider_name: "Clinician Name",
+  specialty: "NUCC Specialty",
+  location_id: "Location Code",
+  address: "Street Address",
+  city: "City",
+  state: "State",
+  zip: "ZIP Code",
+  phone: "Phone",
+  directory_visible: "Visibility",
+  source_updated_at: "Updated",
+};
+
 export function ImportAdaptPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -466,8 +481,14 @@ export function ImportAdaptPage() {
                     .slice(0, 12)
                     .map((target) => (
                       <Field key={target}>
-                        <FieldLabel htmlFor={`map-${target}`} className="font-mono text-xs">
-                          {target}
+                        <FieldLabel
+                          htmlFor={`map-${target}`}
+                          className="flex items-baseline justify-between gap-2 text-xs"
+                        >
+                          <span>{FIELD_LABELS[target] ?? target}</span>
+                          <span className="font-mono text-[11px] font-normal text-muted-foreground">
+                            {target}
+                          </span>
                         </FieldLabel>
                         <Select
                           value={draftMapping[target] ?? "__none__"}

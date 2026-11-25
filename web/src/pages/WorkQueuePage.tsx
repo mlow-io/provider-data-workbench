@@ -55,7 +55,8 @@ import {
   formatShortDate,
 } from "@/lib/format";
 import type { CaseActionInput, WorkCaseSummary } from "@/lib/types";
-import { updateWorkspaceQuery, useWorkspaceQuery } from "@/workspaceNavigation";
+import { cn } from "@/lib/utils";
+import { navigateWorkspace, updateWorkspaceQuery, useWorkspaceQuery } from "@/workspaceNavigation";
 
 function compactDiff(row: WorkCaseSummary): string {
   const rightRaw = row.proposal ?? row.reference_value;
@@ -145,7 +146,7 @@ export function WorkQueuePage() {
         cell: ({ row }) => (
           <div className="flex flex-col">
             <span className="font-medium text-foreground">{row.original.provider_name}</span>
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="font-mono text-xs text-muted-foreground tabular-nums">
               {row.original.npi ? `NPI ${row.original.npi}` : row.original.source}
             </span>
           </div>
@@ -170,37 +171,34 @@ export function WorkQueuePage() {
         id: "discrepancy",
         header: "Discrepancy & Diff",
         cell: ({ row }) => (
-          <div className="flex max-w-md flex-col gap-0.5">
+          <div className="flex max-w-xs flex-col gap-0.5 xl:max-w-sm">
             <span className="truncate font-medium text-foreground">{row.original.issue}</span>
             <span className="truncate font-mono text-xs text-muted-foreground">
               {compactDiff(row.original)}
             </span>
-            {(row.original.phone_conflict ||
-              (row.original.regulatory_regime &&
-                row.original.regulatory_regime.regime !== "unclassified_regime") ||
-              row.original.hospital_based_newpt_risk) && (
-              <div className="mt-1 flex flex-wrap gap-1">
-                {row.original.phone_conflict && (
-                  <Badge variant="outline" className="text-[11px] font-normal">
-                    {row.original.phone_conflict.label}
-                  </Badge>
-                )}
-                {row.original.regulatory_regime &&
-                  row.original.regulatory_regime.regime !== "unclassified_regime" && (
-                    <Badge variant="secondary" className="text-[11px] font-normal">
-                      {row.original.regulatory_regime.label}
-                    </Badge>
-                  )}
-                {row.original.hospital_based_newpt_risk && (
-                  <Badge
-                    variant="outline"
-                    className="border-transparent bg-status-warning-bg text-[11px] text-status-warning"
-                  >
-                    Hospital-Based newpt
-                  </Badge>
-                )}
+            {row.original.hospital_based_newpt_risk ? (
+              <div className="mt-1 flex">
+                <Badge
+                  variant="outline"
+                  className="border-transparent bg-status-warning-bg text-[11px] text-status-warning"
+                >
+                  Hospital-Based newpt
+                </Badge>
               </div>
-            )}
+            ) : row.original.phone_conflict ? (
+              <div className="mt-1 flex">
+                <Badge variant="outline" className="text-[11px] font-normal">
+                  {row.original.phone_conflict.label}
+                </Badge>
+              </div>
+            ) : row.original.regulatory_regime &&
+              row.original.regulatory_regime.regime !== "unclassified_regime" ? (
+              <div className="mt-1 flex">
+                <Badge variant="secondary" className="text-[11px] font-normal">
+                  {row.original.regulatory_regime.label}
+                </Badge>
+              </div>
+            ) : null}
           </div>
         ),
       },
@@ -283,44 +281,78 @@ export function WorkQueuePage() {
               {ov ? `${ov.clean_rate_pct}%` : <Skeleton className="h-7 w-16" />}
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-xs text-muted-foreground">
-            {ov
-              ? `${ov.total_providers} clinicians across ${ov.total_locations} Middle TN clinics`
-              : "Loading metrics…"}
+          <CardContent className="flex flex-col gap-2 text-xs text-muted-foreground">
+            {ov && (
+              <div
+                className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+                aria-hidden="true"
+              >
+                <div
+                  className="h-full rounded-full bg-status-success transition-all"
+                  style={{ width: `${Math.min(100, Math.max(0, ov.clean_rate_pct))}%` }}
+                />
+              </div>
+            )}
+            <span>
+              {ov
+                ? `${ov.total_providers} clinicians across ${ov.total_locations} Middle TN clinics`
+                : "Loading metrics…"}
+            </span>
           </CardContent>
         </Card>
 
-        <Card size="sm">
-          <CardHeader className="pb-1">
-            <CardDescription className="flex items-center justify-between">
-              <span>Open Discrepancies</span>
-              <AlertTriangle className="size-4 text-status-warning" />
-            </CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
-              {ov ? ov.open_discrepancies : <Skeleton className="h-7 w-12" />}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-xs text-muted-foreground">
-            {ov ? `${ov.high_risk_discrepancies} high-risk patient contact items` : "Loading…"}
-          </CardContent>
-        </Card>
+        <button
+          type="button"
+          onClick={() => {
+            setStatusFilter("open");
+            setRiskFilter((prev) => (prev === "high" ? "all" : "high"));
+          }}
+          className="rounded-xl text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          <Card
+            size="sm"
+            className={cn(
+              "h-full transition-colors hover:border-primary/40",
+              riskFilter === "high" && "border-primary/60 bg-accent/20"
+            )}
+          >
+            <CardHeader className="pb-1">
+              <CardDescription className="flex items-center justify-between">
+                <span>Open Discrepancies</span>
+                <AlertTriangle className="size-4 text-status-warning" />
+              </CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums">
+                {ov ? ov.open_discrepancies : <Skeleton className="h-7 w-12" />}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              {ov ? `${ov.high_risk_discrepancies} high-risk patient contact items` : "Loading…"}
+            </CardContent>
+          </Card>
+        </button>
 
-        <Card size="sm">
-          <CardHeader className="pb-1">
-            <CardDescription className="flex items-center justify-between">
-              <span>Held Deliveries</span>
-              <FileWarning className="size-4 text-status-danger" />
-            </CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
-              {ov ? ov.held_deliveries : <Skeleton className="h-7 w-12" />}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-xs text-muted-foreground">
-            {ov
-              ? `${ov.quarantined_rows} quarantined ${ov.quarantined_rows === 1 ? "row" : "rows"} held safely off live roster`
-              : "Loading…"}
-          </CardContent>
-        </Card>
+        <button
+          type="button"
+          onClick={() => navigateWorkspace("deliveries")}
+          className="rounded-xl text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          <Card size="sm" className="h-full transition-colors hover:border-primary/40">
+            <CardHeader className="pb-1">
+              <CardDescription className="flex items-center justify-between">
+                <span>Held Deliveries</span>
+                <FileWarning className="size-4 text-status-danger" />
+              </CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums">
+                {ov ? ov.held_deliveries : <Skeleton className="h-7 w-12" />}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground">
+              {ov
+                ? `${ov.quarantined_rows} quarantined ${ov.quarantined_rows === 1 ? "row" : "rows"} held safely off live roster`
+                : "Loading…"}
+            </CardContent>
+          </Card>
+        </button>
 
         <Card size="sm">
           <CardHeader className="pb-1">
