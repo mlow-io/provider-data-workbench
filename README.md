@@ -17,6 +17,7 @@ Provider Data Workbench combines a deterministic Python/FastAPI/SQLite operation
 - **Reviewed corrections become approved data, not just notes:** When the clinic roster and a payer directory disagree on an office phone, an operator picks the value, the workbench builds a complete candidate roster that changes only that office's row, and a separate approval promotes it with pinned lineage. A clinician's other offices are never touched, and NPI alone never selects an office.
 - **Visual field-level triage & append-only audit trail:** Operators inspect exact before/after diffs (`Clinic Roster` vs `NPPES` / `Payer`), record outreach and corrections under optimistic concurrency, and export snapshot-pinned XLSX/JSON rosters scoped to an entire network or a single clinic.
 - **CMS NPI check-digit validation & bounded FHIR/NPPES support:** Validates 10-digit NPIs with the CMS ISO 7812 Luhn algorithm (`80840` prefix) and conservatively interprets saved NPPES API 2.1 and FHIR R4 / Plan-Net 1.2.0 Bundles.
+- **Real-world domain signals & 4-Gate Provider Truth:** Separates Commercial No Surprises Act, CMS Medicare Advantage, and Medicaid / TennCare MCO regimes; flags hospital-based taxonomies (`207P`, `2085R`, etc.) marked accepting new patients; classifies phone conflicts (`Toll-Free Centralized Desk` vs. `Same Clinic Prefix (NPA-NXX)`); and isolates self-reported licensure from primary-source board verification (`PSV Required`).
 
 | Discrepancy Diff Inspector | Import & Schema Adaptation |
 |---|---|

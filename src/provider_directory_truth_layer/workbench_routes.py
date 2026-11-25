@@ -6,6 +6,14 @@ import re
 from datetime import date, datetime, timezone
 from typing import Any
 
+from .domain_signals import (
+    build_four_gate_evidence,
+    classify_phone_conflict,
+    classify_regulatory_regime,
+    classify_regulatory_regimes,
+    is_accepting_panel,
+    is_hospital_based_taxonomy,
+)
 from .managed_feed import ManagedFeed
 from .normalize import normalize_phone
 
@@ -131,6 +139,35 @@ def build_directory_records(
         phone = normalize_phone(norm.get("phone") or orig.get("phone") or "")
         ext = norm.get("phone_extension") or orig.get("phone_extension") or None
         specialty = norm.get("specialty") or orig.get("specialty") or "General Practice"
+        panel_status = (
+            norm.get("panel_status")
+            or orig.get("panel_status")
+            or norm.get("accepting_new_patients")
+            or orig.get("accepting_new_patients")
+        )
+        hb_leak = bool(
+            is_hospital_based_taxonomy(str(specialty))
+            and raw_visible
+            and is_accepting_panel(str(panel_status) if panel_status is not None else None)
+        )
+        state_val = str(norm.get("state") or orig.get("state") or "")
+        lic_state = norm.get("license_state") or orig.get("license_state") or (state_val or None)
+        psv_status = norm.get("psv_status") or orig.get("psv_status")
+        pecos_status = (
+            norm.get("pecos_status")
+            or orig.get("pecos_status")
+            or ("pecos_ffs_enrolled" if "medicare" in " ".join(networks_set).lower() else "unverified")
+        )
+        regimes = classify_regulatory_regimes(sorted(networks_set), row["source"])
+        four_gate = build_four_gate_evidence(
+            npi=npi,
+            npi_luhn_valid=is_valid_npi(npi),
+            practice_state=state_val or "TN",
+            license_state=str(lic_state) if lic_state else None,
+            psv_status=str(psv_status) if psv_status else None,
+            pecos_status=str(pecos_status) if pecos_status else None,
+            hospital_based_newpt_leak=hb_leak,
+        )
         verified_at = (
             row["human_verified_at"]
             or norm.get("source_updated_at")
@@ -148,7 +185,7 @@ def build_directory_records(
             "location_name": str(loc_name),
             "address": str(norm.get("address") or orig.get("address") or ""),
             "city": str(norm.get("city") or orig.get("city") or ""),
-            "state": str(norm.get("state") or orig.get("state") or ""),
+            "state": state_val,
             "zip": str(norm.get("zip") or orig.get("zip") or ""),
             "phone": phone,
             "phone_extension": str(ext) if ext else None,
@@ -158,6 +195,10 @@ def build_directory_records(
             "open_issues": len(case_ids),
             "primary_case_id": case_ids[0] if case_ids else None,
             "source": row["source"],
+            "regulatory_regimes": regimes,
+            "hospital_based_newpt_risk": hb_leak,
+            "licensure_psv_status": four_gate["gate2_licensure"]["status"],
+            "four_gate_evidence": four_gate,
         }
 
     items = sorted(records.values(), key=lambda r: (r["open_issues"] == 0, r["provider_name"], r["location_code"]))
@@ -270,6 +311,89 @@ def schema_catalog_status(schema_catalog=None) -> dict[str, Any]:
     }
 
 
+def _case_domain_signals(
+    item: dict[str, Any],
+    ev: dict[str, Any],
+    npi: str | None,
+) -> dict[str, Any]:
+    """Compute domain triage signals (regime, phone conflict, hospital newpt, 4-gate truth) for a case."""
+    norm = ev.get("normalized") or {}
+    orig = ev.get("original") or {}
+    net_hint = (
+        item.get("network_label")
+        or item.get("network_id")
+        or norm.get("network_label")
+        or norm.get("network_name")
+        or orig.get("network_label")
+        or orig.get("network_name")
+        or ev.get("source")
+        or item.get("source")
+    )
+    regimes = classify_regulatory_regimes(
+        [str(net_hint)] if net_hint else [],
+        str(ev.get("source") or item.get("source") or ""),
+    )
+    regime = regimes[0] if regimes else classify_regulatory_regime(str(net_hint or ""))
+
+    phone_conflict = (
+        classify_phone_conflict(item.get("listing_value"), item.get("reference_value"))
+        if item.get("field_name") == "phone"
+        else None
+    )
+
+    specialty = str(norm.get("specialty") or orig.get("specialty") or "")
+    raw_visible = norm.get("directory_visible")
+    visible = True if raw_visible is None else bool(raw_visible)
+    panel_status = (
+        norm.get("panel_status")
+        or orig.get("panel_status")
+        or norm.get("accepting_new_patients")
+        or orig.get("accepting_new_patients")
+    )
+    hb_risk = bool(
+        is_hospital_based_taxonomy(specialty)
+        and visible
+        and is_accepting_panel(str(panel_status) if panel_status is not None else None)
+    )
+    practice_state = str(norm.get("state") or orig.get("state") or "TN")
+    license_state = norm.get("license_state") or orig.get("license_state") or practice_state
+    four_gate = build_four_gate_evidence(
+        npi=npi,
+        npi_luhn_valid=bool(npi and is_valid_npi(npi)),
+        practice_state=practice_state,
+        license_state=str(license_state) if license_state else None,
+        psv_status=norm.get("psv_status") or orig.get("psv_status"),
+        pecos_status=norm.get("pecos_status") or orig.get("pecos_status") or "unverified",
+        address_confirmed=item.get("field_name") != "address",
+        hospital_based_newpt_leak=hb_risk,
+    )
+    return {
+        "regulatory_regime": regime,
+        "phone_conflict": phone_conflict,
+        "hospital_based_newpt_risk": hb_risk,
+        "four_gate_evidence": four_gate,
+    }
+
+
+def enrich_case_detail(case: dict[str, Any]) -> dict[str, Any]:
+    """Attach operational domain signals to a single work-case detail payload."""
+    ev = case.get("evidence") or {}
+    norm = ev.get("normalized") or {}
+    npi = str(norm.get("npi") or "")
+    if not npi and str(ev.get("provider_id") or "").startswith("NPI:"):
+        npi = str(ev["provider_id"]).split("NPI:", 1)[1]
+    enriched = {
+        **case,
+        "npi": case.get("npi") or (npi or None),
+        "listing_value": case.get("listing_value") if case.get("listing_value") is not None else ev.get("listing_value"),
+        "reference_value": case.get("reference_value") if case.get("reference_value") is not None else ev.get("reference_value"),
+    }
+    return {
+        **enriched,
+        **_case_domain_signals(enriched, ev, npi or None),
+    }
+
+
 def build_work_queue(store) -> list[dict[str, Any]]:
     """Return work queue items enriched with formatted field diffs and clinic metadata."""
     items = store.work().get("items", [])
@@ -294,16 +418,16 @@ def build_work_queue(store) -> list[dict[str, Any]]:
             npi = str(ev["provider_id"]).split("NPI:", 1)[1]
         code = _location_code(item.get("location_id"), norm)
         clinic_name = item.get("location_label") or loc_names.get(code) or code
-        enriched.append(
-            {
-                **item,
-                "listing_value": ev.get("listing_value"),
-                "reference_value": ev.get("reference_value"),
-                "npi": npi or None,
-                "location_code": code,
-                "clinic_name": clinic_name,
-            }
-        )
+        row = {
+            **item,
+            "listing_value": ev.get("listing_value"),
+            "reference_value": ev.get("reference_value"),
+            "npi": npi or None,
+            "location_code": code,
+            "clinic_name": clinic_name,
+        }
+        row.update(_case_domain_signals(row, ev, npi or None))
+        enriched.append(row)
     return enriched
 
 
@@ -382,6 +506,19 @@ def build_phone_reviews(store) -> dict[str, Any]:
                         "new_value": manifest["materialization"]["new_value"],
                     })
                 correction = {"status": "no_roster"} if base is None else materialization.assess(conn, base, clinician_id, location_id, view)
+                selectable_numbers: list[str] = []
+                for opt in options:
+                    num = opt.get("number")
+                    if opt.get("selectable") and num and num not in selectable_numbers:
+                        selectable_numbers.append(str(num))
+                phone_conflict = (
+                    classify_phone_conflict(
+                        selectable_numbers[0] if selectable_numbers else None,
+                        selectable_numbers[1] if len(selectable_numbers) > 1 else (selectable_numbers[0] if selectable_numbers else None),
+                    )
+                    if len(values) > 1
+                    else None
+                )
                 items.append({
                     "clinician_id": clinician_id,
                     "clinician_label": view["clinician"]["label"],
@@ -391,6 +528,7 @@ def build_phone_reviews(store) -> dict[str, Any]:
                     "inputs_fresh": view["inputs_fresh"],
                     "status": phone["status"],
                     "sources_agree": len(values) <= 1,
+                    "phone_conflict": phone_conflict,
                     "options": options,
                     "decision": None if decision is None else {
                         "id": decision["id"],

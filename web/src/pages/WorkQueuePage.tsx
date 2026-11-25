@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { RiskBadge, StatusBadge } from "@/components/shared/StatusBadge";
 import { CaseInspectorSheet } from "@/components/work/CaseInspectorSheet";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -174,6 +175,32 @@ export function WorkQueuePage() {
             <span className="truncate font-mono text-xs text-muted-foreground">
               {compactDiff(row.original)}
             </span>
+            {(row.original.phone_conflict ||
+              (row.original.regulatory_regime &&
+                row.original.regulatory_regime.regime !== "unclassified_regime") ||
+              row.original.hospital_based_newpt_risk) && (
+              <div className="mt-1 flex flex-wrap gap-1">
+                {row.original.phone_conflict && (
+                  <Badge variant="outline" className="text-[11px] font-normal">
+                    {row.original.phone_conflict.label}
+                  </Badge>
+                )}
+                {row.original.regulatory_regime &&
+                  row.original.regulatory_regime.regime !== "unclassified_regime" && (
+                    <Badge variant="secondary" className="text-[11px] font-normal">
+                      {row.original.regulatory_regime.label}
+                    </Badge>
+                  )}
+                {row.original.hospital_based_newpt_risk && (
+                  <Badge
+                    variant="outline"
+                    className="border-transparent bg-status-warning-bg text-[11px] text-status-warning"
+                  >
+                    Hospital-Based newpt
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
         ),
       },

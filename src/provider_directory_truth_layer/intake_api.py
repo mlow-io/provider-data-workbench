@@ -448,7 +448,9 @@ def create_workbench(path: Path | None = None, root: Path | None = None, *, demo
 
     @app.get('/api/work/{case_id}')
     def case(case_id: str):
-        return store.case(case_id)
+        from .workbench_routes import enrich_case_detail
+
+        return enrich_case_detail(store.case(case_id))
 
     @app.post('/api/work/{case_id}/events')
     def event(case_id: str, payload: dict):

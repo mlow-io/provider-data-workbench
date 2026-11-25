@@ -21,6 +21,14 @@ import type {
   WorkbenchOverview,
 } from "@/lib/types";
 
+import {
+  buildFourGateEvidence,
+  classifyPhoneConflict,
+  classifyRegulatoryRegime,
+  classifyRegulatoryRegimes,
+  isHospitalBasedTaxonomy,
+} from "../lib/domainSignals";
+
 export const SAMPLE_OPTIONS: IntakeSampleOption[] = [
   {
     id: "cumberland-monthly-known",
@@ -565,7 +573,7 @@ function buildInitialDirectory(): DirectoryRecord[] {
       provider_name: "Dr. Owen Reynolds, MD",
       npi: "1990001129",
       npi_luhn_valid: true,
-      specialty: "207X00000X · Orthopedic Surgery",
+      specialty: "2085R0202X · Diagnostic Radiology",
       location_code: "BRNT-PARK",
       location_name: "Brentwood Maryland Farms",
       address: "5120 Maryland Way, Suite 120",
@@ -1094,8 +1102,73 @@ function buildInitialCases(): WorkCaseDetail[] {
   ];
 }
 
+function enrichDirectoryRow(row: DirectoryRecord): DirectoryRecord {
+  const networks = [...row.networks];
+  if (
+    (row.npi === "1990001046" || row.npi === "1990001095") &&
+    !networks.includes("TennCare Community Plan")
+  ) {
+    networks.push("TennCare Community Plan");
+  }
+  const hbLeak = isHospitalBasedTaxonomy(row.specialty) && row.directory_visible;
+  const licenseState = row.npi === "1990001095" ? "KY" : row.state;
+  const fourGate = buildFourGateEvidence({
+    npi: row.npi,
+    npiLuhnValid: row.npi_luhn_valid,
+    practiceState: row.state || "TN",
+    licenseState,
+    psvVerified: false,
+    pecosStatus: networks.some((n) => /medicare/i.test(n)) ? "pecos_ffs_enrolled" : "unverified",
+    addressConfirmed: row.open_issues === 0,
+    hospitalBasedNewptLeak: hbLeak,
+  });
+  return {
+    ...row,
+    networks,
+    regulatory_regimes: classifyRegulatoryRegimes(networks, row.source),
+    hospital_based_newpt_risk: hbLeak,
+    licensure_psv_status: fourGate.gate2_licensure.status,
+    four_gate_evidence: fourGate,
+  };
+}
+
+function enrichWorkCase(c: WorkCaseDetail, directory: DirectoryRecord[]): WorkCaseDetail {
+  const matchingDir = directory.find(
+    (d) => d.npi === c.npi && d.location_code === c.location_code
+  );
+  const netHint = matchingDir?.networks[0] ?? c.source;
+  const regime = classifyRegulatoryRegime(netHint);
+  const phoneConflict =
+    c.field_name === "phone" ? classifyPhoneConflict(c.listing_value, c.reference_value) : null;
+  const norm = (c.evidence?.normalized ?? {}) as Record<string, unknown>;
+  const specialty = String(norm.specialty ?? matchingDir?.specialty ?? "");
+  const visible = norm.directory_visible === undefined ? true : Boolean(norm.directory_visible);
+  const hbRisk = isHospitalBasedTaxonomy(specialty) && visible;
+  const practiceState = String(norm.state ?? matchingDir?.state ?? "TN");
+  const licenseState = String(norm.license_state ?? (c.npi === "1990001095" ? "KY" : practiceState));
+  const fourGate = buildFourGateEvidence({
+    npi: c.npi,
+    npiLuhnValid: Boolean(c.npi && isValidNpi(c.npi)),
+    practiceState,
+    licenseState,
+    psvVerified: false,
+    pecosStatus: matchingDir?.networks.some((n) => /medicare/i.test(n))
+      ? "pecos_ffs_enrolled"
+      : "unverified",
+    addressConfirmed: c.field_name !== "address",
+    hospitalBasedNewptLeak: hbRisk,
+  });
+  return {
+    ...c,
+    regulatory_regime: regime,
+    phone_conflict: phoneConflict,
+    hospital_based_newpt_risk: hbRisk,
+    four_gate_evidence: fourGate,
+  };
+}
+
 function buildInitialState(): DemoState {
-  const directory = buildInitialDirectory();
+  const directory = buildInitialDirectory().map(enrichDirectoryRow);
   const initialVariant: SchemaVariantSummary = {
     id: "var-cumberland-ehr-2026q4",
     source: "cumberland-clinic",
@@ -1234,7 +1307,7 @@ function buildInitialState(): DemoState {
 
   return {
     directory,
-    cases: buildInitialCases(),
+    cases: buildInitialCases().map((c) => enrichWorkCase(c, directory)),
     variants: [initialVariant],
     catalogRevision: 1,
     feeds: [
@@ -1405,6 +1478,8 @@ function inferDraftMapping(headers: string[]): Record<string, string> {
     practitioner_npi: ["npi", "practitioner_npi", "clinician_npi", "clinician npi"],
     provider_name: ["provider_name", "full_name", "clinician_name", "provider name"],
     specialty: ["specialty", "nucc_taxonomy", "taxonomy"],
+    license_state: ["license_state", "lic_state", "board_state"],
+    panel_status: ["panel_status", "accepting_new_patients", "new_patient_flag"],
     location_id: ["location_id", "clinic_code", "office_id", "site_key"],
     address: ["address", "street_addr", "street", "office_address"],
     city: ["city", "town"],
@@ -1543,21 +1618,22 @@ export const demoClient = {
         },
       ],
     };
-    state.cases[idx] = updated;
+    state.cases[idx] = enrichWorkCase(updated, state.directory);
     if (["verified", "resolved", "deferred"].includes(nextStatus)) {
       state.directory = state.directory.map((d) =>
         d.primary_case_id === caseId
-          ? {
+          ? enrichDirectoryRow({
               ...d,
               open_issues: 0,
               primary_case_id: null,
               phone: payload.observed ? payload.observed.replace(/\D/g, "") : d.phone,
               verified_at: nextStatus === "verified" ? nowIso : d.verified_at,
-            }
+            })
           : d
       );
+      state.cases[idx] = enrichWorkCase(state.cases[idx], state.directory);
     }
-    return structuredClone(updated);
+    return structuredClone(state.cases[idx]);
   },
 
   async uploadAndInspectIntake(params: {
@@ -1762,6 +1838,38 @@ export const demoClient = {
         counts.invalid_phone = (counts.invalid_phone ?? 0) + 1;
         findings.push({ code: "invalid_phone", layer: "structure", locator, message: msg, severity: "error" });
       }
+      const spec = String(normalized.specialty ?? raw.specialty ?? raw.taxonomy ?? "");
+      const panelVal = String(
+        normalized.panel_status ?? raw.accepting_new_patients ?? raw.panel_status ?? ""
+      ).trim().toLowerCase();
+      if (
+        isHospitalBasedTaxonomy(spec) &&
+        normalized.directory_visible !== false &&
+        ["", "y", "yes", "true", "newpt", "open", "accepting"].includes(panelVal)
+      ) {
+        counts.hospital_based_accepting_new_patients =
+          (counts.hospital_based_accepting_new_patients ?? 0) + 1;
+        findings.push({
+          code: "hospital_based_accepting_new_patients",
+          layer: "domain_signal",
+          locator,
+          message: `Hospital-based specialty (${spec}) marked visible/accepting new patients; verify outpatient scheduling.`,
+          severity: "warning",
+        });
+      }
+      const pracSt = String(normalized.state ?? raw.state ?? "").trim().toUpperCase();
+      const licSt = String(normalized.license_state ?? raw.license_state ?? "").trim().toUpperCase();
+      if (pracSt && licSt && pracSt !== licSt) {
+        counts.license_state_mismatch_unverified_psv =
+          (counts.license_state_mismatch_unverified_psv ?? 0) + 1;
+        findings.push({
+          code: "license_state_mismatch_unverified_psv",
+          layer: "domain_signal",
+          locator,
+          message: `Self-reported license state (${licSt}) differs from practice state (${pracSt}); primary-source board verification required.`,
+          severity: "warning",
+        });
+      }
       hostRows.push({
         locator: `row:${idx + 2}`,
         original: raw,
@@ -1859,7 +1967,19 @@ export const demoClient = {
   },
 
   async phoneReviews(): Promise<PhoneReviewScope[]> {
-    return state.phoneScopes.map(phoneScopeView);
+    return state.phoneScopes.map((scope) => {
+      const view = phoneScopeView(scope);
+      const nums = Array.from(
+        new Set(view.options.filter((o) => o.selectable && o.number).map((o) => String(o.number)))
+      );
+      return {
+        ...view,
+        phone_conflict:
+          !view.sources_agree && nums.length >= 1
+            ? classifyPhoneConflict(nums[0], nums[1] ?? nums[0])
+            : null,
+      };
+    });
   },
 
   async decidePhone(params: {

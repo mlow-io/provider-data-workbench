@@ -220,7 +220,7 @@ TN_LISTINGS: list[dict[str, str]] = [
         "record_id": "CVMG-15",
         "npi": "1990001129",
         "provider_name": "Dr. Owen Reynolds, MD",
-        "specialty": "207X00000X · Orthopedic Surgery",
+        "specialty": "2085R0202X · Diagnostic Radiology",
         "location_id": "BRNT-PARK",
         "phone": "6155550112",
         "reference_phone": "6155550112",

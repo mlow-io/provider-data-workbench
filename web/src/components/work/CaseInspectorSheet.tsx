@@ -210,6 +210,15 @@ export function CaseInspectorSheet({
                 )}
               </>
             )}
+            {caseDetail?.regulatory_regime && (
+              <Badge
+                variant="outline"
+                className="font-normal"
+                title={caseDetail.regulatory_regime.sla_note}
+              >
+                {caseDetail.regulatory_regime.label}
+              </Badge>
+            )}
           </SheetDescription>
         </SheetHeader>
 
@@ -246,8 +255,86 @@ export function CaseInspectorSheet({
                       </div>
                     </div>
                   </div>
+                  {caseDetail.phone_conflict && (
+                    <div className="rounded-lg border bg-muted/40 p-2.5 text-xs">
+                      <div className="font-medium text-foreground">
+                        Phone Conflict Triage: {caseDetail.phone_conflict.label}
+                      </div>
+                      <p className="mt-0.5 text-muted-foreground">
+                        {caseDetail.phone_conflict.guidance}
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
+
+              {caseDetail.four_gate_evidence && (
+                <Card size="sm">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">4-Gate Provider Truth</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                      <div className="font-medium text-muted-foreground">1. Identity</div>
+                      <div className="mt-0.5 font-medium text-foreground">
+                        {caseDetail.four_gate_evidence.gate1_identity.label}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {caseDetail.four_gate_evidence.gate1_identity.source}
+                      </div>
+                    </div>
+                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                      <div className="font-medium text-muted-foreground">
+                        2. State Licensure [PSV]
+                      </div>
+                      <div
+                        className={
+                          caseDetail.four_gate_evidence.gate2_licensure.psv_required
+                            ? "mt-0.5 font-medium text-status-warning"
+                            : "mt-0.5 font-medium text-status-success"
+                        }
+                      >
+                        {caseDetail.four_gate_evidence.gate2_licensure.label}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {caseDetail.four_gate_evidence.gate2_licensure.psv_required
+                          ? "PSV Required"
+                          : "PSV Verified"}
+                      </div>
+                    </div>
+                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                      <div className="font-medium text-muted-foreground">
+                        3. Enrollment / LEIE
+                      </div>
+                      <div className="mt-0.5 font-medium text-foreground">
+                        {caseDetail.four_gate_evidence.gate3_enrollment.label}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {caseDetail.four_gate_evidence.gate3_enrollment.leie_clear
+                          ? "LEIE Clear"
+                          : "LEIE Alert"}
+                      </div>
+                    </div>
+                    <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
+                      <div className="font-medium text-muted-foreground">
+                        4. Directory / Panel
+                      </div>
+                      <div
+                        className={
+                          caseDetail.four_gate_evidence.gate4_directory.hospital_based_newpt_leak
+                            ? "mt-0.5 font-medium text-status-warning"
+                            : "mt-0.5 font-medium text-foreground"
+                        }
+                      >
+                        {caseDetail.four_gate_evidence.gate4_directory.label}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {caseDetail.four_gate_evidence.gate4_directory.note}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               <Tabs defaultValue="review">
                 <TabsList className="w-full">

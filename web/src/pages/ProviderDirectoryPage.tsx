@@ -94,6 +94,14 @@ export function ProviderDirectoryPage() {
           <div className="flex flex-col">
             <span className="font-medium text-foreground">{row.original.provider_name}</span>
             <span className="text-xs text-muted-foreground">{row.original.specialty}</span>
+            {row.original.hospital_based_newpt_risk && (
+              <Badge
+                variant="outline"
+                className="mt-1 w-fit border-transparent bg-status-warning-bg text-status-warning"
+              >
+                Hospital-Based newpt
+              </Badge>
+            )}
           </div>
         ),
       },
@@ -119,6 +127,16 @@ export function ProviderDirectoryPage() {
                 <ShieldAlert className="size-3" />
                 Invalid Checksum
               </Badge>
+            )}
+            {row.original.four_gate_evidence?.gate2_licensure.psv_required && (
+              row.original.four_gate_evidence.gate2_licensure.status ===
+              "out_of_state_license_only_unverified_psv" ? (
+                <span className="text-xs font-medium text-status-warning">
+                  Out-of-state license · PSV Required
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">PSV Required</span>
+              )
             )}
           </div>
         ),
@@ -167,6 +185,11 @@ export function ProviderDirectoryPage() {
             ) : (
               <span className="inline-flex items-center gap-1 text-xs text-status-warning">
                 <EyeOff className="size-3" /> Directory Suppressed
+              </span>
+            )}
+            {row.original.regulatory_regimes && row.original.regulatory_regimes.length > 0 && (
+              <span className="text-[11px] text-muted-foreground">
+                {row.original.regulatory_regimes.map((r) => r.label).join(" · ")}
               </span>
             )}
           </div>

@@ -45,6 +45,11 @@ describe("WorkQueuePage", () => {
     expect(screen.getByText("Submitted / Reference Value")).toBeInTheDocument();
     expect(screen.getByText("(615) 555-0101")).toBeInTheDocument();
     expect(screen.getByText("(615) 555-0142")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Phone Conflict Triage: Same Clinic Prefix \(NPA-NXX\)/i)
+    ).toBeInTheDocument();
+    expect(screen.getByText("4-Gate Provider Truth")).toBeInTheDocument();
+    expect(screen.getAllByText(/PSV Required/i).length).toBeGreaterThanOrEqual(1);
 
     fireEvent.change(screen.getByLabelText("Audit Rationale"), {
       target: { value: "Verified West End suite direct scheduling desk number." },

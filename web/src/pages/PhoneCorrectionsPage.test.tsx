@@ -25,6 +25,9 @@ describe("PhoneCorrectionsPage", () => {
     const scopeList = (await screen.findByText("Reviewed office scopes")).closest("[data-slot=card]") as HTMLElement;
     expect(within(scopeList).getByText("Sources disagree")).toBeInTheDocument();
     expect(within(scopeList).getByText("Sources agree")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Phone Conflict Triage · Same Clinic Prefix \(NPA-NXX\)/i)
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("radio", { name: /\(615\) 555-0139/ }));
     const record = screen.getByRole("button", { name: /Record phone decision/i });

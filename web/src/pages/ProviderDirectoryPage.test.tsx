@@ -23,6 +23,9 @@ describe("ProviderDirectoryPage", () => {
     expect(screen.getAllByText(/Dr\. Elena Morales, MD/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Luhn Valid").length).toBe(15);
     expect(screen.getAllByText("Directory Suppressed").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Hospital-Based newpt")).toBeInTheDocument();
+    expect(screen.getByText("Out-of-state license · PSV Required")).toBeInTheDocument();
+    expect(screen.getAllByText(/Medicaid \/ TennCare MCO/i).length).toBeGreaterThanOrEqual(1);
 
     const search = screen.getByLabelText("Search directory");
     fireEvent.change(search, { target: { value: "Morales" } });

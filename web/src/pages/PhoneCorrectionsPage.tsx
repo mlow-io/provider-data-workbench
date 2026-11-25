@@ -197,6 +197,13 @@ function ScopeDetail({ scope }: { scope: PhoneReviewScope }) {
           </Alert>
         )}
 
+        {!scope.sources_agree && scope.phone_conflict && (
+          <Alert>
+            <AlertTitle>Phone Conflict Triage · {scope.phone_conflict.label}</AlertTitle>
+            <AlertDescription>{scope.phone_conflict.guidance}</AlertDescription>
+          </Alert>
+        )}
+
         <section aria-labelledby="phone-step-compare" className="flex flex-col gap-3">
           <div id="phone-step-compare">
             <StepHeading step={1} title="Choose the office phone" done={Boolean(scope.decision)} />

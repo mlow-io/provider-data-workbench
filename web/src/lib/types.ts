@@ -16,6 +16,8 @@ export interface WorkbenchOverview {
   generated_at: string;
 }
 
+import type { FourGateEvidence, PhoneConflictInfo, RegulatoryRegimeInfo } from "./domainSignals";
+
 export interface DirectoryRecord {
   id: string;
   provider_name: string;
@@ -36,6 +38,10 @@ export interface DirectoryRecord {
   open_issues: number;
   primary_case_id: string | null;
   source: string;
+  regulatory_regimes?: RegulatoryRegimeInfo[];
+  hospital_based_newpt_risk?: boolean;
+  licensure_psv_status?: string;
+  four_gate_evidence?: FourGateEvidence;
 }
 
 export interface SchemaVariantSummary {
@@ -82,6 +88,10 @@ export interface WorkCaseSummary {
   npi?: string | null;
   location_code?: string | null;
   clinic_name?: string | null;
+  regulatory_regime?: RegulatoryRegimeInfo;
+  phone_conflict?: PhoneConflictInfo | null;
+  hospital_based_newpt_risk?: boolean;
+  four_gate_evidence?: FourGateEvidence;
 }
 
 export interface WorkEvent {
@@ -371,6 +381,7 @@ export interface PhoneReviewScope {
   inputs_fresh: boolean;
   status: string;
   sources_agree: boolean;
+  phone_conflict?: PhoneConflictInfo | null;
   options: PhoneSourceOption[];
   decision: {
     id: string;
