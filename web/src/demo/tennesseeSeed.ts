@@ -631,6 +631,7 @@ function buildInitialCases(): WorkCaseDetail[] {
         provider_id: "NPI:1990001012",
         receipt_id: "rcpt-v1",
         observation_id: "obs-cvmg-01",
+        retrieved_at: "2026-11-16T14:00:00+00:00",
         normalized: {
           record_id: "CVMG-01",
           npi: "1990001012",
@@ -1006,6 +1007,7 @@ function buildInitialCases(): WorkCaseDetail[] {
         provider_id: "NPI:1990001038",
         receipt_id: "rcpt-v1",
         observation_id: "obs-cvmg-03",
+        retrieved_at: "2026-11-05T10:00:00+00:00",
         normalized: {
           record_id: "CVMG-03",
           npi: "1990001038",
@@ -1517,6 +1519,7 @@ export const demoClient = {
       total_providers: new Set(state.directory.map((d) => d.npi)).size,
       total_locations: new Set(state.directory.map((d) => d.location_code)).size,
       total_directory_listings: state.directory.length,
+      listings_without_open_issues: clean,
       clean_rate_pct: state.directory.length
         ? Math.round((1000 * clean) / state.directory.length) / 10
         : 100,
@@ -1593,7 +1596,13 @@ export const demoClient = {
       defer: "deferred",
       resolve: "resolved",
     };
-    const nextStatus = nextStatusMap[payload.action] ?? current.status;
+    const observed = payload.observed?.replace(/\D/g, "");
+    if (payload.action === "verify" && (current.status !== "pending_verification" ||
+      observed?.length !== 10 || !payload.verification_note?.trim())) {
+      throw new Error("Verification requires a submitted correction, an observed phone and a note.");
+    }
+    const mismatch = payload.action === "verify" && observed !== current.proposal?.replace(/\D/g, "");
+    const nextStatus = mismatch ? "reopened" : nextStatusMap[payload.action] ?? current.status;
     const nowIso = new Date().toISOString();
     const updated: WorkCaseDetail = {
       ...current,

@@ -107,6 +107,7 @@ def test_seeded_workbench_routes_expose_domain_signals(tmp_path):
     detail = detail_resp.json()
     assert detail["phone_conflict"]["category"] == "same_npa_nxx_clinic_pbx"
     assert detail["regulatory_regime"]["regime"]
+    assert detail["evidence"]["retrieved_at"]
     assert detail["four_gate_evidence"]["gate4_directory"]["address_confirmed"] is None
     assert detail["four_gate_evidence"]["gate3_enrollment"]["leie_clear"] is None
 

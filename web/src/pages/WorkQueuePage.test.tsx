@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { dataClient } from "@/lib/dataClient";
 import { WorkQueuePage } from "./WorkQueuePage";
 
 function renderWorkQueue() {
@@ -19,7 +20,7 @@ describe("WorkQueuePage", () => {
   it("displays KPI summary cards and Cumberland clinic discrepancy rows", async () => {
     renderWorkQueue();
 
-    expect(await screen.findByText("Directory Clean Rate")).toBeInTheDocument();
+    expect(await screen.findByText("Listings without open issues")).toBeInTheDocument();
     expect(screen.getByText("Open Discrepancies")).toBeInTheDocument();
     expect(screen.getByText("Held Deliveries")).toBeInTheDocument();
     expect(screen.getByText("NSA 2-Day SLA At-Risk")).toBeInTheDocument();
@@ -41,7 +42,7 @@ describe("WorkQueuePage", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Inspect Dr\. Elena Morales/i }));
 
-    expect(await screen.findByText(/Current Directory \(phone\)/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Directory at intake \(phone\)/i)).toBeInTheDocument();
     expect(screen.getByText("Submitted / Reference Value")).toBeInTheDocument();
     expect(screen.getByText("(615) 555-0101")).toBeInTheDocument();
     expect(screen.getByText("(615) 555-0142")).toBeInTheDocument();
@@ -61,4 +62,21 @@ describe("WorkQueuePage", () => {
       expect(screen.getByText(/Audit Timeline \(1\)/i)).toBeInTheDocument();
     });
   });
+  it("reopens a submitted phone correction when the later directory still shows the old phone", async () => {
+    window.history.replaceState(null, "", "/?demo=1");
+    const item = (await dataClient.workQueue()).find((row) => row.status === "pending_verification" && row.field_name === "phone")!;
+    const row = await dataClient.caseDetail(item.id);
+    const result = await dataClient.recordCaseEvent(item.id, {
+      action: "verify",
+      actor: "Demo Reviewer",
+      reason: "Checked the latest synthetic directory",
+      expected_version: row.version,
+      observed: row.listing_value!,
+      verification_note: "Original number still listed",
+    });
+    expect(result.status).toBe("reopened");
+    expect(result.proposal).toBe(row.proposal);
+    expect(result.history.at(-1)?.payload.observed).toBe(row.listing_value);
+  });
+
 });

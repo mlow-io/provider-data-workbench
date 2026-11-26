@@ -76,6 +76,20 @@ function compactDiff(row: WorkCaseSummary): string {
   return `${left} → ${right}`;
 }
 
+function nextAction(item: WorkCaseSummary): string {
+  switch (item.status) {
+    case "pending_verification": return "Check the payer directory";
+    case "approved": return "Send correction and log submission";
+    case "triaged": return item.kind === "correction" ? "Review proposed correction" : "Review QA disposition";
+    case "needs_information": return "Collect missing evidence";
+    case "reopened": return "Investigate the latest discrepancy";
+    case "deferred": return "Review when due";
+    case "verified":
+    case "resolved": return "Complete";
+    default: return item.field_name === "phone" ? "Check scheduling number" : "Review source discrepancy";
+  }
+}
+
 export function WorkQueuePage() {
   const queryClient = useQueryClient();
   const urlQuery = useWorkspaceQuery();
@@ -169,13 +183,14 @@ export function WorkQueuePage() {
       },
       {
         id: "discrepancy",
-        header: "Discrepancy & Diff",
+        header: "Discrepancy & next action",
         cell: ({ row }) => (
           <div className="flex max-w-xs flex-col gap-0.5 xl:max-w-sm">
             <span className="truncate font-medium text-foreground">{row.original.issue}</span>
             <span className="truncate font-mono text-xs text-muted-foreground">
               {compactDiff(row.original)}
             </span>
+            <span className="text-xs font-medium">{nextAction(row.original)}</span>
             {row.original.hospital_based_newpt_risk ? (
               <div className="mt-1 flex">
                 <Badge
@@ -274,15 +289,15 @@ export function WorkQueuePage() {
         <Card size="sm">
           <CardHeader className="pb-1">
             <CardDescription className="flex items-center justify-between">
-              <span>Directory Clean Rate</span>
+              <span>Listings without open issues</span>
               <CheckCircle2 className="size-4 text-status-success" />
             </CardDescription>
             <CardTitle className="text-2xl font-semibold tabular-nums">
-              {ov ? `${ov.clean_rate_pct}%` : <Skeleton className="h-7 w-16" />}
+              {ov ? (ov.total_directory_listings ? `${ov.clean_rate_pct}%` : "—") : <Skeleton className="h-7 w-16" />}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2 text-xs text-muted-foreground">
-            {ov && (
+            {ov && ov.total_directory_listings > 0 && (
               <div
                 className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
                 aria-hidden="true"
@@ -295,7 +310,7 @@ export function WorkQueuePage() {
             )}
             <span>
               {ov
-                ? `${ov.total_providers} clinicians across ${ov.total_locations} Middle TN clinics`
+                ? `${ov.listings_without_open_issues} of ${ov.total_directory_listings} directory listings`
                 : "Loading metrics…"}
             </span>
           </CardContent>

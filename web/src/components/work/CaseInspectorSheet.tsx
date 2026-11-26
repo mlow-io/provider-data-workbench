@@ -37,6 +37,7 @@ import {
   clinicDisplayName,
   formatDateTime,
   formatPhone,
+  formatShortDate,
   isValidNpi,
   statusLabel,
 } from "@/lib/format";
@@ -61,7 +62,7 @@ function allowedActionsFor(detail: WorkCaseDetail): Array<{ value: CaseActionInp
       options.push({ value: "approve", label: "Approve Correction Proposal" });
     }
     if (detail.status === "approved") {
-      options.push({ value: "submit", label: "Submit Update to Payer" });
+      options.push({ value: "submit", label: "Record Payer Submission" });
     }
     if (detail.status === "pending_verification") {
       options.push({ value: "verify", label: "Verify Observed Payer Directory" });
@@ -107,7 +108,7 @@ export function CaseInspectorSheet({
   const [submissionRef, setSubmissionRef] = useState("");
   const [verificationNote, setVerificationNote] = useState("");
   const [owner, setOwner] = useState("M. Brooks");
-  const [followUp, setFollowUp] = useState("2026-11-26");
+  const [followUp, setFollowUp] = useState("");
   const [outreachOutcome, setOutreachOutcome] = useState<
     "no_answer" | "message_left" | "response_received"
   >("response_received");
@@ -120,13 +121,13 @@ export function CaseInspectorSheet({
     const first = allowedActionsFor(caseDetail)[0]?.value ?? "outreach";
     setAction(first);
     setProposalPhone(caseDetail.reference_value ?? caseDetail.evidence.reference_value ?? "");
-    setObservedPhone(caseDetail.proposal ?? caseDetail.reference_value ?? "");
-    setSubmissionRef(`VOL-${caseDetail.location_code ?? "TN"}-2026`);
-    setVerificationNote("Confirmed in latest payer extract");
+    setObservedPhone("");
+    setSubmissionRef("");
+    setVerificationNote("");
     setReason("");
     setOutreachSummary("");
     setOwner(caseDetail.owner ?? "M. Brooks");
-    setFollowUp(caseDetail.follow_up ?? "2026-11-26");
+    setFollowUp(caseDetail.follow_up ?? "");
   }, [caseDetail?.id, caseDetail?.status, caseDetail?.version]);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -159,7 +160,7 @@ export function CaseInspectorSheet({
         payload.submission_reference = submissionRef;
       } else if (action === "verify") {
         payload.observed = observedPhone;
-        payload.verification_note = verificationNote || cleanReason;
+        payload.verification_note = verificationNote;
       } else if (action === "outreach") {
         payload.contact_at = new Date().toISOString();
         payload.method = "phone";
@@ -193,6 +194,13 @@ export function CaseInspectorSheet({
   const npiValid = isValidNpi(npiRaw);
   const listingVal = caseDetail?.listing_value ?? caseDetail?.evidence.listing_value ?? null;
   const referenceVal = caseDetail?.reference_value ?? caseDetail?.evidence.reference_value ?? null;
+
+  const events = [...(caseDetail?.history ?? [])].reverse();
+  const approved = events.find((event) => event.action === "approve");
+  const submitted = events.find((event) => event.action === "submit");
+  const checked = events.find((event) => event.action === "verify");
+  const captured = caseDetail?.evidence.retrieved_at;
+  const sourceLine = `${caseDetail?.evidence.source || "Source unavailable"} · ${captured ? `Captured ${formatShortDate(captured)}` : "Capture date unavailable"}`;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -251,11 +259,12 @@ export function CaseInspectorSheet({
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
                     <div className="rounded-lg border bg-status-danger-bg/60 p-3">
                       <div className="text-xs font-medium text-muted-foreground">
-                        Current Directory ({caseDetail.field_name})
+                        Directory at intake ({caseDetail.field_name})
                       </div>
                       <div className="mt-1 font-mono text-sm font-medium text-foreground">
                         {formatDiffValue(caseDetail.field_name, listingVal)}
                       </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{sourceLine}</p>
                     </div>
                     <ArrowRight className="hidden size-4 text-muted-foreground sm:block" />
                     <div className="rounded-lg border bg-status-success-bg/60 p-3">
@@ -265,9 +274,10 @@ export function CaseInspectorSheet({
                       <div className="mt-1 font-mono text-sm font-medium text-foreground">
                         {formatDiffValue(
                           caseDetail.field_name,
-                          caseDetail.proposal ?? referenceVal
+                          referenceVal
                         )}
                       </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{sourceLine}</p>
                     </div>
                   </div>
                   {caseDetail.phone_conflict && (
@@ -280,6 +290,37 @@ export function CaseInspectorSheet({
                   )}
                 </CardContent>
               </Card>
+
+              {caseDetail.kind === "correction" && caseDetail.field_name === "phone" && (
+                <Card size="sm">
+                  <CardHeader><CardTitle className="text-sm">Correction and follow-up</CardTitle></CardHeader>
+                  <CardContent>
+                    <dl className="grid gap-3 text-xs sm:grid-cols-2">
+                      <div>
+                        <dt className="text-muted-foreground">Approved correction</dt>
+                        <dd>{approved ? `${formatPhone(String(approved.payload.proposal ?? ""))} · ${formatShortDate(approved.occurred_at)}` : "Awaiting approval"}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Payer submission</dt>
+                        <dd>{submitted ? `${String(submitted.payload.submission_reference ?? "Reference unavailable")} · ${formatShortDate(submitted.occurred_at)}` : "Awaiting submission"}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Payer acknowledgment</dt>
+                        <dd>Unrecorded</dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">Latest recorded payer directory check</dt>
+                        <dd>{checked ? `${formatPhone(String(checked.payload.observed ?? ""))} · ${formatShortDate(checked.occurred_at)} · ${checked.to_status === "verified" ? "Matches correction" : "Discrepancy remains"}` : "Awaiting a directory check"}</dd>
+                        {checked && <dd className="text-muted-foreground">{String(checked.payload.verification_note ?? "")}</dd>}
+                      </div>
+                      <div className="border-t pt-2 sm:col-span-2">
+                        <dt className="text-muted-foreground">Follow-up</dt>
+                        <dd>{caseDetail.status === "verified" ? "Verified" : `${caseDetail.owner ?? "Unassigned"} · ${caseDetail.follow_up ? formatShortDate(caseDetail.follow_up) : "Date unscheduled"}`}</dd>
+                      </div>
+                    </dl>
+                  </CardContent>
+                </Card>
+              )}
 
               {caseDetail.four_gate_evidence && (
                 <Collapsible open={gateOpen} onOpenChange={setGateOpen}>
@@ -448,6 +489,7 @@ export function CaseInspectorSheet({
                           <FieldLabel htmlFor="submission-ref">Payer Submission Reference</FieldLabel>
                           <Input
                             id="submission-ref"
+                            required
                             value={submissionRef}
                             onChange={(e) => setSubmissionRef(e.target.value)}
                           />
@@ -460,6 +502,7 @@ export function CaseInspectorSheet({
                             <FieldLabel htmlFor="observed-phone">Observed Payer Directory Phone</FieldLabel>
                             <Input
                               id="observed-phone"
+                            required
                               value={observedPhone}
                               onChange={(e) => setObservedPhone(e.target.value)}
                             />
@@ -468,6 +511,7 @@ export function CaseInspectorSheet({
                             <FieldLabel htmlFor="verification-note">Verification Note</FieldLabel>
                             <Input
                               id="verification-note"
+                            required
                               value={verificationNote}
                               onChange={(e) => setVerificationNote(e.target.value)}
                             />

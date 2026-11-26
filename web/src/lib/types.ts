@@ -5,6 +5,7 @@ export interface WorkbenchOverview {
   total_locations: number;
   total_directory_listings: number;
   clean_rate_pct: number;
+  listings_without_open_issues: number;
   open_discrepancies: number;
   high_risk_discrepancies: number;
   held_deliveries: number;
@@ -111,6 +112,7 @@ export interface WorkEvent {
 export interface WorkCaseDetail extends WorkCaseSummary {
   evidence: {
     designation: string;
+    retrieved_at?: string;
     listing_value: string | null;
     reference_value: string | null;
     location_id: string | null;

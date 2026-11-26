@@ -801,6 +801,11 @@ class IntakeStore:
                 raise KeyError('Work case not found')
             case = dict(row)
             case['evidence'] = json.loads(case['evidence'])
+            observation = conn.execute(
+                'select retrieved_at from observation where id=?', (case['evidence'].get('observation_id'),)
+            ).fetchone()
+            if observation:
+                case['evidence']['retrieved_at'] = observation['retrieved_at']
             from .network_review import case_scope, review_evidence
             case['scope'] = case_scope(conn,case_id)
             from .follow_up import case_scopes

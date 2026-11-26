@@ -267,6 +267,7 @@ def build_overview(store, schema_catalog=None) -> dict[str, Any]:
         "total_locations": unique_locations,
         "total_directory_listings": total_records,
         "clean_rate_pct": clean_rate_pct,
+        "listings_without_open_issues": clean_records,
         "open_discrepancies": len(open_cases),
         "high_risk_discrepancies": len(high_risk),
         "held_deliveries": held_deliveries,
