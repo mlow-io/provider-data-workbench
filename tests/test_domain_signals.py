@@ -6,6 +6,7 @@ from provider_directory_truth_layer.domain_signals import (
     classify_phone_conflict,
     classify_regulatory_regimes,
     is_hospital_based_taxonomy,
+    is_accepting_panel,
 )
 
 
@@ -36,7 +37,7 @@ def test_four_gate_evidence_never_promotes_self_reported_licensure():
         license_state="TN",
         psv_status=None,
     )
-    assert unverified_match["gate1_identity"]["status"] == "active_npi"
+    assert unverified_match["gate1_identity"]["status"] == "checksum_valid"
     assert unverified_match["gate2_licensure"]["status"] == "self_reported_state_match_unverified_psv"
     assert unverified_match["gate2_licensure"]["psv_required"] is True
 
@@ -82,7 +83,15 @@ def test_seeded_workbench_routes_expose_domain_signals(tmp_path):
     first_dir = dir_items[0]
     assert first_dir["regulatory_regimes"]
     assert first_dir["four_gate_evidence"]["gate2_licensure"]["psv_required"] is True
-    assert first_dir["licensure_psv_status"] == "self_reported_state_match_unverified_psv"
+    assert first_dir["licensure_psv_status"] == "no_license_state_recorded_unverified_psv"
+    medicare_rows = [r for r in dir_items if "medicare" in " ".join(r["networks"]).lower()]
+    assert medicare_rows
+    assert any(row["verified_at"] is None for row in dir_items)
+    for row in medicare_rows:
+        evidence = row["four_gate_evidence"]
+        assert evidence["gate3_enrollment"]["status"] == "unverified"
+        assert evidence["gate3_enrollment"]["leie_clear"] is None
+        assert evidence["gate4_directory"]["address_confirmed"] is None
 
     work_resp = client.get("/api/workbench/work")
     assert work_resp.status_code == 200
@@ -98,8 +107,25 @@ def test_seeded_workbench_routes_expose_domain_signals(tmp_path):
     detail = detail_resp.json()
     assert detail["phone_conflict"]["category"] == "same_npa_nxx_clinic_pbx"
     assert detail["regulatory_regime"]["regime"]
+    assert detail["four_gate_evidence"]["gate4_directory"]["address_confirmed"] is None
+    assert detail["four_gate_evidence"]["gate3_enrollment"]["leie_clear"] is None
 
     phone_resp = client.get("/api/workbench/phone-reviews")
     assert phone_resp.status_code == 200
     disagreements = [s for s in phone_resp.json()["items"] if not s["sources_agree"]]
     assert any(s.get("phone_conflict") for s in disagreements)
+
+def test_evidence_requires_an_explicit_observation():
+    card = build_four_gate_evidence(npi=None, npi_luhn_valid=False)
+    assert card["gate1_identity"]["status"] == "unlinked"
+    assert card["gate3_enrollment"]["leie_clear"] is None
+    assert card["gate4_directory"]["address_confirmed"] is None
+    assert card["gate4_directory"]["accepting_new_patients"] is None
+    assert card["gate4_directory"]["label"] == "Address unchecked"
+    for token in (None, "", "unknown", "pending"):
+        assert is_accepting_panel(token) is None
+    assert is_accepting_panel("closed") is False
+    assert is_accepting_panel("newpt") is True
+    for status, expected in [("clear", True), ("alert", False), ("pending", None)]:
+        result = build_four_gate_evidence(npi=None, npi_luhn_valid=False, leie_status=status)
+        assert result["gate3_enrollment"]["leie_clear"] is expected

@@ -244,6 +244,7 @@ export function ProviderDirectoryPage() {
         id: "nsa",
         header: "NSA 90-Day",
         cell: ({ row }) => {
+          if (!row.original.verified_at) return <span>Verification date unknown</span>;
           const check = daysUntilNsaCheck(row.original.verified_at);
           return (
             <Badge

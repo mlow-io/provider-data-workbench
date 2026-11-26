@@ -27,6 +27,7 @@ import {
   classifyRegulatoryRegime,
   classifyRegulatoryRegimes,
   isHospitalBasedTaxonomy,
+  isAcceptingPanel,
 } from "../lib/domainSignals";
 
 export const SAMPLE_OPTIONS: IntakeSampleOption[] = [
@@ -486,6 +487,7 @@ function buildInitialDirectory(): DirectoryRecord[] {
     },
     {
       id: "1990001095:HEND-LAKE",
+      license_state: "KY",
       provider_name: "Naomi Foster, APRN",
       npi: "1990001095",
       npi_luhn_valid: true,
@@ -573,6 +575,7 @@ function buildInitialDirectory(): DirectoryRecord[] {
       provider_name: "Dr. Owen Reynolds, MD",
       npi: "1990001129",
       npi_luhn_valid: true,
+      panel_status: "newpt",
       specialty: "2085R0202X · Diagnostic Radiology",
       location_code: "BRNT-PARK",
       location_name: "Brentwood Maryland Farms",
@@ -1110,16 +1113,16 @@ function enrichDirectoryRow(row: DirectoryRecord): DirectoryRecord {
   ) {
     networks.push("TennCare Community Plan");
   }
-  const hbLeak = isHospitalBasedTaxonomy(row.specialty) && row.directory_visible;
-  const licenseState = row.npi === "1990001095" ? "KY" : row.state;
+  const accepting = isAcceptingPanel(row.panel_status);
+  const hbLeak = isHospitalBasedTaxonomy(row.specialty) && row.directory_visible && accepting === true;
+  const licenseState = row.license_state;
   const fourGate = buildFourGateEvidence({
     npi: row.npi,
     npiLuhnValid: row.npi_luhn_valid,
-    practiceState: row.state || "TN",
+    practiceState: row.state,
     licenseState,
     psvVerified: false,
-    pecosStatus: networks.some((n) => /medicare/i.test(n)) ? "pecos_ffs_enrolled" : "unverified",
-    addressConfirmed: row.open_issues === 0,
+    acceptingNewPatients: accepting,
     hospitalBasedNewptLeak: hbLeak,
   });
   return {
@@ -1143,19 +1146,17 @@ function enrichWorkCase(c: WorkCaseDetail, directory: DirectoryRecord[]): WorkCa
   const norm = (c.evidence?.normalized ?? {}) as Record<string, unknown>;
   const specialty = String(norm.specialty ?? matchingDir?.specialty ?? "");
   const visible = norm.directory_visible === undefined ? true : Boolean(norm.directory_visible);
-  const hbRisk = isHospitalBasedTaxonomy(specialty) && visible;
-  const practiceState = String(norm.state ?? matchingDir?.state ?? "TN");
-  const licenseState = String(norm.license_state ?? (c.npi === "1990001095" ? "KY" : practiceState));
+  const accepting = isAcceptingPanel(norm.panel_status ?? norm.accepting_new_patients ?? matchingDir?.panel_status);
+  const hbRisk = isHospitalBasedTaxonomy(specialty) && visible && accepting === true;
+  const practiceState = String(norm.state ?? matchingDir?.state ?? "");
+  const licenseState = String(norm.license_state ?? matchingDir?.license_state ?? "");
   const fourGate = buildFourGateEvidence({
     npi: c.npi,
     npiLuhnValid: Boolean(c.npi && isValidNpi(c.npi)),
     practiceState,
     licenseState,
     psvVerified: false,
-    pecosStatus: matchingDir?.networks.some((n) => /medicare/i.test(n))
-      ? "pecos_ffs_enrolled"
-      : "unverified",
-    addressConfirmed: c.field_name !== "address",
+    acceptingNewPatients: accepting,
     hospitalBasedNewptLeak: hbRisk,
   });
   return {
@@ -1845,7 +1846,7 @@ export const demoClient = {
       if (
         isHospitalBasedTaxonomy(spec) &&
         normalized.directory_visible !== false &&
-        ["", "y", "yes", "true", "newpt", "open", "accepting"].includes(panelVal)
+        isAcceptingPanel(panelVal) === true
       ) {
         counts.hospital_based_accepting_new_patients =
           (counts.hospital_based_accepting_new_patients ?? 0) + 1;

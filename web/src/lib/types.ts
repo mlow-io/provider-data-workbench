@@ -34,7 +34,9 @@ export interface DirectoryRecord {
   phone_extension: string | null;
   networks: string[];
   directory_visible: boolean;
-  verified_at: string;
+  verified_at: string | null;
+  license_state?: string;
+  panel_status?: string;
   open_issues: number;
   primary_case_id: string | null;
   source: string;

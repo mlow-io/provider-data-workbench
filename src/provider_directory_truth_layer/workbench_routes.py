@@ -18,6 +18,14 @@ from .managed_feed import ManagedFeed
 from .normalize import normalize_phone
 
 
+def _reported_panel(normalized: dict[str, Any], original: dict[str, Any]) -> bool | None:
+    for record in (normalized, original):
+        for key in ("panel_status", "accepting_new_patients"):
+            if record.get(key) is not None:
+                return is_accepting_panel(str(record[key]))
+    return None
+
+
 def is_valid_npi(value: str | None) -> bool:
     """Validate 10-digit NPI using CMS ISO 7812 Luhn check digit (80840 prefix)."""
     if not isinstance(value, str) or not re.fullmatch(r"\d{10}", value):
@@ -139,40 +147,30 @@ def build_directory_records(
         phone = normalize_phone(norm.get("phone") or orig.get("phone") or "")
         ext = norm.get("phone_extension") or orig.get("phone_extension") or None
         specialty = norm.get("specialty") or orig.get("specialty") or "General Practice"
-        panel_status = (
-            norm.get("panel_status")
-            or orig.get("panel_status")
-            or norm.get("accepting_new_patients")
-            or orig.get("accepting_new_patients")
-        )
+        panel_accepting = _reported_panel(norm, orig)
         hb_leak = bool(
             is_hospital_based_taxonomy(str(specialty))
             and raw_visible
-            and is_accepting_panel(str(panel_status) if panel_status is not None else None)
+            and panel_accepting is True
         )
         state_val = str(norm.get("state") or orig.get("state") or "")
-        lic_state = norm.get("license_state") or orig.get("license_state") or (state_val or None)
+        lic_state = norm.get("license_state") or orig.get("license_state")
         psv_status = norm.get("psv_status") or orig.get("psv_status")
         pecos_status = (
             norm.get("pecos_status")
             or orig.get("pecos_status")
-            or ("pecos_ffs_enrolled" if "medicare" in " ".join(networks_set).lower() else "unverified")
+            or "unverified"
         )
         regimes = classify_regulatory_regimes(sorted(networks_set), row["source"])
         four_gate = build_four_gate_evidence(
             npi=npi,
             npi_luhn_valid=is_valid_npi(npi),
-            practice_state=state_val or "TN",
+            practice_state=state_val,
             license_state=str(lic_state) if lic_state else None,
             psv_status=str(psv_status) if psv_status else None,
             pecos_status=str(pecos_status) if pecos_status else None,
+            accepting_new_patients=panel_accepting,
             hospital_based_newpt_leak=hb_leak,
-        )
-        verified_at = (
-            row["human_verified_at"]
-            or norm.get("source_updated_at")
-            or row["source_updated_at"]
-            or row["retrieved_at"]
         )
         case_ids = by_provider_loc.get(key, [])
         records[key] = {
@@ -191,7 +189,7 @@ def build_directory_records(
             "phone_extension": str(ext) if ext else None,
             "networks": sorted(networks_set),
             "directory_visible": bool(raw_visible),
-            "verified_at": str(verified_at),
+            "verified_at": row["human_verified_at"],
             "open_issues": len(case_ids),
             "primary_case_id": case_ids[0] if case_ids else None,
             "source": row["source"],
@@ -344,19 +342,14 @@ def _case_domain_signals(
     specialty = str(norm.get("specialty") or orig.get("specialty") or "")
     raw_visible = norm.get("directory_visible")
     visible = True if raw_visible is None else bool(raw_visible)
-    panel_status = (
-        norm.get("panel_status")
-        or orig.get("panel_status")
-        or norm.get("accepting_new_patients")
-        or orig.get("accepting_new_patients")
-    )
+    panel_accepting = _reported_panel(norm, orig)
     hb_risk = bool(
         is_hospital_based_taxonomy(specialty)
         and visible
-        and is_accepting_panel(str(panel_status) if panel_status is not None else None)
+        and panel_accepting is True
     )
-    practice_state = str(norm.get("state") or orig.get("state") or "TN")
-    license_state = norm.get("license_state") or orig.get("license_state") or practice_state
+    practice_state = str(norm.get("state") or orig.get("state") or "")
+    license_state = norm.get("license_state") or orig.get("license_state")
     four_gate = build_four_gate_evidence(
         npi=npi,
         npi_luhn_valid=bool(npi and is_valid_npi(npi)),
@@ -364,7 +357,7 @@ def _case_domain_signals(
         license_state=str(license_state) if license_state else None,
         psv_status=norm.get("psv_status") or orig.get("psv_status"),
         pecos_status=norm.get("pecos_status") or orig.get("pecos_status") or "unverified",
-        address_confirmed=item.get("field_name") != "address",
+        accepting_new_patients=panel_accepting,
         hospital_based_newpt_leak=hb_risk,
     )
     return {

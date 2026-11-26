@@ -187,6 +187,9 @@ export function CaseInspectorSheet({
   const npiRaw =
     caseDetail?.npi ??
     String(caseDetail?.evidence.normalized?.npi ?? "");
+  const leieClear = caseDetail?.four_gate_evidence?.gate3_enrollment.leie_clear;
+  const exclusionLabel = leieClear == null ? "LEIE unchecked" : leieClear ? "LEIE Clear" : "LEIE Alert";
+  const accepting = caseDetail?.four_gate_evidence?.gate4_directory.accepting_new_patients;
   const npiValid = isValidNpi(npiRaw);
   const listingVal = caseDetail?.listing_value ?? caseDetail?.evidence.listing_value ?? null;
   const referenceVal = caseDetail?.reference_value ?? caseDetail?.evidence.reference_value ?? null;
@@ -283,9 +286,9 @@ export function CaseInspectorSheet({
                   <Card size="sm">
                     <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-2">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <CardTitle className="text-sm font-medium">4-Gate Provider Truth</CardTitle>
+                        <CardTitle className="text-sm font-medium">Provider evidence</CardTitle>
                         <Badge variant="secondary" className="text-[11px] font-normal">
-                          {npiValid ? "Identity ✓" : "Identity !"}
+                          {caseDetail.four_gate_evidence.gate1_identity.label}
                         </Badge>
                         <Badge
                           variant="outline"
@@ -301,9 +304,7 @@ export function CaseInspectorSheet({
                             : "PSV Verified"}
                         </Badge>
                         <Badge variant="secondary" className="text-[11px] font-normal">
-                          {caseDetail.four_gate_evidence.gate3_enrollment.leie_clear
-                            ? "LEIE Clear"
-                            : "LEIE Alert"}
+                          {exclusionLabel}
                         </Badge>
                         {caseDetail.four_gate_evidence.gate4_directory.hospital_based_newpt_leak && (
                           <Badge
@@ -363,9 +364,7 @@ export function CaseInspectorSheet({
                             {caseDetail.four_gate_evidence.gate3_enrollment.label}
                           </div>
                           <div className="text-[11px] text-muted-foreground">
-                            {caseDetail.four_gate_evidence.gate3_enrollment.leie_clear
-                              ? "LEIE Clear"
-                              : "LEIE Alert"}
+                            {exclusionLabel}
                           </div>
                         </div>
                         <div className="rounded-md border bg-muted/30 p-2.5 text-xs">
@@ -383,7 +382,7 @@ export function CaseInspectorSheet({
                             {caseDetail.four_gate_evidence.gate4_directory.label}
                           </div>
                           <div className="text-[11px] text-muted-foreground">
-                            {caseDetail.four_gate_evidence.gate4_directory.note}
+                            {accepting == null ? "Panel status unknown" : accepting ? "Reported accepting new patients" : "Reported closed to new patients"}
                           </div>
                         </div>
                       </CardContent>

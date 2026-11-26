@@ -24,8 +24,8 @@ export interface PhoneConflictInfo {
 export interface FourGateEvidence {
   gate1_identity: { status: string; label: string; source: string };
   gate2_licensure: { status: string; label: string; psv_required: boolean; note: string };
-  gate3_enrollment: { status: string; leie_clear: boolean; label: string; note: string };
-  gate4_directory: { address_confirmed: boolean; hospital_based_newpt_leak: boolean; label: string; note: string };
+  gate3_enrollment: { status: string; leie_clear: boolean | null; label: string; note: string };
+  gate4_directory: { address_confirmed: boolean | null; accepting_new_patients: boolean | null; hospital_based_newpt_leak: boolean; label: string; note: string };
 }
 
 const HOSPITAL_BASED_PREFIXES = ["2085R", "207L", "207P", "207Z", "208M", "367500"];
@@ -141,7 +141,7 @@ export function classifyPhoneConflict(
     return {
       category: "same_npa_nxx_clinic_pbx",
       label: "Same Clinic Prefix (NPA-NXX)",
-      guidance: "First 6 digits match, indicating another DID/extension on the same clinic/hospital PBX.",
+      guidance: "First six digits match. Verify the scheduling destination for this office.",
     };
   }
   if (pa.slice(0, 3) === pb.slice(0, 3)) {
@@ -158,6 +158,13 @@ export function classifyPhoneConflict(
   };
 }
 
+export function isAcceptingPanel(value: unknown): boolean | null {
+  const token = String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+  if (["newpt", "accepting", "open", "true", "yes", "y", "accepting_new_patients", "accepting new patients"].includes(token)) return true;
+  if (["closed", "existptonly", "existing_only", "false", "no", "n", "not_accepting"].includes(token)) return false;
+  return null;
+}
+
 export function buildFourGateEvidence(params: {
   npi: string | null | undefined;
   npiLuhnValid: boolean;
@@ -167,16 +174,17 @@ export function buildFourGateEvidence(params: {
   pecosStatus?: "pecos_ffs_enrolled" | "order_referring_only" | "not_in_medicare_ffs" | "unverified";
   leieClear?: boolean;
   addressConfirmed?: boolean;
+  acceptingNewPatients?: boolean | null;
   hospitalBasedNewptLeak?: boolean;
   directoryNote?: string;
 }): FourGateEvidence {
-  const prac = (params.practiceState ?? "TN").trim().toUpperCase();
+  const prac = (params.practiceState ?? "").trim().toUpperCase();
   const lic = (params.licenseState ?? "").trim().toUpperCase();
   const psv = Boolean(params.psvVerified);
 
   const gate1 =
     params.npi && params.npiLuhnValid
-      ? { status: "active_npi", label: "Valid Luhn NPI", source: "CMS ISO 7812 / NPPES" }
+      ? { status: "checksum_valid", label: "Valid Luhn NPI", source: "CMS ISO 7812" }
       : {
           status: params.npi ? "invalid_checksum" : "unlinked",
           label: params.npi ? "Invalid NPI Checksum" : "Unlinked Identity",
@@ -198,6 +206,9 @@ export function buildFourGateEvidence(params: {
       psv_required: true,
       note: `Self-reported ${lic} license does not match ${prac} practice site; verify compact (eNLC) or active ${prac} board record.`,
     };
+  } else if (lic && !prac) {
+    gate2 = { status: "self_reported_state_unverified_psv", label: "Self-reported license state",
+      psv_required: true, note: "Practice state unavailable for comparison." };
   } else if (lic) {
     gate2 = {
       status: "self_reported_state_match_unverified_psv",
@@ -214,7 +225,7 @@ export function buildFourGateEvidence(params: {
     };
   }
 
-  const pStatus = params.pecosStatus ?? "pecos_ffs_enrolled";
+  const pStatus = params.pecosStatus ?? "unverified";
   const g3Map: Record<string, { label: string; note: string }> = {
     pecos_ffs_enrolled: {
       label: "PECOS FFS Enrolled",
@@ -230,35 +241,36 @@ export function buildFourGateEvidence(params: {
     },
     unverified: {
       label: "PECOS Unchecked",
-      note: "LEIE exclusion screen clear; Medicare PECOS enrollment requires reconciliation.",
+      note: "Medicare PECOS enrollment requires reconciliation.",
     },
   };
   const g3Info = g3Map[pStatus] ?? g3Map.unverified;
 
-  const addrOk = params.addressConfirmed ?? true;
+  const addrOk = params.addressConfirmed ?? null;
   const hbLeak = params.hospitalBasedNewptLeak ?? false;
   return {
     gate1_identity: gate1,
     gate2_licensure: gate2,
     gate3_enrollment: {
       status: pStatus,
-      leie_clear: params.leieClear ?? true,
+      leie_clear: params.leieClear ?? null,
       label: g3Info.label,
       note: g3Info.note,
     },
     gate4_directory: {
       address_confirmed: addrOk,
+      accepting_new_patients: params.acceptingNewPatients ?? null,
       hospital_based_newpt_leak: hbLeak,
       label: hbLeak
         ? "Hospital-Based Accepting New Patients"
-        : addrOk
-          ? "Confirmed Location & Panel"
+        : addrOk === null ? "Address unchecked" : addrOk
+          ? "Address confirmed"
           : "Address Unconfirmed vs NPD/NPPES",
       note:
         params.directoryNote ??
         (hbLeak
           ? "Hospital-based specialist marked accepting new patients; confirm direct outpatient scheduling."
-          : "Location and panel fields aligned with source assertions."),
+          : "Panel availability requires separate evidence."),
     },
   };
 }

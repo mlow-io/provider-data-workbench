@@ -48,7 +48,8 @@ describe("WorkQueuePage", () => {
     expect(
       screen.getByText(/Phone Conflict Triage: Same Clinic Prefix \(NPA-NXX\)/i)
     ).toBeInTheDocument();
-    expect(screen.getByText("4-Gate Provider Truth")).toBeInTheDocument();
+    expect(screen.getByText("LEIE unchecked")).toBeInTheDocument();
+    expect(screen.getByText("Provider evidence")).toBeInTheDocument();
     expect(screen.getAllByText(/PSV Required/i).length).toBeGreaterThanOrEqual(1);
 
     fireEvent.change(screen.getByLabelText("Audit Rationale"), {

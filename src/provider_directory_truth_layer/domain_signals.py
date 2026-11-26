@@ -34,6 +34,7 @@ HOSPITAL_BASED_KEYWORDS = (
     "crna",
     "nurse anesthetist",
 )
+SHARED_PREFIX_GUIDANCE = "First six digits match. Verify the scheduling destination for this office."
 TOLL_FREE_PREFIXES = {"800", "888", "877", "866", "855", "844", "833"}
 ACCEPTING_TOKENS = {"newpt", "accepting", "open", "true", "yes", "y", "accepting_new_patients", "accepting new patients"}
 
@@ -41,7 +42,7 @@ ACCEPTING_TOKENS = {"newpt", "accepting", "open", "true", "yes", "y", "accepting
 def is_hospital_based_taxonomy(specialty: str | None) -> bool:
     if _intake_hospital_based is not None:
         return bool(_intake_hospital_based(specialty))
-    if not specialty:
+    if not specialty or not specialty.strip():
         return False
     token = specialty.strip().split()[0].upper()
     if any(token.startswith(p) for p in HOSPITAL_BASED_PREFIXES):
@@ -50,13 +51,15 @@ def is_hospital_based_taxonomy(specialty: str | None) -> bool:
     return any(k in low for k in HOSPITAL_BASED_KEYWORDS)
 
 
-def is_accepting_panel(panel_status: str | None) -> bool:
-    if not panel_status:
-        return True  # Default directory-visible listing without explicit panel closed flag
-    tok = " ".join(str(panel_status).strip().lower().split())
-    if tok in {"closed", "existptonly", "existing_only", "false", "no", "n", "not_accepting"}:
+def is_accepting_panel(panel_status: str | None) -> bool | None:
+    if panel_status is None:
+        return None
+    token = " ".join(str(panel_status).strip().lower().split())
+    if token in ACCEPTING_TOKENS:
+        return True
+    if token in {"closed", "existptonly", "existing_only", "false", "no", "n", "not_accepting"}:
         return False
-    return tok in ACCEPTING_TOKENS or True
+    return None
 
 
 def classify_regulatory_regime(network_or_source: str | None) -> dict[str, str]:
@@ -117,7 +120,10 @@ def _digits10(value: str | None) -> str | None:
 
 def classify_phone_conflict(phone_a: str | None, phone_b: str | None) -> dict[str, str]:
     if _intake_phone_conflict is not None:
-        return dict(_intake_phone_conflict(phone_a, phone_b))
+        result = dict(_intake_phone_conflict(phone_a, phone_b))
+        if result["category"] == "same_npa_nxx_clinic_pbx":
+            result["guidance"] = SHARED_PREFIX_GUIDANCE
+        return result
     pa = _digits10(phone_a)
     pb = _digits10(phone_b)
     if not pa or not pb:
@@ -142,7 +148,7 @@ def classify_phone_conflict(phone_a: str | None, phone_b: str | None) -> dict[st
         return {
             "category": "same_npa_nxx_clinic_pbx",
             "label": "Same Clinic Prefix (NPA-NXX)",
-            "guidance": "First 6 digits match, indicating another DID/extension on the same clinic/hospital PBX rather than an unrelated address.",
+            "guidance": SHARED_PREFIX_GUIDANCE,
         }
     if pa[:3] == pb[:3]:
         return {
@@ -158,6 +164,9 @@ def classify_phone_conflict(phone_a: str | None, phone_b: str | None) -> dict[st
 
 
 def _assess_licensure(practice_state: str | None, license_state: str | None, psv_verified: bool = False) -> dict[str, Any]:
+    if license_state and not practice_state and not psv_verified:
+        return {"status": "self_reported_state_unverified_psv", "label": "Self-reported license state",
+                "psv_required": True, "note": "Practice state unavailable for comparison."}
     if _intake_licensure is not None:
         raw = _intake_licensure(practice_state, license_state, psv_verified=psv_verified)
         return {
@@ -205,17 +214,18 @@ def build_four_gate_evidence(
     license_state: str | None = None,
     psv_status: str | None = None,
     pecos_status: str | None = None,
-    leie_status: str | None = "clear",
-    address_confirmed: bool = True,
+    leie_status: str | None = None,
+    address_confirmed: bool | None = None,
+    accepting_new_patients: bool | None = None,
     hospital_based_newpt_leak: bool = False,
     claims_activity_note: str | None = None,
 ) -> dict[str, Any]:
     """Assemble the 4-Gate Provider Truth Card while strictly separating unverified gates."""
     gate1 = (
         {
-            "status": "active_npi",
+            "status": "checksum_valid",
             "label": "Valid Luhn NPI" if npi else "NPI Unlinked",
-            "source": "CMS ISO 7812 / NPPES",
+            "source": "CMS ISO 7812",
         }
         if (npi and npi_luhn_valid)
         else {
@@ -225,7 +235,7 @@ def build_four_gate_evidence(
         }
     )
 
-    psv_verified = bool(psv_status and str(psv_status).strip().lower() in {"active", "primary_source_verified", "psv_verified_active", "verified"})
+    psv_verified = bool(psv_status and str(psv_status).strip().lower() in {"primary_source_verified", "psv_verified_active"})
     gate2 = _assess_licensure(practice_state, license_state, psv_verified=psv_verified)
 
     pecos_norm = (pecos_status or "unverified").strip().lower()
@@ -235,32 +245,35 @@ def build_four_gate_evidence(
     elif pecos_norm in {"order_referring_only", "order_only"}:
         g3_status, g3_label = "order_referring_only", "Order & Referring Only"
         g3_note = "Order/Referring eligible (DME/HHA/Hospice) without full PECOS Part B billing enrollment."
-    elif pecos_norm in {"not_in_medicare_ffs", "medicaid_or_dental_only"}:
+    elif pecos_norm in {"not_in_medicare_ffs"}:
         g3_status, g3_label = "not_in_medicare_ffs", "Not in Medicare PECOS"
         g3_note = "Zero Medicare enrollment; verify whether Medicaid/pediatric/dental/OB-GYN scope explains absence."
     else:
         g3_status, g3_label = "unverified", "PECOS Unchecked (Manual Check)"
-        g3_note = "Exclusion screen clear; Medicare PECOS enrollment requires reconciliation."
+        g3_note = "Medicare PECOS enrollment requires reconciliation."
 
     gate3 = {
         "status": g3_status,
-        "leie_clear": (leie_status or "clear").lower() == "clear",
+        "leie_clear": {"clear": True, "alert": False}.get((leie_status or "").strip().lower()),
         "label": g3_label,
         "note": g3_note,
     }
 
     g4_parts = []
-    if not address_confirmed:
+    if address_confirmed is None:
+        g4_parts.append("Address unchecked")
+    elif not address_confirmed:
         g4_parts.append("Address unconfirmed in NPD/NPPES")
     if hospital_based_newpt_leak:
         g4_parts.append("Hospital-based specialty marked accepting new patients")
     if claims_activity_note:
         g4_parts.append(claims_activity_note)
     gate4 = {
-        "address_confirmed": bool(address_confirmed),
+        "address_confirmed": address_confirmed,
+        "accepting_new_patients": accepting_new_patients,
         "hospital_based_newpt_leak": bool(hospital_based_newpt_leak),
-        "label": "; ".join(g4_parts) if g4_parts else "Confirmed Location & Panel",
-        "note": claims_activity_note or ("Flagged for outpatient scheduling confirmation." if hospital_based_newpt_leak else "Directory location aligned with source assertions."),
+        "label": "; ".join(g4_parts) if g4_parts else "Address confirmed",
+        "note": claims_activity_note or ("Flagged for outpatient scheduling confirmation." if hospital_based_newpt_leak else "Panel availability requires separate evidence."),
     }
     return {
         "gate1_identity": gate1,
