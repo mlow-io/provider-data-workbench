@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, ChevronDown, Clock, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, Clock, Maximize2, Minimize2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { RiskBadge, StatusBadge } from "@/components/shared/StatusBadge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -41,6 +41,7 @@ import {
   isValidNpi,
   statusLabel,
 } from "@/lib/format";
+import { RequestRejected } from "@/lib/dataClient";
 import type { CaseActionInput, WorkCaseDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +50,7 @@ interface CaseInspectorSheetProps {
   caseDetail: WorkCaseDetail | null;
   loading: boolean;
   onOpenChange: (open: boolean) => void;
+  onRefresh: () => Promise<void>;
   onRecordEvent: (caseId: string, input: CaseActionInput) => Promise<void>;
 }
 
@@ -97,6 +99,7 @@ export function CaseInspectorSheet({
   caseDetail,
   loading,
   onOpenChange,
+  onRefresh,
   onRecordEvent,
 }: CaseInspectorSheetProps) {
   const actions = useMemo(() => (caseDetail ? allowedActionsFor(caseDetail) : []), [caseDetail]);
@@ -115,11 +118,16 @@ export function CaseInspectorSheet({
   const [outreachSummary, setOutreachSummary] = useState("");
   const [saving, setSaving] = useState(false);
   const [gateOpen, setGateOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     if (!caseDetail) return;
     const first = allowedActionsFor(caseDetail)[0]?.value ?? "outreach";
     setAction(first);
+    setActionError(null);
+    setStale(false);
     setProposalPhone(caseDetail.reference_value ?? caseDetail.evidence.reference_value ?? "");
     setObservedPhone("");
     setSubmissionRef("");
@@ -144,6 +152,7 @@ export function CaseInspectorSheet({
             ? "Reviewed and resolved against source evidence"
             : "Recorded workflow decision");
     setSaving(true);
+    setActionError(null);
     try {
       const payload: CaseActionInput = {
         action,
@@ -179,7 +188,11 @@ export function CaseInspectorSheet({
         description: `${caseDetail.provider_name} updated via ${action}.`,
       });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not record action");
+      const conflict = err instanceof RequestRejected && err.status === 409;
+      const message = conflict ? "This case may have changed or the action is no longer available. Refresh the case and review the latest evidence before recording your decision." : err instanceof Error ? err.message : "Could not record action";
+      setStale(conflict);
+      setActionError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -206,7 +219,7 @@ export function CaseInspectorSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex h-dvh max-h-dvh flex-col gap-0 overflow-hidden p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-xl"
+        className={cn("flex h-dvh max-h-dvh flex-col gap-0 overflow-hidden p-0 data-[side=right]:w-full", focused ? "data-[side=right]:sm:max-w-6xl" : "data-[side=right]:sm:max-w-xl")}
       >
         <SheetHeader className="shrink-0 border-b px-6 py-4">
           <div className="flex flex-wrap items-center gap-2 pr-6">
@@ -243,13 +256,21 @@ export function CaseInspectorSheet({
               </TooltipProvider>
             )}
           </SheetDescription>
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 pr-8">
+            {caseDetail && <p className="text-xs text-muted-foreground">Owner: {caseDetail.owner ?? "Unassigned"} · Follow-up: {caseDetail.follow_up ? formatShortDate(caseDetail.follow_up) : "Unscheduled"}</p>}
+            <Button variant="outline" size="sm" onClick={() => setFocused((value) => !value)}>
+              {focused ? <Minimize2 data-icon="inline-start" /> : <Maximize2 data-icon="inline-start" />}
+              {focused ? "Quick inspector" : "Open focused workspace"}
+            </Button>
+          </div>
         </SheetHeader>
 
         <ScrollArea className="min-h-0 flex-1">
           {loading || !caseDetail ? (
             <div className="p-6 text-sm text-muted-foreground">Loading discrepancy evidence…</div>
           ) : (
-            <div className="flex flex-col gap-5 p-6">
+            <div className={cn("case-workspace grid min-w-0 gap-4 p-4 sm:p-6", focused && "lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]")}>
+              <div className="flex min-w-0 flex-col gap-4">
               <Card size="sm">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium">{caseDetail.issue}</CardTitle>
@@ -261,17 +282,17 @@ export function CaseInspectorSheet({
                       <div className="text-xs font-medium text-muted-foreground">
                         Directory at intake ({caseDetail.field_name})
                       </div>
-                      <div className="mt-1 font-mono text-sm font-medium text-foreground">
+                      <div className="mt-1 break-words text-sm font-medium text-foreground">
                         {formatDiffValue(caseDetail.field_name, listingVal)}
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground">{sourceLine}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">Directory snapshot at intake · source date unavailable</p>
                     </div>
                     <ArrowRight className="hidden size-4 text-muted-foreground sm:block" />
-                    <div className="rounded-lg border bg-status-success-bg/60 p-3">
+                    <div className="rounded-lg border bg-accent/40 p-3">
                       <div className="text-xs font-medium text-muted-foreground">
                         Submitted / Reference Value
                       </div>
-                      <div className="mt-1 font-mono text-sm font-medium text-foreground">
+                      <div className="mt-1 break-words text-sm font-medium text-foreground">
                         {formatDiffValue(
                           caseDetail.field_name,
                           referenceVal
@@ -325,8 +346,8 @@ export function CaseInspectorSheet({
               {caseDetail.four_gate_evidence && (
                 <Collapsible open={gateOpen} onOpenChange={setGateOpen}>
                   <Card size="sm">
-                    <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-2">
-                      <div className="flex flex-wrap items-center gap-1.5">
+                    <CardHeader className="flex flex-row items-center justify-between gap-2 py-2.5">
+                      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
                         <CardTitle className="text-sm font-medium">Provider evidence</CardTitle>
                         <Badge variant="secondary" className="text-[11px] font-normal">
                           {caseDetail.four_gate_evidence.gate1_identity.label}
@@ -357,7 +378,7 @@ export function CaseInspectorSheet({
                         )}
                       </div>
                       <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="xs">
+                        <Button variant="ghost" size="xs" className="shrink-0">
                           <span>Details</span>
                           <ChevronDown
                             data-icon="inline-end"
@@ -432,15 +453,16 @@ export function CaseInspectorSheet({
                 </Collapsible>
               )}
 
-              <Tabs defaultValue="review">
-                <TabsList className="w-full">
-                  <TabsTrigger value="review" className="flex-1">
+              </div>
+              <Tabs defaultValue="review" className="min-w-0">
+                <TabsList className="h-auto min-h-8 w-full">
+                  <TabsTrigger value="review" className="min-w-0 flex-1 whitespace-normal text-center text-xs leading-tight">
                     Review & Decide
                   </TabsTrigger>
-                  <TabsTrigger value="timeline" className="flex-1">
+                  <TabsTrigger value="timeline" className="min-w-0 flex-1 whitespace-normal text-center text-xs leading-tight">
                     Audit Timeline ({caseDetail.history.length})
                   </TabsTrigger>
-                  <TabsTrigger value="evidence" className="flex-1">
+                  <TabsTrigger value="evidence" className="min-w-0 flex-1 whitespace-normal text-center text-xs leading-tight">
                     Source Evidence
                   </TabsTrigger>
                 </TabsList>
@@ -579,20 +601,10 @@ export function CaseInspectorSheet({
                         </>
                       )}
 
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <Field>
-                          <FieldLabel htmlFor="case-actor">Reviewer</FieldLabel>
-                          <Input
-                            id="case-actor"
-                            value={actor}
-                            onChange={(e) => setActor(e.target.value)}
-                          />
-                        </Field>
-                        <Field>
-                          <FieldLabel htmlFor="case-version-ro">Lock Version</FieldLabel>
-                          <Input id="case-version-ro" value={`v${caseDetail.version}`} disabled />
-                        </Field>
-                      </div>
+                      <Field>
+                        <FieldLabel htmlFor="case-actor">Reviewer</FieldLabel>
+                        <Input id="case-actor" value={actor} onChange={(e) => setActor(e.target.value)} />
+                      </Field>
 
                       <Field>
                         <FieldLabel htmlFor="case-reason">Audit Rationale</FieldLabel>
@@ -605,10 +617,28 @@ export function CaseInspectorSheet({
                         />
                       </Field>
 
-                      <Button type="submit" disabled={saving}>
+                      {actionError && (
+                        <Alert role="alert">
+                          <AlertTitle>Decision not recorded</AlertTitle>
+                          <AlertDescription>
+                            <p>{actionError}</p>
+                            {stale && <Button type="button" variant="outline" size="sm" className="mt-2" onClick={async () => {
+                              try {
+                                await onRefresh();
+                                setStale(false);
+                                setActionError(null);
+                              } catch {
+                                setActionError("Could not refresh the case. Try again before recording your decision.");
+                              }
+                            }}>Refresh case</Button>}
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                      <Button type="submit" disabled={saving || stale}>
                         <CheckCircle2 data-icon="inline-start" />
                         {saving ? "Recording Decision…" : "Record Decision"}
                       </Button>
+                      <p className="text-xs text-muted-foreground">Case revision {caseDetail.version}</p>
                     </FieldGroup>
                   </form>
                 </TabsContent>

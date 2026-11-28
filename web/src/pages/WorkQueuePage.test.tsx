@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { dataClient } from "@/lib/dataClient";
+import { describe, expect, it, vi } from "vitest";
+import { dataClient, RequestRejected } from "@/lib/dataClient";
 import { WorkQueuePage } from "./WorkQueuePage";
 
 function renderWorkQueue() {
@@ -56,11 +56,28 @@ describe("WorkQueuePage", () => {
     fireEvent.change(screen.getByLabelText("Audit Rationale"), {
       target: { value: "Verified West End suite direct scheduling desk number." },
     });
+    fireEvent.click(screen.getByRole("button", { name: "Open focused workspace" }));
+    expect(screen.getByLabelText("Audit Rationale")).toHaveValue("Verified West End suite direct scheduling desk number.");
+    expect(screen.getByRole("button", { name: "Quick inspector" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Record Decision/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/Audit Timeline \(1\)/i)).toBeInTheDocument();
     });
+  });
+  it("offers a refresh when a decision is rejected because the case changed", async () => {
+    const rejectDecision = vi.spyOn(dataClient, "recordCaseEvent").mockRejectedValueOnce(new RequestRejected("Stale version", 409));
+    try {
+      renderWorkQueue();
+      fireEvent.click(await screen.findByRole("button", { name: /Inspect Dr\. Elena Morales/i }));
+      fireEvent.click(await screen.findByRole("button", { name: /Record Decision/i }));
+      expect(await screen.findByText(/This case may have changed/)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Record Decision/i })).toBeDisabled();
+      fireEvent.click(screen.getByRole("button", { name: "Refresh case" }));
+      await waitFor(() => expect(screen.getByRole("button", { name: /Record Decision/i })).toBeEnabled());
+    } finally {
+      rejectDecision.mockRestore();
+    }
   });
   it("reopens a submitted phone correction when the later directory still shows the old phone", async () => {
     window.history.replaceState(null, "", "/?demo=1");

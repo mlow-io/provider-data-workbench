@@ -120,9 +120,11 @@ export function ProviderDirectoryPage() {
         id: "clinician",
         header: "Clinician & Taxonomy",
         cell: ({ row }) => (
-          <div className="flex flex-col">
+          <div className="flex max-w-[170px] flex-col">
             <span className="font-medium text-foreground">{row.original.provider_name}</span>
-            <span className="text-xs text-muted-foreground">{row.original.specialty}</span>
+            <span className="text-xs leading-snug text-muted-foreground whitespace-normal">
+              {row.original.specialty}
+            </span>
             {row.original.hospital_based_newpt_risk && (
               <Badge
                 variant="outline"
@@ -190,10 +192,15 @@ export function ProviderDirectoryPage() {
         id: "location",
         header: "Practice Location",
         cell: ({ row }) => (
-          <div className="flex flex-col">
-            <span className="font-medium text-foreground">{row.original.location_name}</span>
-            <span className="text-xs text-muted-foreground">
-              {row.original.address}, {row.original.city}, {row.original.state} {row.original.zip}
+          <div className="flex max-w-[180px] flex-col">
+            <span className="text-sm font-medium whitespace-normal text-foreground">
+              {row.original.location_name}
+            </span>
+            <span className="text-xs leading-snug whitespace-normal text-muted-foreground">
+              {row.original.address}
+            </span>
+            <span className="text-xs leading-snug whitespace-normal text-muted-foreground">
+              {row.original.city}, {row.original.state} {row.original.zip}
             </span>
           </div>
         ),
@@ -211,7 +218,7 @@ export function ProviderDirectoryPage() {
         id: "networks",
         header: "Networks & Visibility",
         cell: ({ row }) => (
-          <div className="flex flex-col gap-1">
+          <div className="flex max-w-[195px] flex-col gap-1">
             <div className="flex flex-wrap gap-1">
               {row.original.networks.length > 0 ? (
                 row.original.networks.map((net) => (
@@ -233,7 +240,7 @@ export function ProviderDirectoryPage() {
               </span>
             )}
             {row.original.regulatory_regimes && row.original.regulatory_regimes.length > 0 && (
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-[11px] leading-snug whitespace-normal text-muted-foreground">
                 {row.original.regulatory_regimes.map((r) => r.label).join(" · ")}
               </span>
             )}

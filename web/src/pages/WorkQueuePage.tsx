@@ -187,33 +187,31 @@ export function WorkQueuePage() {
         cell: ({ row }) => (
           <div className="flex max-w-xs flex-col gap-0.5 xl:max-w-sm">
             <span className="truncate font-medium text-foreground">{row.original.issue}</span>
-            <span className="truncate font-mono text-xs text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {compactDiff(row.original)}
             </span>
-            <span className="text-xs font-medium">{nextAction(row.original)}</span>
-            {row.original.hospital_based_newpt_risk ? (
-              <div className="mt-1 flex">
+            <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-medium text-primary">
+                Next: {nextAction(row.original)}
+              </span>
+              {row.original.hospital_based_newpt_risk ? (
                 <Badge
                   variant="outline"
                   className="border-transparent bg-status-warning-bg text-[11px] text-status-warning"
                 >
                   Hospital-Based newpt
                 </Badge>
-              </div>
-            ) : row.original.phone_conflict ? (
-              <div className="mt-1 flex">
+              ) : row.original.phone_conflict ? (
                 <Badge variant="outline" className="text-[11px] font-normal">
                   {row.original.phone_conflict.label}
                 </Badge>
-              </div>
-            ) : row.original.regulatory_regime &&
-              row.original.regulatory_regime.regime !== "unclassified_regime" ? (
-              <div className="mt-1 flex">
+              ) : row.original.regulatory_regime &&
+                row.original.regulatory_regime.regime !== "unclassified_regime" ? (
                 <Badge variant="secondary" className="text-[11px] font-normal">
                   {row.original.regulatory_regime.label}
                 </Badge>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         ),
       },
@@ -229,10 +227,11 @@ export function WorkQueuePage() {
       },
       {
         id: "sla",
-        header: "Updated",
+        header: "Owner & follow-up",
         cell: ({ row }) => (
           <div className="flex flex-col text-xs text-muted-foreground tabular-nums">
-            <span>{formatShortDate(row.original.updated_at)}</span>
+            <span>{row.original.owner ?? "Unassigned"}</span>
+            <span>Updated {formatShortDate(row.original.updated_at)}</span>
             {row.original.follow_up && (
               <span>Due {formatShortDate(row.original.follow_up)}</span>
             )}
@@ -274,7 +273,7 @@ export function WorkQueuePage() {
   const ov = overviewQuery.data;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Provider Discrepancy Work Queue
@@ -285,7 +284,7 @@ export function WorkQueuePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="queue-summary grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <Card size="sm">
           <CardHeader className="pb-1">
             <CardDescription className="flex items-center justify-between">
@@ -310,7 +309,7 @@ export function WorkQueuePage() {
             )}
             <span>
               {ov
-                ? `${ov.listings_without_open_issues} of ${ov.total_directory_listings} directory listings`
+                ? `${ov.listings_without_open_issues} of ${ov.total_directory_listings} directory listings · not a verification of accuracy`
                 : "Loading metrics…"}
             </span>
           </CardContent>
@@ -557,6 +556,7 @@ export function WorkQueuePage() {
         open={Boolean(selectedCaseId)}
         caseDetail={detailQuery.data ?? null}
         loading={detailQuery.isLoading}
+        onRefresh={async () => { await detailQuery.refetch({ throwOnError: true }); }}
         onOpenChange={closeSheet}
         onRecordEvent={handleRecordEvent}
       />

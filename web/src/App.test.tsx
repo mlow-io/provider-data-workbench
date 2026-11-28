@@ -30,7 +30,7 @@ describe("App shell navigation and demo controls", () => {
     expect(screen.queryByText(/Source Mapping/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Operations Hub/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Interactive Demo · Synthetic TN/i)).toBeInTheDocument();
-    expect(screen.getByText(/Static Demo Sandbox/i)).toBeInTheDocument();
+    expect(screen.getByText(/Synthetic demo workspace/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Reset Demo/i })).toBeInTheDocument();
   });
 

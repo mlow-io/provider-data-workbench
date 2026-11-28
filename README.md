@@ -10,6 +10,12 @@ Provider Data Workbench combines a deterministic Python/FastAPI/SQLite operation
 
 ![Work queue KPI strip and discrepancy table](docs/images/workbench-overview.png)
 
+## Local interface review
+
+The [UI specification](docs/UI_SPEC.md) defines the shared typography, cards, spacing and evidence/action layout. In the Work Queue, inspect a case and choose **Open focused workspace** to view evidence and the existing decision form side by side. Switching layouts preserves the draft; a stale decision requires refreshing the case before retrying.
+
+For a local synthetic preview, run `npm run dev --prefix web -- --host 127.0.0.1 --port 5181` and open `http://127.0.0.1:5181/?demo=1`. This mode stores demo state in the browser. API-backed mode uses the Python service described below. On a Mac with Google Chrome installed, browser checks can use `PDTL_BROWSER_CHANNEL=chrome npm run test:e2e --prefix web` without downloading another browser.
+
 ## Why it matters in healthcare operations
 
 - **Prevents silent ghost networks:** Recurring deliveries that omit an active office (such as Franklin Cool Springs Clinic in a partial EHR extract) are held automatically while the last approved directory version stays live for consumers.

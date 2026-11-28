@@ -170,9 +170,9 @@ function AppSidebar({
           <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
           <div className="flex flex-col gap-0.5">
             <span className="font-medium text-foreground">
-              {demoMode ? "Static Demo Sandbox" : "SQLite + Intake Engine"}
+              {demoMode ? "Synthetic demo workspace" : "Local review workspace"}
             </span>
-            <span>Synthetic TN data · Audit trail enabled</span>
+            <span>{demoMode ? "Synthetic TN data · Audit trail enabled" : "API-backed data · Audit trail enabled"}</span>
           </div>
         </div>
       </SidebarFooter>
@@ -214,7 +214,7 @@ export function AppShell({
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden sm:inline-flex">
-                    Cumberland Valley Ops
+                    Provider operations
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden sm:inline-flex" />
                   <BreadcrumbItem>
@@ -225,7 +225,7 @@ export function AppShell({
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="hidden sm:inline-flex">
-                {demoMode ? "Interactive Demo · Synthetic TN" : "Local Workspace · Live API"}
+                {demoMode ? "Interactive Demo · Synthetic TN" : "Local Workspace · API-backed"}
               </Badge>
               {demoMode && onResetDemo && (
                 <Button variant="outline" size="sm" onClick={onResetDemo}>

@@ -34,7 +34,7 @@ test.describe("Live SQLite & Intake Engine Workbench", () => {
     const errors = attachErrorListeners(page);
 
     await page.goto("/");
-    await expect(page.getByText("Directory Clean Rate")).toBeVisible();
+    await expect(page.getByText("Listings without open issues")).toBeVisible();
     await expect(page.getByText("Open Discrepancies")).toBeVisible();
     await expect(page.getByText("Held Deliveries")).toBeVisible();
     await expect(page.getByText("NSA 2-Day SLA At-Risk")).toBeVisible();
@@ -43,9 +43,14 @@ test.describe("Live SQLite & Intake Engine Workbench", () => {
 
     await page.getByRole("button", { name: /Inspect Dr\. Elena Morales/i }).click();
     const sheet = page.getByRole("dialog");
-    await expect(sheet.getByText(/Current Directory \(phone\)/i)).toBeVisible();
+    await expect(sheet.getByText(/Directory at intake \(phone\)/i)).toBeVisible();
     await expect(sheet.getByText("(615) 555-0101", { exact: true })).toBeVisible();
     await expect(sheet.getByText("(615) 555-0142", { exact: true })).toBeVisible();
+    await sheet.getByLabel("Audit Rationale").fill("Draft review preserved across layouts");
+    await sheet.getByRole("button", { name: "Open focused workspace" }).click();
+    await expect(sheet.getByLabel("Audit Rationale")).toHaveValue("Draft review preserved across layouts");
+    await expect(sheet.getByRole("button", { name: "Quick inspector" })).toBeVisible();
+    await assertNoHorizontalOverflow(page);
     await page.keyboard.press("Escape");
 
     await openSidebarView(page, "Import & Adapt");
